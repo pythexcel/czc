@@ -1,2 +1,15 @@
 backend/venv
+
+*.__pycache__/
+__pycache__/*
+/__pycache__
+__pycache__/
+
+**/migrations/**
+!**/migrations
+!**/migrations/__init__.py
+db.sqlite3
+.env
+backend/nohup.out
+
 frontend/node_modules
