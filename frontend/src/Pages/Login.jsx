@@ -29,18 +29,20 @@ function Login() {
           }
           return errors;
         }}
+        onSubmit={submitLogin}
       >
         {({
           values,
           // errors,
           // touched,
+          handleSubmit,
           handleChange,
           // isSubmitting,
         }) => (
-          <section className="text-gray-600 body-font pt-[10%]">
+          <section className="text-gray-600 body-font pt-4 sm:pt-[10%]">
             <div className="container px-5 mx-auto items-center flex flex-col">
-              <img src={logo} alt="brand" className="w-[450px] h-[150px]" />
-              <form onSubmit={submitLogin} className="w-[100%] md:w-[400px] bg-white rounded-lg p-8 flex flex-col md:ml-auto mt-10 mx-auto md:mt-0 shadow-md">
+              <img src={logo} alt="brand" className="sm:w-[450px] sm:h-[150px] w-[400px] h-[120px]" />
+              <form onSubmit={handleSubmit} className="w-[100%] md:w-[400px] bg-white rounded-lg p-6 flex flex-col md:ml-auto mt-5 sm:mt-10 mx-auto md:mt-0 shadow-md">
                 <h2 className="text-gray-700 text-3xl font-bold title-font mb-5 mx-auto"
                 >
                   Welcome back
@@ -95,21 +97,21 @@ function Login() {
                   </span>
                 </label>
 
-                <button type="submit" className="text-white bg-blue-500 border-0 py-2 mt-3 px-8 focus:outline-none hover:bg-blue-400 rounded-md text-lg">
+                <button type="submit" className="text-white bg-blue-500 border-0 py-2 mt-3 px-8 focus:outline-none hover:bg-blue-400 rounded-md text-md">
                   Sign in
                 </button>
-                <p className="text-sm font-medium text-gray-500 mt-5 mx-auto large-text">
+                <p className="text-md font-medium text-gray-500 mt-5 mx-auto large-text">
                   Don&rsquo;t have an account? <Link to="/signUp" className="text-green-500 font-semibold">Sign Up</Link>
                 </p>
-                <p className="text-sm font-medium text-gray-500 mt-3 mb-5 mx-auto">
+                <p className="text-md font-medium text-gray-500 mt-3 mb-5 mx-auto">
                   Forgot your password? Reset
                 </p>
               </form>
-              <p className="text-md font-medium text-gray-500 mt-5 sm:mt-10 mx-auto">
+              <p className="text-lg font-medium text-gray-500 mt-10 mx-auto">
                 Terms & Conditions
               </p>
-              <p className="text-md font-medium text-gray-500 mt-8 mx-auto flex flex-col sm:flex items-center">
-                <p className="flex"> Copyright <PiCopyrightThin className="mx-1" /> 2023</p> <p> ZappyChat</p>
+              <p className="text-md font-medium text-gray-500 mt-8 mx-auto flex sm:flex-row flex-col items-center">
+                <p className="flex items-center"> Copyright <PiCopyrightThin className="mx-1" /> 2023</p> <p> ZappyChat</p>
               </p>
             </div>
           </section>
