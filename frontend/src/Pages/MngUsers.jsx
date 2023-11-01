@@ -5,8 +5,8 @@ const MngUsers = () => {
     <>
       <div className="p-6">
         <div className="flex justify-between">
-          <h6 className="font-bold  text-[#344767] text-3xl">Agency Users</h6>
-          <button className="bg-[#0F45F5] flex py-4 px-4 rounded-lg">
+          <h6 className="font-bold  text-[#344767] text-2xl">Agency Users</h6>
+          <button className="bg-[#0F45F5] flex py-2 px-2 rounded-lg">
             <i className="text-slate-50 text-xl">
               <AiOutlinePlus />
             </i>
@@ -19,16 +19,16 @@ const MngUsers = () => {
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-blue-100 ">
-                <th className="py-4 text-xl text-[#8392AB]">USER REFERNCE</th>
-                <th className="py-4 text-xl px-4 text-[#8392AB]">
+                <th className="py-4 font-medium text-[#8392B3]">USER REFERNCE</th>
+                <th className="py-4 font-medium px-4 text-[#8392B3]">
                   EMAIL REFERNCE
                 </th>
-                <th className="py-4 text-xl px-4 text-[#8392AB]">ACTIONS</th>
+                <th className="py-4 font-medium px-4 text-[#8392B3]">ACTIONS</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className="py-4 px-4 text-2xl text-center" colSpan="3">
+                <td className="py-4 px-4 text-md text-center" colSpan="3">
                   No User found
                 </td>
               </tr>
