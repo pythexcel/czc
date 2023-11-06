@@ -14,5 +14,5 @@ __pycache__/
 db.sqlite3
 .env
 backend/nohup.out
-
+.vscode
 frontend/node_modules
