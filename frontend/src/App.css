@@ -1,44 +1,177 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+
+.copyicon {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.copyicon .copyicontext {
+  visibility: hidden;
+  width: fit-content;
+  background-color: #555;
+  color: #fff;
   text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  border-radius: 6px;
+  padding: 5px 10px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -30px;
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.copyicon .copyicontext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.copyicon:hover .copyicontext {
+  visibility: visible;
+  opacity: 1;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+
+
+
+
+.edit {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
 }
 
-.card {
-  padding: 2em;
+.edit .edittext {
+  visibility: hidden;
+  width: fit-content;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  border-radius: 6px;
+  padding: 5px 10px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -23px;
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
-.read-the-docs {
-  color: #888;
+.edit .edittext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
 }
 
+.edit:hover .edittext {
+  visibility: visible;
+  opacity: 1;
+}
+
+
+
+
+.delete {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.delete .deletetext {
+  visibility: hidden;
+  width: fit-content;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  border-radius: 6px;
+  padding: 5px 10px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -32px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.delete .deletetext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.delete:hover .deletetext {
+  visibility: visible;
+  opacity: 1;
+}
+
+
+
+
+
+
+.details {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.details .detailstext {
+  visibility: hidden;
+  width: max-content;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  border-radius: 6px;
+  padding: 5px 10px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -42px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.details .detailstext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.details:hover .detailstext {
+  visibility: visible;
+  opacity: 1;
+}
 

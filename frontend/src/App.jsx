@@ -13,6 +13,8 @@ import ResetPassword from "./Pages/ResetPassword";
 import PrivateRoute from "./Component/PrivateRoute";
 import CreateBot from "./Pages/CreateBot";
 import TermAndC from './Pages/TermAndC';
+import './App.css';
+
 
 function App() {
   return (
