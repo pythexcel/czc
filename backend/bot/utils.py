@@ -1,51 +1,32 @@
-from bot.serializers import (
-    TagTypeSerializer,
-    CustomFieldTypeSerializer,
-    TriggerWebhookSerializer,
-    HeaderSerializer,
+from bot.models import (
+     TagType,
+     CustomFieldType,
+     TriggerWebhook,
+     Header
+
 )
 
 
-def add_goals(request, id):
-    data = request.data
-    keys = data.keys()
-    if "tag_type" in keys:
-        tag_data = request.data["tag_type"]
-        serializer = TagTypeSerializer(data=tag_data)
-        tag_data["bot_id"] = id
-        if not serializer.is_valid():
-            message = serializer.errors
-            return message, False
-        serializer.save()
+def add_goals(validate_data, bot_instance):
+    tag_goal_list = validate_data['tag_type']
+    custom_goal_list = validate_data['custom_field_type']
+    trigger_webhook_goal_list = validate_data['trigger_webhook_type']
+    for tag_goal in tag_goal_list:
+        tag_goal["bot_id"] = bot_instance
+        TagType.objects.create(**tag_goal)
 
-    if "custom_field_type" in keys:
-        custom_field_data = request.data["custom_field_type"]
-        serializer = CustomFieldTypeSerializer(data=custom_field_data)
-        custom_field_data["bot_id"] = id
-        if not serializer.is_valid():
-            message = serializer.errors
-            return message, False
-        serializer.save()
+    for custom_goal in custom_goal_list:
+        custom_goal['bot_id'] = bot_instance
+        CustomFieldType.objects.create(**custom_goal)
 
-    if "trigger_webhook_type" in keys:
-        trigger_webhook_data = request.data["trigger_webhook_type"]
-        serializer = TriggerWebhookSerializer(data=trigger_webhook_data)
-        trigger_webhook_data["bot_id"] = id
-        if not serializer.is_valid():
-            message = serializer.errors
-            return message, False
-        webhook_id = serializer.save().id
+    for trigger_goal in trigger_webhook_goal_list:
+        trigger_goal["bot_id"] = bot_instance
+        header_data = trigger_goal['header_type']
+        trigger_goal.pop("header_type")
+        webhook_id = TriggerWebhook.objects.create(**trigger_goal)
+        for header in header_data:
+            header["triggerwebhook_id"] = webhook_id
+            Header.objects.create(**header)
 
-        if "header_type" in keys:
-            header_data = request.data["header_type"]
-            serializer = HeaderSerializer(data=header_data)
-            header_data["triggerwebhook_id"] = webhook_id
-
-            if not serializer.is_valid():
-                message = serializer.errors
-                return message, False
-            serializer.save()
-
-    message = "added successfully"
-
+    message = "register successfully"
     return message, True
