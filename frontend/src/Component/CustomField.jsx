@@ -70,7 +70,7 @@ function CustomField({ onDeleteClick, index }) {
             </div>
             <div className="flex justify-between items-center mx-4 w-[30%]">
                 <div className="border border-gray-400 px-2 py-2 rounded-md hover:bg-blue-600 hover:text-white shadow-lg h-[40px] float-bottom items-center">
-                    <RiDeleteBin6Line onClick={handleDelete} className="w-[25px] h-[25px] text-gray-600 my-auto hover:text-white" />
+                    <RiDeleteBin6Line onClick={handleDelete} className="w-[20px] h-[20px] text-gray-600 my-auto hover:text-white" />
                 </div>
                 <div className="">
                     <ToggleSwitch />

@@ -53,7 +53,10 @@ function Integrations() {
     const renderModals = <div>
         {openModal && <IntegrationModal onClose={handleCloseModal} />}
         {openUpdateModal && <UpdateModal onClose={handleCloseUpdateModal} />}
-        {success && <ToastSuccess onClose={handleCloseSuccess} />}
+        {success && <ToastSuccess
+            title="Success"
+            message="Selected agency updated successfully!"
+            onClose={handleCloseSuccess} />}
         {failed && <ToastFailed onClose={handleCloseFailed} />}
         {error && <ErrorPage onClose={handleCloseError} />}
     </div>

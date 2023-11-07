@@ -1,7 +1,7 @@
 
 function NormalText({children}) {
   return (
-    <p className="text-gray-400 font-normal text-md break-all">{children}</p>
+    <p className="text-gray-400 font-normal text-md">{children}</p>
   )
 }
 
