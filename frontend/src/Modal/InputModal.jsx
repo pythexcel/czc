@@ -8,8 +8,8 @@ import ModalShadow from '../Common-Component/ModalShadow';
 function InputModal({ onClose }) {
     return (
         <ModalShadow onClose={onClose}>
-            <div className="relative bg-white rounded-xl shadow-lg dark:bg-gray-700 mx-auto mt-[20%] w-[500px] z-50">
-                <div className="flex items-start bg-blue-600 justify-between p-4 rounded-t-xl ">
+            <div className="SlideModal relative bg-white rounded-xl shadow-lg dark:bg-gray-700 mx-auto mt-[20%] w-[500px] z-50">
+                <div className="flex items-start bg-[#0F45F5] justify-between p-4 rounded-t-xl ">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                         Add Users
                     </h3>
