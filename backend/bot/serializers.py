@@ -31,6 +31,7 @@ class CreateBotSerializer(serializers.Serializer):
         tag_field_serializer.is_valid(raise_exception=True)
 
         webhook_field_data = attrs['trigger_webhook_type']
+        print("wwwwwwwww",webhook_field_data)
         webhook_field_serializer = TriggerWebhookSerializer(
             data=webhook_field_data, many=True
         )
@@ -51,7 +52,7 @@ class BotModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = BotModel
         fields = "__all__"
-
+ 
 
 class HeaderSerializer(serializers.ModelSerializer):
     class Meta:
@@ -60,14 +61,11 @@ class HeaderSerializer(serializers.ModelSerializer):
 
 
 class TriggerWebhookSerializer(serializers.ModelSerializer):
+    header_type = HeaderSerializer(many=True)
 
     class Meta:
         model = TriggerWebhook
         fields = "__all__"
-
-    def validate(self, attrs):
-        header_type = HeaderSerializer(many=True)
-        return super().validate(attrs)
 
 
 class TagTypeSerializer(serializers.ModelSerializer):
