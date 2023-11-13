@@ -88,24 +88,22 @@ def update_bot_record(request,  validated_data, bot_instance):
     return message, True
 
 
-def delete_bot_data(bot_id, goal_name, goal_id):
+def delete_bot_data( goal_name, goal_id):
     try:
-        print("gggg",goal_id)
-        if goal_name is not None:
-            if goal_name == 'tag':
-                tag_goal_instance = TagType.objects.get(id=goal_id)
-                tag_goal_instance.delete()
-            if goal_name == 'custom':
-                custom_goal = CustomFieldType.objects.get(id=goal_id)
-                custom_goal.delete()
-            if goal_name =="webhook":
-                webhook_goal = TriggerWebhook.objects.get(id=goal_id)
-                webhook_goal.objects.delete()
-
-        bot_instance = BotModel.objects.get(id=bot_id)
-        bot_instance.delete()
-        message ="deleted successfully"
+        if goal_name == 'tag':
+            tag_goal_instance = TagType.objects.get(id=goal_id)
+            tag_goal_instance.delete()
+        elif goal_name == 'custom':
+            custom_goal = CustomFieldType.objects.get(id=goal_id)
+            custom_goal.delete()
+        elif goal_name == "webhook":
+            webhook_goal = TriggerWebhook.objects.get(id=goal_id)
+            webhook_goal.objects.delete()
+        elif goal_name == "bot":
+            bot_instance = BotModel.objects.get(id=goal_id)
+            bot_instance.delete()
+        message = "deleted successfully"
         return message, True
     except Exception as e:
-        print("your error is",e)
+        print("your error is", e)
         return str(e), False

@@ -74,13 +74,14 @@ class CreateBotAPI(APIView):
 
     def delete(self, request, id):
         try:
-            goal_name = request.GET['goal_name']
-            goal_id = request.GET['goal_id']
+            value = id.split("=")
+            goal_name = value[0]
+            goal_id = value[1]
+            print(goal_name, goal_id)
+            message, response = delete_bot_data(goal_name, goal_id)
+            if response:
+                return Response({"message": message, "success":True}, status= status.HTTP_200_OK)
+            return Response({"success": False, "message": "invalid bot id"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            print("error is ", e)
-            goal_name = None
-            goal_id = None
-        message, response = delete_bot_data(id, goal_name, goal_id)
-        if response:
-            return Response({"message": message, "success":True}, status= status.HTTP_200_OK)
-        return Response({"success": False, "message": "invalid bot id"}, status=status.HTTP_400_BAD_REQUEST)
+            print("your error is ", e)
+            return Response({"success": False, "message": "invalid bot id"}, status=status.HTTP_400_BAD_REQUEST)
