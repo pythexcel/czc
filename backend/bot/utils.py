@@ -6,6 +6,16 @@ from bot.models import (
      BotModel
 
 )
+import openai
+
+
+def open_ai_is_valid(open_ai_key):
+    openai.api_key = open_ai_key
+    try:
+        openai.models.list()
+        return True
+    except openai.APIError:
+        return False
 
 
 def add_goals(validate_data, bot_instance):
@@ -34,7 +44,7 @@ def add_goals(validate_data, bot_instance):
 
 
 def get_bot_data(user_id):
-    data = list(BotModel.objects.filter(user_id=user_id).values("bot_name", "bot_description", "prompt_type", "prompt", "ai_type","open_ai_api_key", "gpt_model_one", "calender_type"))
+    data = list(BotModel.objects.filter(user_id=user_id).values("bot_name", "bot_description", "prompt_type", "prompt", "ai_type","open_ai_api_key", "gpt_model"))
     return data
 
 
@@ -76,3 +86,26 @@ def update_bot_record(request,  validated_data, bot_instance):
             )
     message = "updated successfully"
     return message, True
+
+
+def delete_bot_data(bot_id, goal_name, goal_id):
+    try:
+        print("gggg",goal_id)
+        if goal_name is not None:
+            if goal_name == 'tag':
+                tag_goal_instance = TagType.objects.get(id=goal_id)
+                tag_goal_instance.delete()
+            if goal_name == 'custom':
+                custom_goal = CustomFieldType.objects.get(id=goal_id)
+                custom_goal.delete()
+            if goal_name =="webhook":
+                webhook_goal = TriggerWebhook.objects.get(id=goal_id)
+                webhook_goal.objects.delete()
+
+        bot_instance = BotModel.objects.get(id=bot_id)
+        bot_instance.delete()
+        message ="deleted successfully"
+        return message, True
+    except Exception as e:
+        print("your error is",e)
+        return str(e), False

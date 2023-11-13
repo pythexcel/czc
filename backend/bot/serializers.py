@@ -1,6 +1,10 @@
 from rest_framework import serializers
 
-from bot.models import BotModel, TriggerWebhook, Header, TagType, CustomFieldType
+from bot.models import (BotModel,
+                        TriggerWebhook,
+                        Header,
+                        TagType,
+                        CustomFieldType)
 
 
 class CreateBotSerializer(serializers.Serializer):
@@ -17,7 +21,6 @@ class CreateBotSerializer(serializers.Serializer):
             data=bot_data
         )
         bot_serializer.is_valid(raise_exception=True)
-
         custom_field_data = attrs["custom_field_type"]
         custom_field_serializer = CustomFieldTypeSerializer(
             data=custom_field_data, many=True
@@ -31,7 +34,6 @@ class CreateBotSerializer(serializers.Serializer):
         tag_field_serializer.is_valid(raise_exception=True)
 
         webhook_field_data = attrs['trigger_webhook_type']
-        print("wwwwwwwww",webhook_field_data)
         webhook_field_serializer = TriggerWebhookSerializer(
             data=webhook_field_data, many=True
         )
@@ -48,11 +50,10 @@ class CreateBotSerializer(serializers.Serializer):
 
 
 class BotModelSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = BotModel
         fields = "__all__"
- 
+
 
 class HeaderSerializer(serializers.ModelSerializer):
     class Meta:

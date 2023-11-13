@@ -1,5 +1,6 @@
 from django.db import models
 from users.models import User
+import uuid
 
 
 class BotModel(models.Model):
@@ -15,7 +16,8 @@ class BotModel(models.Model):
     TIME_ZONE_CHOICES = (("Contact", "Contact"), ("Location", "Location"))
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    ai_type = models.CharField(max_length=100,choices=AI_TYPE_CHOICES)
+   # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    ai_type = models.CharField(max_length=100, choices=AI_TYPE_CHOICES)
     bot_name = models.CharField(max_length=100)
     bot_description = models.CharField(max_length=500, blank=True, null=True)
     prompt_type = models.CharField(max_length=20, choices=PROMPT_TYPE_CHOICES)
@@ -32,6 +34,7 @@ class BotModel(models.Model):
 
 
 class TagType(models.Model):
+   # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     bot_id = models.ForeignKey(BotModel, on_delete=models.CASCADE,
                                null=True,
                                related_name="tag_field")
@@ -42,6 +45,7 @@ class TagType(models.Model):
 
 
 class CustomFieldType(models.Model):
+  #  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     bot_id = models.ForeignKey(
         BotModel, on_delete=models.CASCADE,
         null=True,
@@ -56,6 +60,7 @@ class CustomFieldType(models.Model):
 
 
 class TriggerWebhook(models.Model):
+   # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     TRIGGER_TYPE_CHOICES = (
         ("Once only", "Once only"),
         ("Multiple Times", "Multiple Times"),
@@ -81,6 +86,7 @@ class TriggerWebhook(models.Model):
 
 
 class Header(models.Model):
+    #id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     triggerwebhook_id = models.ForeignKey(TriggerWebhook, on_delete=models.CASCADE, null=True)
     headers = models.CharField(max_length=100)
     value_of_header = models.CharField(max_length=100, blank=True, null=True)
