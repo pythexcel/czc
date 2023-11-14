@@ -14,6 +14,7 @@ class CreateBotSerializer(serializers.Serializer):
     trigger_webhook_type = serializers.ListField()
 
     def validate(self, attrs):
+        print(attrs.keys())
         request = self.context["request"]
         bot_data = attrs["bot_type"]
         bot_data["user"] = request.user.id
