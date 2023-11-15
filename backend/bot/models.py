@@ -37,7 +37,7 @@ class TagType(models.Model):
    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     bot_id = models.ForeignKey(BotModel, on_delete=models.CASCADE,
                                null=True,
-                               verbose_name="bot_id")
+                               related_name="bot_tagtype")
     tag_name = models.CharField(
         max_length=100,
     )
@@ -61,7 +61,7 @@ class CustomFieldType(models.Model):
     bot_id = models.ForeignKey(
         BotModel, on_delete=models.CASCADE,
         null=True,
-        related_name="bot_custon_field"
+        related_name="bot_custom"
     )
     field_name = models.CharField(max_length=100)
     field_type = models.CharField(choices=FIELD_TYPE_CHOICES, max_length=50,)
@@ -76,7 +76,7 @@ class TriggerWebhook(models.Model):
         ("Multiple Times", "Multiple Times"),
     )
     REQUEST_METHOD_CHOICES = (("GET", "GET"), ("POST", "POST"))
-   
+
     bot_id = models.ForeignKey(
         BotModel, on_delete=models.CASCADE,
         null=True,
@@ -98,6 +98,9 @@ class TriggerWebhook(models.Model):
 
 class Header(models.Model):
     #id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    triggerwebhook_id = models.ForeignKey(TriggerWebhook, on_delete=models.CASCADE, null=True)
+    triggerwebhook_id = models.ForeignKey(TriggerWebhook,
+                                          on_delete=models.CASCADE,
+                                          null=True,
+                                          related_name="webhook_header")
     headers = models.CharField(max_length=100)
     value_of_header = models.CharField(max_length=100, blank=True, null=True)

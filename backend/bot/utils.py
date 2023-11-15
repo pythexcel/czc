@@ -18,32 +18,36 @@ def open_ai_is_valid(open_ai_key):
 
 
 def add_goals(validate_data, bot_instance):
-    tag_goal_list = validate_data['tag_type']
-    custom_goal_list = validate_data['custom_field_type']
-    trigger_webhook_goal_list = validate_data['trigger_webhook_type']
-    for tag_goal in tag_goal_list:
-        tag_goal["bot_id"] = bot_instance
-        TagType.objects.create(**tag_goal)
-
-    for custom_goal in custom_goal_list:
-        custom_goal['bot_id'] = bot_instance
-        CustomFieldType.objects.create(**custom_goal)
-
-    for trigger_goal in trigger_webhook_goal_list:
-        trigger_goal["bot_id"] = bot_instance
-        header_data = trigger_goal['header_type']
-        trigger_goal.pop("header_type")
-        webhook_id = TriggerWebhook.objects.create(**trigger_goal)
-        for header in header_data:
-            header["triggerwebhook_id"] = webhook_id
-            Header.objects.create(**header)
-
+    all_goal_list = validate_data.keys()
+    if "tag_type" in all_goal_list:
+        tag_goal_list = validate_data['tag_type']
+        for tag_goal in tag_goal_list:
+            tag_goal["bot_id"] = bot_instance
+            TagType.objects.create(**tag_goal)
+    if "custom_field_type" in all_goal_list:
+        custom_goal_list = validate_data['custom_field_type']
+        for custom_goal in custom_goal_list:
+            custom_goal['bot_id'] = bot_instance
+            CustomFieldType.objects.create(**custom_goal)
+    if "trigger_webhook_type" in all_goal_list:
+        trigger_webhook_goal_list = validate_data['trigger_webhook_type']
+        for trigger_goal in trigger_webhook_goal_list:
+            trigger_goal["bot_id"] = bot_instance
+            if "header_type" in trigger_goal.keys():
+                header_data = trigger_goal['header_type']
+                trigger_goal.pop("header_type")
+                webhook_id = TriggerWebhook.objects.create(**trigger_goal)
+                for header in header_data:
+                    header["triggerwebhook_id"] = webhook_id
+                    Header.objects.create(**header)
+            else:
+                TriggerWebhook.objects.create(**trigger_goal)
     message = "register successfully"
     return message, True
 
 
-def get_bot_data(user_id):
-    data = list(BotModel.objects.filter(user_id=user_id).values("bot_name", "bot_description", "prompt_type", "prompt", "ai_type","open_ai_api_key", "gpt_model"))
+def get_bot_data(bot_id, user_id):
+    data = list(BotModel.objects.filter(id=bot_id, user_id=user_id).values("bot_name", "bot_description", "prompt_type", "prompt", "ai_type","open_ai_api_key", "gpt_model"))
     return data
 
 
@@ -87,27 +91,6 @@ def update_bot_record(request,  validated_data, bot_instance):
     return message, True
 
 
-def delete_bot_data(goal_name, goal_id):
-    try:
-        if goal_name == 'tag_id':
-            tag_goal_instance = TagType.objects.get(id=goal_id)
-            tag_goal_instance.delete()
-        elif goal_name == 'custom_id':
-            custom_goal = CustomFieldType.objects.get(id=goal_id)
-            custom_goal.delete()
-        elif goal_name == "webhook_id":
-            webhook_goal = TriggerWebhook.objects.get(id=goal_id)
-            webhook_goal.objects.delete()
-        elif goal_name == "bot_id":
-            bot_instance = BotModel.objects.get(id=goal_id)
-            bot_instance.delete()
-        message = "deleted successfully"
-        return message, True
-    except Exception as e:
-        print("eee", e)
-        return str(e), False
-
-
 def clone_bot_data(bot_id, bot_name):
     try:
         bot_data = list(BotModel.objects.filter(id=bot_id).values())
@@ -129,9 +112,10 @@ def clone_bot_data(bot_id, bot_name):
 
         webhook_data = list(TriggerWebhook.objects.filter(bot_id=bot_id).values())
         for webhook_goal in webhook_data:
+            webhook_id = webhook_goal['id']
             webhook_goal.pop('id')
             webhook_goal['bot_id_id'] = bot_instance.id
-            header_data = list(Header.objects.filter(triggerwebhook_id=webhook_goal['id']).values())
+            header_data = list(Header.objects.filter(triggerwebhook_id=webhook_id).values())
             webhook_instance = TriggerWebhook.objects.create(**webhook_goal)
             for header_goal in header_data:
                 header_goal.pop('id')
@@ -143,6 +127,7 @@ def clone_bot_data(bot_id, bot_name):
     except IndexError:
         message = "invalid id"
         return message, False
-    except Exception:
+    except Exception as e:
+        print("errror", e)
         message = "bot_name must be unique"
         return message, False

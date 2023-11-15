@@ -1,8 +1,10 @@
 from bot.serializers import (
-     CreateBotSerializer
+     CreateBotSerializer,
+     DeleteBotSerializer
 )
 from bot.models import (
-    BotModel
+    BotModel,
+    Header
     )
 from rest_framework.response import Response
 from rest_framework.views import APIView, status
@@ -11,7 +13,6 @@ from bot.utils import (add_goals,
                        get_bot_data,
                        update_bot_record,
                        open_ai_is_valid,
-                       delete_bot_data,
                        clone_bot_data)
 
 
@@ -44,9 +45,9 @@ class CreateBotAPI(APIView):
 
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
+    def get(self, request, id):
         user_id = request.user.id
-        data = get_bot_data(user_id)
+        data = get_bot_data(id, user_id)
         return Response({"details": data, "success": True}, status=status.HTTP_200_OK)
 
     permission_classes = [IsAuthenticated]
@@ -82,17 +83,35 @@ class CreateBotAPI(APIView):
 
     permission_classes = [IsAuthenticated]
 
-    def delete(self, request, id):
+    def delete(self, request):
         try:
-            value = id.split("=")
-            goal_name = value[0]
-            goal_id = value[1]
-            message, response = delete_bot_data(goal_name, goal_id)
-            if response:
-                return Response({"message": message, "success": True}, status=status.HTTP_200_OK)
+            data = request.data
+            serializer = DeleteBotSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            bot_instance = BotModel.objects.get(
+                id=serializer.validated_data["bot_id"]
+            )
+            if serializer.validated_data["tag_type_ids"]:
+                bot_instance.bot_tagtype.all().filter(
+                    id__in=serializer.validated_data["tag_type_ids"]
+                ).delete()
+            if serializer.validated_data["custom_field_type_ids"]:
+                bot_instance.bot_custom.all().filter(
+                    id__in=serializer.validated_data["custom_field_type_ids"]
+                ).delete()
+
+            if serializer.validated_data['trigger_webhook_type_ids']:
+                bot_instance.bot_trigger.all().filter(
+                    id__in=serializer.validated_data["trigger_webhook_type_ids"]
+                ).delete()
+            if serializer.validated_data['header_type_ids']:
+                header_goal = Header.objects.filter(id__in=serializer.validated_data["header_type_ids"])
+                header_goal.delete()
+
+            return Response({"message": "deleted successfully", "success": True}, status=status.HTTP_200_OK)
+          
+        except BotModel.DoesNotExist:
             return Response({"success": False, "message": "invalid bot id"}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception:
-            return Response({"success": False, "message": "id is required"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CloneBotAPI(APIView):
