@@ -18,7 +18,7 @@ class BotModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     ai_type = models.CharField(max_length=100, choices=AI_TYPE_CHOICES)
-    bot_name = models.CharField(max_length=100)
+    bot_name = models.CharField(max_length=100, unique=True)
     bot_description = models.CharField(max_length=500, blank=True, null=True)
     prompt_type = models.CharField(max_length=20, choices=PROMPT_TYPE_CHOICES)
     prompt = models.CharField(max_length=100)
@@ -37,7 +37,7 @@ class TagType(models.Model):
    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     bot_id = models.ForeignKey(BotModel, on_delete=models.CASCADE,
                                null=True,
-                               related_name="tag_field")
+                               related_name="bot_tagtype")
     tag_name = models.CharField(
         max_length=100,
     )
@@ -46,15 +46,25 @@ class TagType(models.Model):
 
 class CustomFieldType(models.Model):
   #  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    FIELD_TYPE_CHOICES = (      
+                                ("Text", "Text"),
+                                ("Number", "Number"),
+                                ("Date", "Date"),
+                                ("Contact Full Name", "Contact Full Name"),
+                                ("Contact Date of Birth", "Contact Date of Birth"),
+                                ("Contact Email", "Contact Email"),
+                                ("Contact Address", "Contact Address"),
+                                ("Contact Timezone", "Contact Timezone"),
+                                ("Phone", "Phone"),
+                                ("Email", "Email"),
+                                ("Contact Business Name", "Contact Business Name"))
     bot_id = models.ForeignKey(
         BotModel, on_delete=models.CASCADE,
         null=True,
-        related_name="bot_custon_field"
+        related_name="bot_custom"
     )
     field_name = models.CharField(max_length=100)
-    field_type = models.CharField(
-        max_length=50,
-    )
+    field_type = models.CharField(choices=FIELD_TYPE_CHOICES, max_length=50,)
     field_description = models.TextField(blank=True, null=True)
     allow_overwrite = models.BooleanField(default=False)
 
@@ -62,10 +72,11 @@ class CustomFieldType(models.Model):
 class TriggerWebhook(models.Model):
    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     TRIGGER_TYPE_CHOICES = (
-        ("Once only", "Once only"),
+        ("Once Only", "Once Only"),
         ("Multiple Times", "Multiple Times"),
     )
     REQUEST_METHOD_CHOICES = (("GET", "GET"), ("POST", "POST"))
+
     bot_id = models.ForeignKey(
         BotModel, on_delete=models.CASCADE,
         null=True,
@@ -75,9 +86,9 @@ class TriggerWebhook(models.Model):
         max_length=100,
         null=True
     )
-    triggers = models.CharField(max_length=100)
+    triggers = models.CharField(choices=TRIGGER_TYPE_CHOICES, max_length=100)
     webhook_description = models.TextField(
-        choices=TRIGGER_TYPE_CHOICES, null=True, blank=True
+        null=True, blank=True
     )
     webhook_url = models.URLField(blank=True, null=True)
     webhook_request_method = models.CharField(
@@ -87,6 +98,9 @@ class TriggerWebhook(models.Model):
 
 class Header(models.Model):
     #id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    triggerwebhook_id = models.ForeignKey(TriggerWebhook, on_delete=models.CASCADE, null=True)
+    triggerwebhook_id = models.ForeignKey(TriggerWebhook,
+                                          on_delete=models.CASCADE,
+                                          null=True,
+                                          related_name="webhook_header")
     headers = models.CharField(max_length=100)
     value_of_header = models.CharField(max_length=100, blank=True, null=True)

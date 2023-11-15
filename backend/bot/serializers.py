@@ -9,9 +9,9 @@ from bot.models import (BotModel,
 
 class CreateBotSerializer(serializers.Serializer):
     bot_type = serializers.JSONField()
-    tag_type = serializers.ListField()
-    custom_field_type = serializers.ListField()
-    trigger_webhook_type = serializers.ListField()
+    tag_type = serializers.ListField(required=False)
+    custom_field_type = serializers.ListField(required=False)
+    trigger_webhook_type = serializers.ListField(required=False)
 
     def validate(self, attrs):
         request = self.context["request"]
@@ -21,23 +21,25 @@ class CreateBotSerializer(serializers.Serializer):
             data=bot_data
         )
         bot_serializer.is_valid(raise_exception=True)
-        custom_field_data = attrs["custom_field_type"]
-        custom_field_serializer = CustomFieldTypeSerializer(
-            data=custom_field_data, many=True
-        )
-        custom_field_serializer.is_valid(raise_exception=True)
-
-        tag_field_data = attrs["tag_type"]
-        tag_field_serializer = TagTypeSerializer(
-            data=tag_field_data, many=True
-        )
-        tag_field_serializer.is_valid(raise_exception=True)
-
-        webhook_field_data = attrs['trigger_webhook_type']
-        webhook_field_serializer = TriggerWebhookSerializer(
-            data=webhook_field_data, many=True
-        )
-        webhook_field_serializer.is_valid(raise_exception=True)
+        all_field_type = attrs.keys()
+        if "custom_field_type" in all_field_type:
+            custom_field_data = attrs["custom_field_type"]
+            custom_field_serializer = CustomFieldTypeSerializer(
+                data=custom_field_data, many=True
+            )
+            custom_field_serializer.is_valid(raise_exception=True)
+        if "tag_type" in all_field_type:
+            tag_field_data = attrs["tag_type"]
+            tag_field_serializer = TagTypeSerializer(
+                data=tag_field_data, many=True
+            )
+            tag_field_serializer.is_valid(raise_exception=True)
+        if "trigger_webhook_type" in all_field_type:
+            webhook_field_data = attrs['trigger_webhook_type']
+            webhook_field_serializer = TriggerWebhookSerializer(
+                data=webhook_field_data, many=True
+            )
+            webhook_field_serializer.is_valid(raise_exception=True)
         return super().validate(attrs)
 
     def create(self):
@@ -62,7 +64,7 @@ class HeaderSerializer(serializers.ModelSerializer):
 
 
 class TriggerWebhookSerializer(serializers.ModelSerializer):
-    header_type = HeaderSerializer(many=True)
+    header_type = HeaderSerializer(many=True, required=False)
 
     class Meta:
         model = TriggerWebhook
@@ -79,3 +81,11 @@ class CustomFieldTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomFieldType
         fields = "__all__"
+
+
+class DeleteBotSerializer(serializers.Serializer):
+    bot_id = serializers.IntegerField()
+    tag_type_ids = serializers.ListField(required=False)
+    custom_field_type_ids = serializers.ListField(required=False)
+    trigger_webhook_type_ids = serializers.ListField(required=False)
+    header_type_ids = serializers.ListField(required=False)
