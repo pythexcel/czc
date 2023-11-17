@@ -10,10 +10,8 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         added_by = self.context.get("added_by", None)
         if added_by:
-            validated_data['role'] = 'User'
             validated_data['added_by_id'] = added_by
         else:
             validated_data['role'] = 'Admin'
-            validated_data['added_by_id'] = None
         user = User.objects.create_user(**validated_data)
         return user
