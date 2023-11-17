@@ -13,5 +13,6 @@ class UserSerializer(serializers.ModelSerializer):
             validated_data['added_by_id'] = added_by
         else:
             validated_data['role'] = 'Admin'
+            validated_data['is_staff'] = True
         user = User.objects.create_user(**validated_data)
         return user

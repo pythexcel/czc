@@ -6,7 +6,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User
 from django.shortcuts import get_object_or_404
 from django.conf import settings
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.contrib.auth import logout
 import base64
 from django.core.mail import send_mail
@@ -135,7 +135,7 @@ class ResetPassword(APIView):
 
 
 class ManageUserAPI(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
     def post(self, request):
         try:
@@ -155,7 +155,7 @@ class ManageUserAPI(APIView):
                     "success": True,
                     "data": data
                 },
-                status=status.HTTP_201_CREATED
+                status=status.HTTP_200_OK
             )
         except Exception:
             return Response(
