@@ -132,3 +132,36 @@ class ResetPassword(APIView):
                 {"message": str(e) + " field is required", "success": False},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+
+class ManageUserAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            serializer = UserSerializer(
+                data=request.data,
+                context={"added_by": request.user.id}
+            )
+            serializer.is_valid(raise_exception=True)
+            user = serializer.save()
+            data = {
+                "id": user.reference,
+                "email": user.email
+            }
+            return Response(
+                {
+                    "Message": "User added with role 'User' and linked to the requester.",
+                    "success": True,
+                    "data": data
+                },
+                status=status.HTTP_201_CREATED
+            )
+        except Exception:
+            return Response(
+                {
+                    "message": serializer.errors,
+                    "success": False
+                 },
+                status=status.HTTP_400_BAD_REQUEST
+            )
