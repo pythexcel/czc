@@ -165,3 +165,15 @@ class ManageUserAPI(APIView):
                  },
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        user = User.objects.filter(added_by_id=request.user.id).values("reference", "email")
+        return Response(
+                {
+                    "message": user,
+                    "success": False
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
