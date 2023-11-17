@@ -1,29 +1,21 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = {
-    Tagname: "",
-    textArea:'',
-}
-
 const TagTypeSlice = createSlice({
-    name: 'Tagname',
-    initialState,
-    reducers: {
-        setTagname: (state, action) => {
-            console.log('statestate',state,action)
-            const {value,type}=action.payload;
-            switch(type){
-                case 'name':
-                   state.Tagname=value
-                   break;
-                case 'textarea':
-                    state.textArea=value
-                    break;    
-            }
-        }
+  name: 'tag',
+  initialState: {
+    childData: [],
+  },
+  reducers: {
+    updateChildData: (state, action) => {
+      const { index, tagname, description } = action.payload;
+      state.childData[index] = {
+        ...state.childData[index],
+        tagname: tagname !== undefined ? tagname : state.childData[index]?.tagname,
+        description,
+      };
     },
+  },
 });
 
-
-export const { setTagname } = TagTypeSlice.actions
-export default TagTypeSlice.reducer
+export const { updateChildData } = TagTypeSlice.actions;
+export default TagTypeSlice.reducer;

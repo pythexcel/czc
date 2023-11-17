@@ -1,39 +1,25 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = {
-    Triggergoalname: '',
-    TriggerselectTriggers: '',
-    TriggerwebhookUrl: '',
-    Triggerwebhookdesc: '',
-    TriggervalueOfheaders: ''
-}
-
 const triggerWebhookSlice = createSlice({
-    name: 'triggerWebhookSlice',
-    initialState,
-    reducers: {
-        setTriggerWebhookSlice: (state, action) => {
-            const { value, type } = action.payload;
-            switch (type) {
-                case 'goalname':
-                    state.Triggergoalname = value
-                    break;
-                case 'selectTriggers':
-                    state.TriggerselectTriggers = value
-                    break;
-                case 'webhookUrl':
-                    state.TriggerwebhookUrl = value
-                    break;
-                case 'webhookdesc':
-                    state.Triggerwebhookdesc = value
-                    break;
-                case 'valueOfheaders':
-                    state.TriggervalueOfheaders = value
-                    break;
-            }
-        }
-    }
-})
+  name: 'triggerWebhook',
+  initialState: {
+    triggerWebhookData: [],
+  },
+  reducers: {
+    setTriggerWebhookSlice: (state, action) => {
+      const { index, Triggergoalname, TriggerselectTriggers, TriggerwebhookUrl, Triggerwebhookdesc, TriggervalueOfheaders } = action.payload;
 
-export const { setTriggerWebhookSlice } = triggerWebhookSlice.actions
-export default triggerWebhookSlice.reducer
+      state.triggerWebhookData[index] = {
+        ...state.triggerWebhookData[index],
+        Triggergoalname: Triggergoalname !== undefined ? Triggergoalname : state.triggerWebhookData[index]?.Triggergoalname,
+        TriggerselectTriggers: TriggerselectTriggers !== undefined ? TriggerselectTriggers : state.triggerWebhookData[index]?.TriggerselectTriggers,
+        TriggerwebhookUrl: TriggerwebhookUrl !== undefined ? TriggerwebhookUrl : state.triggerWebhookData[index]?.TriggerwebhookUrl,
+        Triggerwebhookdesc: Triggerwebhookdesc !== undefined ? Triggerwebhookdesc : state.triggerWebhookData[index]?.Triggerwebhookdesc,
+        TriggervalueOfheaders: TriggervalueOfheaders !== undefined ? TriggervalueOfheaders : state.triggerWebhookData[index]?.TriggervalueOfheaders,
+      };
+    },
+  },
+});
+
+export const { setTriggerWebhookSlice } = triggerWebhookSlice.actions;
+export default triggerWebhookSlice.reducer;

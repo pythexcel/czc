@@ -1,9 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import InputModal from "../Modal/InputModal";
+import axiosInstance from "../utils/axios";
+import DeleteBox from "../Common-Component/DeleteBox";
+import EditBox from '../Common-Component/EditBox';
 
 const MngUsers = () => {
   const [openModal, setOpenModal] = useState(false);
+  const [userdata, setUserData] = useState([]);
+  console.log(userdata, "0000000000000ia mauser management data")
+
+  const getAllDetails = async () => {
+    try {
+      const resp = await axiosInstance.get("api/manage-user/")
+      setUserData(resp.response.data.message)
+
+    } catch (error) {
+      console.log(error, "i am error")
+    }
+  }
+
+  useEffect(() => {
+    getAllDetails()
+  }, [])
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -12,6 +31,10 @@ const MngUsers = () => {
   const handleCloseModal = () => {
     setOpenModal(false);
   }
+
+  const removeHyphens = (inputString) => {
+    return inputString.replace(/-/g, '');
+  };
 
   return (
     <div>
@@ -28,22 +51,25 @@ const MngUsers = () => {
           </button>
         </div>
         <div className="w-full mt-6 bg-slate-50 shadow-lg  bg-opacity-17 rounded-lg">
-          <table className="w-full border-collapse rounded-lg">
+          <table className="table-auto w-full text-left whitespace-no-wrap">
             <thead>
-              <tr className="bg-[#F3F5FE] ">
-                <th className="py-2 font-normal text-[#8392AB]">USER REFERNCE</th>
-                <th className="py-2 font-normal text-[#8392AB]">
-                  EMAIL REFERNCE
-                </th>
-                <th className="py-2 font-normal text-[#8392AB]">ACTIONS</th>
+              <tr>
+                <th className="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100 rounded-tl rounded-bl">USER REFERNCE</th>
+                <th className="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100">EMAIL REFERNCE</th>
+                <th className="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100">ASSIGNED LOCATION</th>
+                <th className="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100">ACTIONS</th>
+               
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td className="py-2  text-[#8392AB] bg-slate-50 text-lg text-center" colSpan="3">
-                  No User found
-                </td>
-              </tr>
+              {userdata.map((item, index) => (
+                <tr key={index}>
+                  <td className="px-4 py-2">{removeHyphens(item.reference)}</td>
+                  <td className="px-4 py-2">{item.email}</td>
+                  <td className="px-4 py-2">Location</td>
+                  <td className="px-4 py-2 text-lg text-gray-900 flex space-x-2"><EditBox /> <DeleteBox /></td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

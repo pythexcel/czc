@@ -1,32 +1,25 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = {
-    customfieldtag: "",
-    customfieldselector: '',
-    customfieldDesc:''
-}
-
 const customFieldSlice = createSlice({
-    name: 'customFieldSlice',
-    initialState,
+    name: 'custom',
+    initialState: {
+        customfieldData: [],
+    },
     reducers: {
         setCustomFieldSlice: (state, action) => {
-            const {value,type}=action.payload;
-            switch(type){
-                case 'customFieldTagname':
-                   state.customfieldtag=value
-                   break;
-                case 'customFieldType':
-                    state.customfieldselector=value
-                    break;
-                case 'customFieldDescription':
-                    state.customfieldDesc = value
-                    break;
-            }
-        }
+            const { index, customFieldTagname, customFieldType, customFieldDescription, allowCustomOverWright } = action.payload;
+
+            // Use spread operator to copy existing values
+            state.customfieldData[index] = {
+                ...state.customfieldData[index], // Copy existing values
+                customFieldTagname: customFieldTagname !== undefined ? customFieldTagname : state.customfieldData[index]?.customFieldTagname,
+                customFieldType: customFieldType !== undefined ? customFieldType : state.customfieldData[index]?.customFieldType,
+                customFieldDescription: customFieldDescription !== undefined ? customFieldDescription : state.customfieldData[index]?.customFieldDescription,
+                allowCustomOverWright: allowCustomOverWright !== undefined ? allowCustomOverWright : false, // Set to false by default
+            };
+        },
     },
 });
 
-
-export const { setCustomFieldSlice } = customFieldSlice.actions
-export default customFieldSlice.reducer
+export const { setCustomFieldSlice } = customFieldSlice.actions;
+export default customFieldSlice.reducer;

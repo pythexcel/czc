@@ -17,7 +17,7 @@ function ResetPassword() {
   const handleResetPassword = async (values) => {
     try {
       const response = await axiosInstance.post(
-        `reset-password?token=${istoken}`,
+        `api/reset-password?token=${istoken}`,
         {
           new_password: values.enter_password,
           confirm_password: values.password,

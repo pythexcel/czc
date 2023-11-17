@@ -1,7 +1,8 @@
 import axios from "axios";
 const axiosInstance = axios.create({
-  baseURL: "http://116.202.210.102:8002/api/",
+  baseURL: "http://116.202.210.102:8002/",
 });
+
 axiosInstance.interceptors.request.use(
   (req) => {
     const token = localStorage.getItem("auth_token");
@@ -14,6 +15,7 @@ axiosInstance.interceptors.request.use(
     return Promise.reject(e);
   }
 );
+
 axiosInstance.interceptors.response.use(
   (res) => {
     return res.data;

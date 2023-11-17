@@ -1,7 +1,7 @@
 import { CiCircleAlert } from 'react-icons/ci';
 import ModalShadow from '../Common-Component/ModalShadow';
 
-function IsDelete({ onClose }) {
+function IsDelete({ onClose, handleDeleteBot }) {
     return (
         <ModalShadow onClose={onClose}>
             <div className="relative bg-white rounded-2xl justify-center text-center items-center shadow-lg dark:white mx-auto mt-[40%] w-[530px] z-50 p-8">
@@ -17,7 +17,7 @@ function IsDelete({ onClose }) {
                     </button>
                     <button
                         className='bg-[#0F45F5] text-white px-6 py-2 rounded-lg font-semibold'
-                        onClick={onClose}
+                        onClick={handleDeleteBot}
                         type="button"
                         title="Close">
                         Yes, delete it!

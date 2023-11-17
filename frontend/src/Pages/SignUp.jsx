@@ -16,7 +16,7 @@ function SignUp() {
   const handleSignUp = async (e) => {
     e.preventDefault();
     try {
-      const response = await axiosInstance.post("signup/", {
+      const response = await axiosInstance.post("api/signup/", {
         email: email,
         password: password,
       });

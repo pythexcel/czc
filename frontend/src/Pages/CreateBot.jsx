@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HiOutlineChevronDown } from 'react-icons/hi';
 import ChevronDownIcon from "../Component/ChevronDownIcon";
 import CustomField from "../Component/CustomField";
@@ -9,9 +9,12 @@ import InputField from '../Component/TextInput';
 import Title from "../Component/Title";
 import TriggerWebhook from "../Component/TriggerWebhook";
 import { useFormik } from 'formik';
-import * as Yup from 'yup';
-import AlertTitle from '../Common-Component/AlertTitle';
 import { useSelector } from 'react-redux';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import axiosInstance from "../utils/axios";
+import 'react-toastify/dist/ReactToastify.css';
+import TextArea from "../Common-Component/TextArea";
+import Updatebutton from "../Common-Component/Updatebutton";
 
 const Intromessage = [
   "Text",
@@ -53,30 +56,34 @@ const OptAi = [
 
 
 function CreateBot() {
-  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const uniqueId = queryParams.get('id');
+
   const [headerValues, setHeaderValues] = useState({});
   const [nameValues, setNameValues] = useState({});
+  // const [headerData, setHeaderData] = useState([])
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [update, setUpdate] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+
 
   console.log(headerValues, nameValues, "this is values");
 
-  const Tagname = useSelector(state => state.tag.Tagname)
-  const textArea = useSelector(state => state.tag.textArea)
-  console.log(Tagname, textArea, "this is the data of Tag Type ")
+  const childData = useSelector((state) => state.tag.childData);
+  console.log(childData, "I am child component data")
 
-  const customfieldTagname = useSelector(state => state.customReducer.customfieldtag)
-  const customfieldDropdown = useSelector(state => state.customReducer.customfieldselector)
-  const customfieldDescription = useSelector(state => state.customReducer.customfieldDesc)
+  const customfieldata = useSelector((state) => state.customReducer.customfieldData);
+  console.log(customfieldata, "this is data of custom Fields")
 
-  console.log(customfieldTagname, customfieldDropdown, customfieldDescription, "this is data of custom Fields")
+  const triggerwebhookdata = useSelector((state) => state.TriggerWebhook.triggerWebhookData);
+  console.log(triggerwebhookdata, "triggerwebhookdata,,,,")
 
-  const GoalName = useSelector(state => state.TriggerWebhook.Triggergoalname)
-  const selectTrigger = useSelector(state => state.TriggerWebhook.TriggerselectTriggers)
-  const webhookurl = useSelector(state => state.TriggerWebhook.TriggerwebhookUrl)
-  const webhookdescription = useSelector(state => state.TriggerWebhook.Triggerwebhookdesc)
-  const valueOfheader = useSelector(state => state.TriggerWebhook.TriggervalueOfheaders)
-
-  console.log(GoalName, selectTrigger, webhookurl, webhookdescription, valueOfheader, "this is data of Trigger Webhook")
+  const headerdata = useSelector((state) => state.inputHeader.inputHeaderData);
+  console.log(headerdata)
 
   const [addtag, setAddTag] = useState([]);
   const [customfield, setCustomfield] = useState([]);
@@ -106,7 +113,6 @@ function CreateBot() {
     setTriggerWebhook(p => p.filter(addWebhookIndex => addWebhookIndex !== index))
   }
 
-
   const handleSelectChange = (event) => {
     const renderComponent = event.target.value;
     if (renderComponent === 'Tag Type') {
@@ -119,24 +125,118 @@ function CreateBot() {
   };
 
   const toggleIsOpen = () => {
-    setIsOpen(prevIsOpen => !prevIsOpen); // Toggle the value
+    setIsOpen(prevIsOpen => !prevIsOpen);
   };
 
   const foreignElements =
     <div>
       {Array.isArray(addtag) && addtag.map((index) => (
-        <TagType onDeleteClick={handleDeleteTage} index=
-          {index} key={index} />
+        <TagType
+          onDeleteClick={handleDeleteTage}
+          index={index}
+          key={index}
+        />
       ))}
 
       {Array.isArray(customfield) && customfield.map((index) => (
-        <CustomField onDeleteClick={handleDeleteCustomeField} index={index} key={index} />
+        <CustomField
+          onDeleteClick={handleDeleteCustomeField}
+          index={index}
+          key={index} />
       ))}
 
       {Array.isArray(triggerWebhook) && triggerWebhook.map((index) => (
-        <TriggerWebhook setHeaderValues={setHeaderValues} setNameValues={setNameValues} onDeleteWebhook={handleDeleteTriggerWebhook} index={index} key={index} />
+        <TriggerWebhook
+          setHeaderValues={setHeaderValues}
+          setNameValues={setNameValues}
+          onDeleteWebhook={handleDeleteTriggerWebhook}
+          index={index}
+          key={index}
+        />
       ))}
     </div>
+
+  const tag_type = childData.map((item, index) => ({
+    "tag_name": item.tagname,
+    "goal_description": item.description
+  }));
+
+  const customfields = customfieldata.map((item, index) => ({
+    "field_name": item.customFieldTagname,
+    "field_type": item.customFieldType,
+    "field_description": item.customFieldDescription,
+    "allow_overwrite": item.allowCustomOverWright
+  }));
+
+  const tiggerwebhook = triggerwebhookdata.map((item, index) => ({
+    "goal_name": item.Triggergoalname,
+    "triggers": item.TriggerselectTriggers,
+    "webhook_request_method": item.TriggervalueOfheaders,
+    "webhook_url": item.TriggerwebhookUrl,
+    "webhook_description": item.Triggerwebhookdesc
+  }))
+
+  const CreateAIBot = async (values) => {
+    setIsLoading(true)
+    try {
+      const createBot = await axiosInstance.post("bot", {
+        "bot_type": {
+          "ai_type": values.AiType,
+          "bot_name": values.Botname,
+          "bot_description": values.BotDescription,
+          "prompt_type": values.PromptType,
+          "prompt": values.Prompt,
+          "intro_message_type": values.IntroMessageType,
+          "intro_message": values.IntroMessage,
+          "converstation_limit": values.Conversation,
+          "time_zone_reference": values.TimeZoneReference,
+          "time_zone_format": values.TimeZoneFormat,
+          "time_format": values.TimeFormat,
+          "gpt_model": values.GPTmodel,
+          "open_ai_api_key": values.OpenAikey,
+          "message_delay": values.messageDelay
+        },
+        "tag_type": tag_type,
+        "custom_field_type": customfields,
+        "trigger_webhook_type": tiggerwebhook
+      })
+      navigate("/dashboard/bots")
+      console.log(createBot.response.data, ">>>>>>>>>>")
+    } catch (error) {
+      alert("i am error")
+    }
+  }
+
+  const handleSubmitForUpdate = async (values) => {
+    try {
+      const createBot = await axiosInstance.put(`bot/${uniqueId}`, {
+        "bot_type": {
+          "ai_type": values.AiType,
+          "bot_name": values.Botname,
+          "bot_description": values.BotDescription,
+          "prompt_type": values.PromptType,
+          "prompt": values.Prompt,
+          "intro_message_type": values.IntroMessageType,
+          "intro_message": values.IntroMessage,
+          "converstation_limit": values.Conversation,
+          "time_zone_reference": values.TimeZoneReference,
+          "time_zone_format": values.TimeZoneFormat,
+          "time_format": values.TimeFormat,
+          "gpt_model": values.GPTmodel,
+          "open_ai_api_key": values.OpenAikey,
+          "message_delay": values.messageDelay
+        },
+        "tag_type": tag_type,
+        "custom_field_type": customfields,
+        "trigger_webhook_type": tiggerwebhook
+      })
+      navigate("/dashboard/bots")
+      console.log(createBot.response.data, "udpate data as well")
+    } catch (error) {
+      // alert("i am error")
+      console.log(error,"i am error")
+    }
+  }
 
   const formik = useFormik({
     initialValues: {
@@ -155,24 +255,48 @@ function CreateBot() {
       GPTmodel: '',
       messageDelay: ''
     },
-    validationSchema: Yup.object({
-      AiType: Yup.string().required('Field is required'),
-      Botname: Yup.string().required('Field is required'),
-      PromptType: Yup.string().required('Field is required'),
-      Prompt: Yup.string().required('Field is required'),
-      IntroMessageType: Yup.string().required('Field is required'),
-      IntroMessage: Yup.string().required('Field is required'),
-      OpenAikey: Yup.string().required('Field is required'),
-      Conversation: Yup.string().required('Field is required'),
-      TimeZoneReference: Yup.string().required('Field is required'),
-      TimeZoneFormat: Yup.string().required('Field is required'),
-      TimeFormat: Yup.string().required('Field is required'),
-      GPTmodel: Yup.string().required('Field is required')
-    }),
-    onSubmit: (values) => {
+    onSubmit: async (values, { resetForm }) => {
       console.log(JSON.stringify(values, null, 2));
+      if (update) {
+        await handleSubmitForUpdate(values);
+      } else {
+        await CreateAIBot(values);
+      }
+      resetForm();
     },
   });
+
+  const getBotForUpdate = async (uniqueId) => {
+    try {
+      const resp = await axiosInstance.get(`bot/${uniqueId}`)
+      const data = resp.details[0];
+      formik.setValues({
+        AiType: data.ai_type,
+        Botname: data.bot_name,
+        BotDescription: data.bot_description,
+        PromptType: data.prompt_type,
+        Prompt: data.prompt,
+        IntroMessageType: data.intro_message_type,
+        IntroMessage: data.intro_message,
+        OpenAikey: data.open_ai_api_key,
+        Conversation: data.converstation_limit,
+        TimeZoneReference: data.time_zone_reference,
+        TimeZoneFormat: data.time_zone_format,
+        TimeFormat: data.time_format,
+        GPTmodel: data.gpt_model,
+        messageDelay: data.message_delay
+      })
+      console.log(resp.details[0], "i am ready for update ")
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    getBotForUpdate(uniqueId)
+    setUpdate(true)
+  }, [uniqueId])
+
 
   return (
     <div className="w-[100%] bg-white border border-gray-400 rounded-lg px-8 py-6 shadow-lg">
@@ -196,11 +320,6 @@ function CreateBot() {
               </DropDown>
               <ChevronDownIcon />
             </div>
-            {formik.touched.AiType && formik.errors.AiType ? (
-              <AlertTitle>{formik.errors.AiType}</AlertTitle>
-            ) : null}
-
-
           </div>
           <div className="w-[50%]">
             <Title>Bot Name</Title>
@@ -213,20 +332,17 @@ function CreateBot() {
               onBlur={formik.handleBlur}
               value={formik.values.Botname}
             />
-            {formik.touched.Botname && formik.errors.Botname ? (
-              <AlertTitle>{formik.errors.Botname}</AlertTitle>
-            ) : null}
           </div>
         </div>
         <div className="w-full my-4">
           <Title>Bot Description</Title>
-          <textarea
+          <TextArea
             id="BotDescription"
             name="BotDescription"
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             value={formik.values.BotDescription}
-            className=" bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 h-[100px] text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out w-full focus:shadow-lg" placeholder="Description"></textarea>
+          />
         </div>
         <div className="flex gap-6 my-4">
           <div className="w-[50%]">
@@ -246,9 +362,6 @@ function CreateBot() {
               </DropDown>
               <ChevronDownIcon />
             </div>
-            {formik.touched.PromptType && formik.errors.PromptType ? (
-              <AlertTitle>{formik.errors.PromptType}</AlertTitle>
-            ) : null}
           </div>
           <div className="w-[50%]">
             <Title>Prompt</Title>
@@ -261,9 +374,6 @@ function CreateBot() {
               onBlur={formik.handleBlur}
               value={formik.values.Prompt}
             />
-            {formik.touched.Prompt && formik.errors.Prompt ? (
-              <AlertTitle>{formik.errors.Prompt}</AlertTitle>
-            ) : null}
           </div>
         </div>
         <div className="flex gap-6 my-4">
@@ -283,9 +393,6 @@ function CreateBot() {
               </DropDown>
               <ChevronDownIcon />
             </div>
-            {formik.touched.IntroMessageType && formik.errors.IntroMessageType ? (
-              <AlertTitle>{formik.errors.IntroMessageType}</AlertTitle>
-            ) : null}
           </div>
           <div className="w-[50%]">
             <Title>Intro Message</Title>
@@ -298,9 +405,6 @@ function CreateBot() {
               onBlur={formik.handleBlur}
               value={formik.values.IntroMessage}
             />
-            {formik.touched.IntroMessage && formik.errors.IntroMessage ? (
-              <AlertTitle>{formik.errors.IntroMessage}</AlertTitle>
-            ) : null}
           </div>
         </div>
         <div className="flex gap-6 my-4">
@@ -315,9 +419,6 @@ function CreateBot() {
               onBlur={formik.handleBlur}
               value={formik.values.OpenAikey}
             />
-            {formik.touched.OpenAikey && formik.errors.OpenAikey ? (
-              <AlertTitle>{formik.errors.OpenAikey}</AlertTitle>
-            ) : null}
           </div>
           <div className="w-[50%]">
             <Title>Conversation Limit</Title>
@@ -329,10 +430,8 @@ function CreateBot() {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values.Conversation}
+              min={0}
             />
-            {formik.touched.Conversation && formik.errors.Conversation ? (
-              <AlertTitle>{formik.errors.Conversation}</AlertTitle>
-            ) : null}
           </div>
         </div>
         <div className="flex gap-6 my-4">
@@ -354,9 +453,6 @@ function CreateBot() {
                 </DropDown>
                 <ChevronDownIcon />
               </div>
-              {formik.touched.TimeZoneReference && formik.errors.TimeZoneReference ? (
-                <AlertTitle>{formik.errors.TimeZoneReference}</AlertTitle>
-              ) : null}
             </div>
             <div className="w-1/3">
               <Title>Time zone Format</Title>
@@ -375,9 +471,6 @@ function CreateBot() {
                 </DropDown>
                 <ChevronDownIcon />
               </div>
-              {formik.touched.TimeZoneFormat && formik.errors.TimeZoneFormat ? (
-                <AlertTitle>{formik.errors.TimeZoneFormat}</AlertTitle>
-              ) : null}
             </div>
             <div className="w-1/3">
               <Title>Time Format</Title>
@@ -396,9 +489,6 @@ function CreateBot() {
                 </DropDown>
                 <ChevronDownIcon />
               </div>
-              {formik.touched.TimeFormat && formik.errors.TimeFormat ? (
-                <AlertTitle>{formik.errors.TimeFormat}</AlertTitle>
-              ) : null}
             </div>
           </div>
           <div className="w-[50%]">
@@ -418,9 +508,6 @@ function CreateBot() {
               </DropDown>
               <ChevronDownIcon />
             </div>
-            {formik.touched.GPTmodel && formik.errors.GPTmodel ? (
-              <AlertTitle>{formik.errors.GPTmodel}</AlertTitle>
-            ) : null}
           </div>
         </div>
         <div className="flex gap-6 my-4">
@@ -438,11 +525,11 @@ function CreateBot() {
           </div>
           <div className="w-[50%]">
             <div className="relative gap-3">
-              <select
+              <select className="rounded-lg border border-blue-600 appearance-none py-2 text-base justify-center focus:shadow-lg pl-5 pr-8 text-center font-semibold text-blue-600 focus:outline-none focus:border-blue-500 hover:bg-[#0F45F5] hover:text-white cursor-pointer"
                 onChange={handleSelectChange}
                 onClick={toggleIsOpen}
                 value={"+ add a Goal"}
-                className="rounded-lg border border-blue-600 appearance-none py-2 text-base justify-center focus:shadow-lg pl-5 pr-8 text-center font-semibold text-blue-600 focus:outline-none focus:border-blue-500 hover:bg-[#0F45F5] hover:text-white cursor-pointer">
+              >
                 <option className="font-bold text-blue-600 hidden">+ Add a Goal</option>
                 {opt.map((item, i) => (
                   <option
@@ -453,22 +540,26 @@ function CreateBot() {
                   </option>
                 ))}
               </select>
-              <span className={`absolute top-0 h-full ml-[18%] text-center font-bold pointer-events-none flex items-center justify-center duration-300 ${isOpen ? 'transform rotate-180' : ''}`} style={{ hover :{
-                  color:"white"
-              }}}>
-                <HiOutlineChevronDown className="text-blue-500 hover:text-white font-bold"/>
+              <span className={`absolute top-0 h-full ml-[18%] text-center font-bold pointer-events-none flex items-center justify-center duration-300 ${isOpen ? 'transform rotate-180' : ''}`} style={{
+                hover: {
+                  color: "white"
+                }
+              }}>
+                <HiOutlineChevronDown className="text-blue-500 hover:text-white font-bold" />
               </span>
             </div>
           </div>
         </div>
         {foreignElements}
         <div className="flex gap-2 my-6">
-          <button type="btn" className="border border-blue-600 rounded-md text-blue-600 px-12 font-semibold py-2 text-md hover:bg-blue-600 hover:text-white">Cancel</button>
-          <LoadingButton type="submit" isLoading={isLoading} />
+          <Link to="/dashboard/bots">
+            <button type="btn" className="border border-blue-600 rounded-md text-blue-600 px-12 font-semibold py-2 text-md hover:bg-blue-600 hover:text-white">Cancel</button>
+          </Link>
+          {update ? <Updatebutton type="submit" handleSubmitForUpdate={handleSubmitForUpdate} /> : <LoadingButton type="submit" isLoading={isLoading} />}
         </div>
       </form>
     </div>
   )
 }
 
-export default CreateBot
+export default CreateBot;
