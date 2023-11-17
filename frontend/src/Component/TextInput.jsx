@@ -10,4 +10,4 @@ function TextInput({ type,name, placeholder, ...props }) {
   )
 }
 
-export default TextInput
+export default TextInput;

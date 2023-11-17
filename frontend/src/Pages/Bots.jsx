@@ -1,103 +1,204 @@
-import { HiSearch } from "react-icons/hi";
+import { useEffect } from "react";
 import BotCard from '../Component/BotCard';
 import BookingCard from "../Component/BookingCard";
 import { useState } from "react";
 import DetailsModal from "../Modal/DetailsModal";
 import CloneBot from "../Modal/CloneBot";
 import IsDelete from "../Modal/IsDelete";
-import NonBookingCard from "../Component/NonBookingCard";
 import Deleted from "../Modal/Deleted";
 import ToastSuccess from "../Modal/ToastSuccess";
+import axiosInstance from "../utils/axios";
+import ToastFailed from "../Modal/ToastFailed";
+import SearchBar from "../Common-Component/SearchBar";
+import SearchIcons from "../Common-Component/SearchIcons";
+import { useNavigate } from "react-router-dom";
 
 
 function Bots() {
-    const [openModal, setOpenModal] = useState(false);
-    const [Clone, setClone] = useState(false);
-    const [deleteBot, setDeleteBot] = useState(false);
+    const navigate = useNavigate();
+    
     const [deleteSuccess, setDeletedSuccess] = useState(false);
     const [successClone, setSuccessClone] = useState(false);
+    const [toastFailed, setToastFailed] = useState(false);
+    const [openModal, setOpenModal] = useState(false);
+    const [deleteBot, setDeleteBot] = useState(false);
+    const [isLoading, setIsLoading] = useState(false)
+    const [Clone, setClone] = useState(false);
+
+    const [clonedBotName, setClonedBotName] = useState('');
+    const [cnfDeleteBot, setCnfDeleteBot] = useState('');
+    const [idforclone, setIdforclone] = useState('');
+    const [botdetails, setBotdetails] = useState([]);
+    const [bot, setBot] = useState([]);
+
+
+    const getAllBots = async () => {
+        try {
+            const response = await axiosInstance.get("bot")
+            setBot(response.details);
+        } catch (error) {
+            console.error("Error duriong get all data", error)
+        }
+    }
+
+    useEffect(() => {
+        getAllBots();
+    });
 
     const handcloseModal = () => {
         setOpenModal(false)
     }
 
-    const handleCopy = () => {
+    const handleCopy = (id) => {
+        const cloneforId = id;
         setClone(true)
+        setIdforclone(cloneforId)
     }
 
     const handleCloseCloneBot = () => {
         setClone(false)
     }
 
-    const handleSuccess = () => {
-        setClone(false)
-        setSuccessClone(true)
+    const handleSuccess = async () => {
+        setIsLoading(true)
+        try {
+            const Cloneresponce = await axiosInstance.post(`bot/clone/`, {
+                "bot_name": clonedBotName,
+                "id": idforclone,
+            });
+            console.log(Cloneresponce)
+            setIsLoading(false);
+            setClone(false)
+            getAllBots();
+            setSuccessClone(true)
+        } catch (error) {
+            setToastFailed(true)
+        }
     }
 
-    const handleEdit = () => {
-        // need to implement API here
+    const handleEdit = (id) => {
+        navigate(`/dashboard/createBot?id=${id}`)
     }
 
     const handleDeleted = () => {
         setDeleteBot(false)
-        setDeletedSuccess(true)
+        setDeletedSuccess(false)
+    }
+
+    const handleCloseFailed = () => {
+        setToastFailed(false)
     }
 
     const handleCloseSuccess = () => {
         setSuccessClone(false)
     }
 
+    setTimeout(() => {
+        setSuccessClone(false)
+    }, [2 * 10000])
+
     const handleSuccessfullyDelete = () => {
         setDeletedSuccess(false)
+        handleDeleted();
+        getAllBots();
     }
 
-    const HandleDelete = () => {
-        setDeleteBot(true)
-    }
+    const handleDelete = (id) => {
+        const botid = id
+        setCnfDeleteBot(botid)
+        setDeleteBot(true);
+    };
 
-    const HandleDetails = () => {
-        setOpenModal(true)
-    }
+    const handleDeleteBot = async () => {
+        try {
+            await axiosInstance.delete(`bot`, {
+                data: {
+                    bot_id: cnfDeleteBot,
+                },
+            });
+            setDeleteBot(true);
+            setDeletedSuccess(true);
+        } catch (error) {
+            console.error("Error deleting bot:", error);
+        }
+    };
 
+    const handleDetails = async (id) => {
+        try {
+            const resp = await axiosInstance.get(`bot/${id}`);
+            setBotdetails(resp.details[0])
+            setOpenModal(true)
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     const renderModals = <div>
-        {openModal && <DetailsModal onClose={handcloseModal} />}
-        {Clone && <CloneBot onClose={handleCloseCloneBot} handleSuccess={handleSuccess} />}
-        {deleteBot && <IsDelete onClose={handleDeleted} />}
-        {deleteSuccess && <Deleted onClose={handleSuccessfullyDelete} />}
-        {successClone && <ToastSuccess
-            title="Success"
-            message="Duplicated bot created"
-            onClose={handleCloseSuccess} />}
+        {openModal && <DetailsModal
+            onClose={handcloseModal}
+            botdetails={botdetails} />
+        }
+        {Clone && <CloneBot
+            onClose={handleCloseCloneBot}
+            handleSuccess={handleSuccess}
+            isLoading={isLoading}
+            onInputChange={(value) => setClonedBotName(value)} />
+        }
+        {deleteBot && <IsDelete
+            onClose={handleDeleted}
+            handleDeleteBot={handleDeleteBot} />
+        }
+        {deleteSuccess && <Deleted
+            onClose={handleSuccessfullyDelete} />
+        }
     </div>
+
+    const Alltoast =
+        <div>
+            {successClone && <ToastSuccess
+                title="Success"
+                message="Duplicated bot created"
+                onClose={handleCloseSuccess} />
+            }
+            {toastFailed && <ToastFailed
+                title="Error"
+                message="An error occured"
+                onClose={handleCloseFailed}
+            />}
+        </div>
+
 
     return (
         <div>
             {renderModals}
-            <div className="text-center font-bold text-red-500">
+            <div className="relative text-center font-bold text-red-500">
                 <section className="text-gray-600 body-font">
                     <form className='w-[90%] sm:w-[30%] mt-4'>
                         <div className="relative">
-                            <div className="absolute inset-y-0 left-0 flex items-center px-3 focus:shadow-md pointer-events-none bg-blue-600 rounded-l-md">
-                                <HiSearch className='text-white w-[20px] h-[20px]' />
-                            </div>
-                            <input type="search" className="block w-full p-2 ml-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none placeholder font-semibold focus:shadow-md" placeholder='Type and Press Enter' required />
+                            <SearchIcons />
+                            <SearchBar
+                                type="search"
+                                name="search"
+                                placeholder="Type and Press Enter"
+                            />
                         </div>
                     </form>
 
                     <div className="my-4 flex flex-wrap gap-4">
                         <BotCard />
-                        <BookingCard {...{ handleCopy, handleEdit, HandleDelete, HandleDetails }} />
-                        <BookingCard {...{ handleCopy, handleEdit, HandleDelete, HandleDetails }} />
-                        <NonBookingCard {...{ handleCopy, handleEdit, HandleDelete, HandleDetails }} />
-                        <BookingCard {...{ handleCopy, handleEdit, HandleDelete, HandleDetails }} />
-                        <NonBookingCard {...{ handleCopy, handleEdit, HandleDelete, HandleDetails }} />
-                        <BookingCard {...{ handleCopy, handleEdit, HandleDelete, HandleDetails }} />
-                        <BookingCard {...{ handleCopy, handleEdit, HandleDelete, HandleDetails }} />
-                        <BookingCard {...{ handleCopy, handleEdit, HandleDelete, HandleDetails }} />
-                        <NonBookingCard {...{ handleCopy, handleEdit, HandleDelete, HandleDetails }} />
+                        {bot.map((item, index) => (
+                            <BookingCard
+                                key={index}
+                                handleCopy={(id) => handleCopy(id)}
+                                handleEdit={(id) => handleEdit(id)}
+                                handleDelete={(id) => handleDelete(id)}
+                                handleDetails={(id) => handleDetails(id)}
+                                userData={item}
+                            />
+                        ))}
                     </div>
                 </section>
+                {Alltoast}
             </div>
         </div>
     )

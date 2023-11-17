@@ -4,10 +4,27 @@ import Label from "../Common-Component/Label"
 import NormalText from "../Common-Component/NormalText"
 import ModalShadow from "../Common-Component/ModalShadow"
 
-function DetailsModal({ onClose }) {
+function DetailsModal({ onClose, botdetails }) {
+
+    const { ai_type,
+        bot_description,
+        bot_name,
+        gpt_model,
+        open_ai_api_key,
+        prompt,
+        converstation_limit,
+        prompt_type } = botdetails;
+
+        const maskString = (str) => {
+            const visibleChars = 2; 
+            const maskedChars = str.length - visibleChars * 2;
+            const maskedString = '*'.repeat(maskedChars);
+            return str.substr(0, visibleChars) + maskedString + str.substr(str.length - visibleChars);
+        };
+
     return (
         <ModalShadow onClose={onClose}>
-            <div className="relative bg-white rounded-xl shadow-lg dark:bg-gray-700 mx-auto mt-[2%] w-[500px] z-50">
+            <div className="SlideModal relative bg-white rounded-xl shadow-lg dark:bg-gray-700 mx-auto mt-[2%] w-[500px] z-50">
                 <div className="flex items-start bg-[#0f45f5] justify-between p-4 rounded-t-xl ">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                         Bot
@@ -19,11 +36,11 @@ function DetailsModal({ onClose }) {
                 <div className="px-8 py-4 space-y-3 bg-white">
                     <div>
                         <Label>Bot Name</Label>
-                        <NormalText>reset</NormalText>
+                        <NormalText>{bot_name}</NormalText>
                     </div>
                     <div>
                         <Label>Bot Description</Label>
-                        <NormalText>It just for testing purpose as well</NormalText>
+                        <NormalText>{bot_description}</NormalText>
                     </div>
                     <div>
                         <Label>Bot Webhook</Label>
@@ -31,36 +48,36 @@ function DetailsModal({ onClose }) {
                     </div>
                     <div>
                         <Label>OpenAi Key</Label>
-                        <NormalText>sk-b*********************************************K8</NormalText>
+                        <NormalText>{maskString(open_ai_api_key)}</NormalText>
                     </div>
                     <div className="flex gap-x-20">
                         <div className="space-y-3">
                             <div>
                                 <Label>Bot Prompt</Label>
-                                <NormalText>Testing Bot</NormalText>
+                                <NormalText>{prompt}</NormalText>
                             </div>
                             <div>
                                 <Label>Bot Reference</Label>
-                                <NormalText>8691698902954100</NormalText>
+                                <NormalText>Under Processing</NormalText>
                             </div>
                             <div>
                                 <Label>Bot Conversation Limit</Label>
-                                <NormalText>2</NormalText>
+                                <NormalText>{converstation_limit}</NormalText>
                             </div>
                         </div>
                         <div className="space-y-3">
                             <div>
                                 <Label>Bot Prompt Type</Label>
-                                <NormalText>custom-field</NormalText>
+                                <NormalText>{prompt_type}</NormalText>
                             </div>
 
                             <div>
                                 <Label>Bot Type</Label>
-                                <NormalText>non-booking</NormalText>
+                                <NormalText>{ai_type}</NormalText>
                             </div>
                             <div>
                                 <Label>Bot Gpt Model</Label>
-                                <NormalText>gpt-3.5-turbo</NormalText>
+                                <NormalText>{gpt_model}</NormalText>
                             </div>
                         </div>
                     </div>

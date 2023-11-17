@@ -6,6 +6,9 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { useState } from "react";
 import BackgroundSection from "../Component/BackgroundSection";
 import axiosInstance from "../utils/axios";
+import Name from '../Common-Component/Name';
+import Head from "../Common-Component/Head";
+import AlterText from "../Common-Component/AlterText";
 
 function Login() {
   const navigate = useNavigate();
@@ -15,7 +18,7 @@ function Login() {
   const handleSignIn = async (values) => {
     try {
       setIsLoading(true);
-      const response = await axiosInstance.post("signin/", {
+      const response = await axiosInstance.post("api/signin/", {
         username: values.email,
         password: values.password,
       });
@@ -64,18 +67,18 @@ function Login() {
                 onSubmit={handleSubmit}
                 className="w-[100%] md:w-[400px] bg-white rounded-lg p-8 flex flex-col md:ml-auto mt-10 mx-auto md:mt-0 shadow-md"
               >
-                <h2 className="text-gray-700 text-3xl font-bold title-font mb-5 mx-auto">
+                <Head>
                   Welcome back
-                </h2>
+                </Head>
                 {islogin &&
                   <div>
-                    <h1 className="py-4 px-4 bg-red-500 text-slate-50 flex item-center rounded-lg font-semibold mb-2">Please enter Valid Login details</h1>
+                    <AlterText>Please enter Valid Login details</AlterText>
                   </div>
                 }
                 <div className="relative mb-4">
-                  <label className="text-sm font-bold text-gray-700">
+                  <Name>
                     Email
-                  </label>
+                  </Name>
                   <input
                     type="email"
                     id="email"
@@ -88,9 +91,9 @@ function Login() {
                   />
                 </div>
                 <div className="relative mb-4">
-                  <label className="text-sm font-bold text-gray-700">
+                  <Name>
                     Password
-                  </label>
+                  </Name>
                   <div className="w-full bg-white rounded border border-gray-300 text-base outline-none text-gray-700 py-1 px-3 mt-2 leading-8 transition-colors duration-200 ease-in-out">
                     <input
                       type={passwordVisible ? "text" : "password"}

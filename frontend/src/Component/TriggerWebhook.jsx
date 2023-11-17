@@ -6,32 +6,31 @@ import Title from "./Title";
 import InputField from '../Component/TextInput';
 import DropDown from "./DropDown";
 import { useDispatch } from "react-redux";
-import { setTriggerWebhookSlice } from "../Store/slice/TriggerWebhookSlice"
+import { setTriggerWebhookSlice } from '../Store/slice/TriggerWebhookSlice';
 
 
-function TriggerWebhook({ onDeleteWebhook, index , setNameValues, setHeaderValues}) {
+function TriggerWebhook({ onDeleteWebhook, index }) {
     const dispatch = useDispatch();
     const [headers, setHeaders] = useState([]);
-  
 
     const handleGoalName = (e) => {
-        dispatch(setTriggerWebhookSlice({ type: 'goalname', value: e.target.value }));
+        dispatch(setTriggerWebhookSlice({ index, Triggergoalname: e.target.value }));
     }
 
     const handleSelectTriggers = (e) => {
-        dispatch(setTriggerWebhookSlice({ type: 'selectTriggers', value: e.target.value }))
+        dispatch(setTriggerWebhookSlice({ index, TriggerselectTriggers: e.target.value }))
     }
 
     const handleWebhookUrl = (e) => {
-        dispatch(setTriggerWebhookSlice({ type: 'webhookUrl', value: e.target.value }))
+        dispatch(setTriggerWebhookSlice({ index, TriggerwebhookUrl: e.target.value }))
     }
 
     const handleWebhookDesc = (e) => {
-        dispatch(setTriggerWebhookSlice({ type: 'webhookdesc', value: e.target.value }))
+        dispatch(setTriggerWebhookSlice({ index, Triggerwebhookdesc: e.target.value }))
     }
 
     const handleValueOfHeaders = (e) => {
-        dispatch(setTriggerWebhookSlice({ type: 'valueOfheaders', value: e.target.value }))
+        dispatch(setTriggerWebhookSlice({ index, TriggervalueOfheaders: e.target.value }))
     }
 
     const handleDeleteWebhook = () => {
@@ -45,34 +44,13 @@ function TriggerWebhook({ onDeleteWebhook, index , setNameValues, setHeaderValue
     const handleDelete = (index) => {
         setHeaders(prevHeaders => prevHeaders.filter(headerIndex => headerIndex !== index));
     }
-    const handleNameChange = (e) => {
-        const { name, value } = e.target
-        setNameValues(old => {
-            return {
-                ...old,
-                [name]: value
-            }
-        })
-    };
-
-    const handleHeaderChange = (e) => {
-        const { name, value } = e.target
-        setHeaderValues(old => {
-            return {
-                ...old,
-                [name]: value
-            }
-        })
-    };
 
     const opt = [
-        "Select",
         "Once Only",
         "Multiple Times"
     ]
 
     const op = [
-        "Select",
         "GET",
         "POST"
     ]
@@ -94,6 +72,7 @@ function TriggerWebhook({ onDeleteWebhook, index , setNameValues, setHeaderValue
                         <DropDown
                             onChange={handleSelectTriggers}
                         >
+                            <option value={""} className="hidden">Select</option>
                             {opt.map((item, i) => (
                                 <option key={i} value={item}>{item}</option>
                             ))}
@@ -118,7 +97,7 @@ function TriggerWebhook({ onDeleteWebhook, index , setNameValues, setHeaderValue
                     id="message"
                     name="message"
                     onChange={handleWebhookDesc}
-                    className=" bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 h-[60px] text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out w-full focus:shadow-lg" placeholder="Description"></textarea>
+                    className="bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 h-[60px] text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out w-full focus:shadow-lg" placeholder="Description"></textarea>
             </div>
             <div className="my-7">
                 <button onClick={handleAddHeaders} className="border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-semibold px-6 py-2 text-center rounded-lg">Add Headers +</button>
@@ -126,19 +105,18 @@ function TriggerWebhook({ onDeleteWebhook, index , setNameValues, setHeaderValue
 
             {headers.map((index) => (
                 <InputHeaders
-                    onDelete={handleDelete}
-                    index={index}
                     key={index}
-                    handleNameChange={handleNameChange}
-                    handleHeaderChange={handleHeaderChange}
+                    index={index}
+                    onDelete={handleDelete}
                 />
             ))}
 
-            <div className="flex gap-6 p-4 items-top items-center">
+            <div className="flex gap-6 p-4 items-top items-center text-center">
                 <div className="w-[20%]">
                     <Title>Value Of header</Title>
                     <div className="relative items-center">
                         <DropDown onChange={handleValueOfHeaders}>
+                            <option value={""} className="hidden">Select</option>
                             {op.map((item, i) => (
                                 <option key={i} value={item}>{item}</option>
                             ))}
@@ -148,7 +126,7 @@ function TriggerWebhook({ onDeleteWebhook, index , setNameValues, setHeaderValue
                         </span>
                     </div>
                 </div>
-                <div className="border border-gray-400 px-2 py-2 rounded-md hover:bg-blue-600 hover:text-white shadow-lg h-[40px] float-bottom items-center">
+                <div className="border border-gray-400 px-2 py-2 mt-5 rounded-md hover:bg-blue-600 hover:text-white shadow-lg h-[40px] float-bottom items-center cursor-pointer">
                     <RiDeleteBin6Line onClick={handleDeleteWebhook} className="w-[20px] h-[20px] text-gray-600 my-auto hover:text-white" />
                 </div>
             </div>

@@ -6,5 +6,5 @@ function Label({children}) {
   )
 }
 
-export default Label
+export default Label;
 
