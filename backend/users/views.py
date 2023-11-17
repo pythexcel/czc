@@ -6,7 +6,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User
 from django.shortcuts import get_object_or_404
 from django.conf import settings
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.contrib.auth import logout
 import base64
 from django.core.mail import send_mail
@@ -130,5 +130,38 @@ class ResetPassword(APIView):
         except Exception as e:
             return Response(
                 {"message": str(e) + " field is required", "success": False},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+class ManageUserAPI(APIView):
+    permission_classes = [IsAdminUser]
+
+    def post(self, request):
+        try:
+            serializer = UserSerializer(
+                data=request.data,
+                context={"added_by": request.user.id}
+            )
+            serializer.is_valid(raise_exception=True)
+            user = serializer.save()
+            data = {
+                "id": user.reference,
+                "email": user.email
+            }
+            return Response(
+                {
+                    "Message": "User added with role 'User' and linked to the requester.",
+                    "success": True,
+                    "data": data
+                },
+                status=status.HTTP_200_OK
+            )
+        except Exception:
+            return Response(
+                {
+                    "message": serializer.errors,
+                    "success": False
+                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
