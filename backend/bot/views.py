@@ -109,7 +109,7 @@ class CreateBotAPI(APIView):
                 header_goal.delete()
 
             return Response({"message": "deleted successfully", "success": True}, status=status.HTTP_200_OK)
-          
+
         except BotModel.DoesNotExist:
             return Response({"success": False, "message": "invalid bot id"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -118,10 +118,15 @@ class CloneBotAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        data = request.data
-        message, response = clone_bot_data(data['id'], data['bot_name'])
-        if response:
-            return Response({"message": message, "success": True},
-                            status=status.HTTP_200_OK)
-        return Response({"success": False, "message": message},
-                        status=status.HTTP_400_BAD_REQUEST)
+        try:
+            data = request.data
+            message, response = clone_bot_data(data['id'], data['bot_name'])
+            if response:
+                return Response({"message": message, "success": True},
+                                status=status.HTTP_200_OK)
+            return Response({"success": False, "message": message},
+                            status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print("eeee", e)
+            return Response({"success": False, "message": str(e)+" field is required"},
+                            status=status.HTTP_400_BAD_REQUEST)
