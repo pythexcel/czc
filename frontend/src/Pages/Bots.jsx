@@ -12,10 +12,15 @@ import ToastFailed from "../Modal/ToastFailed";
 import SearchBar from "../Common-Component/SearchBar";
 import SearchIcons from "../Common-Component/SearchIcons";
 import { useNavigate } from "react-router-dom";
+import { selectFlag } from '../Store/slice/flagSlice';
+import { useDispatch, useSelector } from "react-redux";
+import { setFlag } from "../Store/slice/flagSlice";
 
 
 function Bots() {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const flag = useSelector(selectFlag);
     
     const [deleteSuccess, setDeletedSuccess] = useState(false);
     const [successClone, setSuccessClone] = useState(false);
@@ -36,6 +41,7 @@ function Bots() {
         try {
             const response = await axiosInstance.get("bot")
             setBot(response.details);
+            dispatch(setFlag(false));
         } catch (error) {
             console.error("Error duriong get all data", error)
         }
@@ -43,7 +49,13 @@ function Bots() {
 
     useEffect(() => {
         getAllBots();
-    });
+    },[]);
+
+    // console.log(flag,"/oooi am glagggggggggggggggggg")
+
+    if(flag === true){
+        getAllBots(); 
+    }
 
     const handcloseModal = () => {
         setOpenModal(false)

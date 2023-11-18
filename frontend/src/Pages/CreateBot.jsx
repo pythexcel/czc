@@ -9,12 +9,12 @@ import InputField from '../Component/TextInput';
 import Title from "../Component/Title";
 import TriggerWebhook from "../Component/TriggerWebhook";
 import { useFormik } from 'formik';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axiosInstance from "../utils/axios";
-import 'react-toastify/dist/ReactToastify.css';
 import TextArea from "../Common-Component/TextArea";
 import Updatebutton from "../Common-Component/Updatebutton";
+import { setFlag } from "../Store/slice/flagSlice";
 
 const Intromessage = [
   "Text",
@@ -57,6 +57,7 @@ const OptAi = [
 
 function CreateBot() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -203,7 +204,7 @@ function CreateBot() {
       navigate("/dashboard/bots")
       console.log(createBot.response.data, ">>>>>>>>>>")
     } catch (error) {
-      alert("i am error")
+      console.log("i am error")
     }
   }
 
@@ -230,11 +231,12 @@ function CreateBot() {
         "custom_field_type": customfields,
         "trigger_webhook_type": tiggerwebhook
       })
+      setUpdate(false)
+      dispatch(setFlag(true));
       navigate("/dashboard/bots")
       console.log(createBot.response.data, "udpate data as well")
     } catch (error) {
-      // alert("i am error")
-      console.log(error,"i am error")
+      console.log(error, "i am error")
     }
   }
 
@@ -286,6 +288,7 @@ function CreateBot() {
         GPTmodel: data.gpt_model,
         messageDelay: data.message_delay
       })
+      setUpdate(true)
       console.log(resp.details[0], "i am ready for update ")
     } catch (error) {
       console.log(error)
@@ -294,9 +297,7 @@ function CreateBot() {
 
   useEffect(() => {
     getBotForUpdate(uniqueId)
-    setUpdate(true)
   }, [uniqueId])
-
 
   return (
     <div className="w-[100%] bg-white border border-gray-400 rounded-lg px-8 py-6 shadow-lg">
@@ -555,7 +556,7 @@ function CreateBot() {
           <Link to="/dashboard/bots">
             <button type="btn" className="border border-blue-600 rounded-md text-blue-600 px-12 font-semibold py-2 text-md hover:bg-blue-600 hover:text-white">Cancel</button>
           </Link>
-          {update ? <Updatebutton type="submit" handleSubmitForUpdate={handleSubmitForUpdate} /> : <LoadingButton type="submit" isLoading={isLoading} />}
+          {update ? <Updatebutton type="submit" handleSubmitForUpdate={handleSubmitForUpdate} /> : <LoadingButton type="submit" isLoading={isLoading} /> }
         </div>
       </form>
     </div>
