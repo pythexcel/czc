@@ -3,6 +3,7 @@ import TagTypeSlice from '../slice/TagTypeSlice';
 import customFieldSlice from '../slice/CustomFieldSlice'
 import TriggerWebhookSlice from '../slice/TriggerWebhookSlice';
 import InputHeaderSlice from '../slice/InputHeaderSlice';
+import flagSlice from '../slice/flagSlice';
 
 
 export const store = configureStore({
@@ -10,6 +11,7 @@ export const store = configureStore({
     tag: TagTypeSlice,
     customReducer: customFieldSlice, 
     TriggerWebhook: TriggerWebhookSlice,
-    inputHeader: InputHeaderSlice
+    inputHeader: InputHeaderSlice,
+    flag: flagSlice
   },
 });
