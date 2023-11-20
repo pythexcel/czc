@@ -6,6 +6,7 @@ from .views import (SignupAPI,
                     ResetPassword,
                     ManageUserAPI,
                     OpenAIAPI,
+                    HighLevelAgencyAPI,
                     )
 
 urlpatterns = [
@@ -16,6 +17,7 @@ urlpatterns = [
     path("reset-password", ResetPassword.as_view(), name="rest-password"),
     path("manage-user/", ManageUserAPI.as_view(), name="manage-user"),
     path("manage-user/<id>", ManageUserAPI.as_view(), name="manage-user"),
-    path("manage-open-ai/", OpenAIAPI.as_view(), name="manage-open")
+    path("manage-open-ai/", OpenAIAPI.as_view(), name="manage-open"),
+    path("high-level/", HighLevelAgencyAPI.as_view(), name="high-level")
 
 ]

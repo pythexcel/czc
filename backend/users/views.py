@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from .serializers import UserSerializer
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import User, OpenAIModel
+from .models import User, OpenAIModel, HighLevelModel
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -239,11 +239,14 @@ class OpenAIAPI(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
             data = request.data
-            data['user_id'] = request.user
-            open_ai_instance = OpenAIModel.objects.create(**data)
+            open_ai_instance = OpenAIModel.objects.update_or_create(
+              user_id=request.user,
+              defaults=data
+
+            )
             return Response(
                     {
-                        "id": open_ai_instance.id,
+                        "id": str(open_ai_instance),
                         "message": "successfully created",
                         "success": True
                     },
@@ -258,29 +261,26 @@ class OpenAIAPI(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-    def put(self, request):
+
+class HighLevelAgencyAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
         try:
             data = request.data
-            result = open_ai_is_valid(data['open_ai_key'])
-            if not result:
-                return Response(
-                    {
-                        "message": "invalid open ai key",
-                        "success": False
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            open_ai_instance = OpenAIModel.objects.get(id=request.data['id'], user_id_id=request.user.id)
-            open_ai_instance.open_ai_key = data['open_ai_key']
-            open_ai_instance.save()
+            high_level_instance = HighLevelModel.objects.update_or_create(
+                user_id=request.user.id,
+                defaults=data
+
+            )
             return Response(
-                        {
-                            "id": open_ai_instance.id,
-                            "message": "updated successfully",
-                            "success": True
-                        },
-                        status=status.HTTP_200_OK
-                    )
+                    {
+                        "id": str(high_level_instance),
+                        "message": "successfully created",
+                        "success": True
+                    },
+                    status=status.HTTP_200_OK
+                )
         except Exception as e:
             return Response(
                 {
