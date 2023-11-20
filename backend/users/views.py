@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from .serializers import UserSerializer
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import User
+from .models import User, OpenAIModel
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -12,6 +12,7 @@ import base64
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from ai_backend.hardCodedString import resert_link_string
+from ai_backend.utils import open_ai_is_valid
 
 
 class SignupAPI(APIView):
@@ -220,5 +221,71 @@ class ManageUserAPI(APIView):
                     "message": "deleted successfully",
                     "success": True
                 },
-                status=status.HTTP_200_OK
+                status=status.HTTP_200_OK)
+
+
+class OpenAIAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            result = open_ai_is_valid(request.data['open_ai_key'])
+            if not result:
+                return Response(
+                    {
+                        "message": "invalid open ai key",
+                        "success": False
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            data = request.data
+            data['user_id'] = request.user
+            open_ai_instance = OpenAIModel.objects.create(**data)
+            return Response(
+                    {
+                        "id": open_ai_instance.id,
+                        "message": "successfully created",
+                        "success": True
+                    },
+                    status=status.HTTP_200_OK
+                )
+        except Exception as e:
+            return Response(
+                {
+                    "message": str(e) + " field is required",
+                    "success": False
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    def put(self, request):
+        try:
+            data = request.data
+            result = open_ai_is_valid(data['open_ai_key'])
+            if not result:
+                return Response(
+                    {
+                        "message": "invalid open ai key",
+                        "success": False
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            open_ai_instance = OpenAIModel.objects.get(id=request.data['id'], user_id_id=request.user.id)
+            open_ai_instance.open_ai_key = data['open_ai_key']
+            open_ai_instance.save()
+            return Response(
+                        {
+                            "id": open_ai_instance.id,
+                            "message": "updated successfully",
+                            "success": True
+                        },
+                        status=status.HTTP_200_OK
+                    )
+        except Exception as e:
+            return Response(
+                {
+                    "message": str(e) + " field is required",
+                    "success": False
+                },
+                status=status.HTTP_400_BAD_REQUEST
             )

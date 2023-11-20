@@ -25,3 +25,8 @@ class User(AbstractUser):
         self.username = self.email
         self.reference = str(self.reference).replace("-", "")
         super().save(*args, **kwargs)
+
+
+class OpenAIModel(models.Model):
+    open_ai_key = models.CharField(max_length=100)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
