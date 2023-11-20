@@ -13,5 +13,6 @@ urlpatterns = [
     path("logout/", LogoutAPI.as_view(), name="logout"),
     path("forget-password/", ForgetPassword.as_view(), name="forget-password"),
     path("reset-password", ResetPassword.as_view(), name="rest-password"),
-    path("user", ManageUserAPI.as_view(), name="create-user"),
+    path("manage-user", ManageUserAPI.as_view(), name="manage-user"),
+
 ]
