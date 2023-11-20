@@ -46,9 +46,12 @@ def add_goals(validate_data, bot_instance):
     return message, True
 
 
-def get_bot_data(bot_id, user_id):
-    data = list(BotModel.objects.filter(id=bot_id, user_id=user_id).values("bot_name", "bot_description", "prompt_type", "prompt", "ai_type","open_ai_api_key", "gpt_model"))
-    return data
+def get_bot_data(bot_id=None, user_id=None):
+    bot_filter = {'user_id': user_id}
+    if bot_id:
+        bot_filter['id'] = bot_id
+    data = BotModel.objects.filter(**bot_filter).values()
+    return list(data)
 
 
 def update_bot_record(request,  validated_data, bot_instance):

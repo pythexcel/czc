@@ -4,7 +4,8 @@ from .views import (SignupAPI,
                     LogoutAPI,
                     ForgetPassword,
                     ResetPassword,
-                    ManageUserAPI)
+                    ManageUserAPI,
+                    )
 
 urlpatterns = [
     path("signup/", SignupAPI.as_view(), name="signup"),
@@ -12,5 +13,7 @@ urlpatterns = [
     path("logout/", LogoutAPI.as_view(), name="logout"),
     path("forget-password/", ForgetPassword.as_view(), name="forget-password"),
     path("reset-password", ResetPassword.as_view(), name="rest-password"),
-    path("create-user", ManageUserAPI.as_view(), name="create-user"),
+    path("manage-user/", ManageUserAPI.as_view(), name="manage-user"),
+    path("manage-user/<id>", ManageUserAPI.as_view(), name="manage-user")
+
 ]

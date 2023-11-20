@@ -93,7 +93,6 @@ class ForgetPassword(APIView):
 
 
 class ResetPassword(APIView):
-    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         try:
@@ -164,4 +163,62 @@ class ManageUserAPI(APIView):
                     "success": False
                  },
                 status=status.HTTP_400_BAD_REQUEST
+            )
+
+    def get(self, request):
+        user = User.objects.filter(added_by_id=request.user.id).values("reference", "email", "id")
+        return Response(
+                {
+                    "details": user,
+                    "success": True
+                },
+                status=status.HTTP_200_OK
+            )
+
+    def put(self, request):
+        try:
+            user_instance = User.objects.get(id= request.data['user_id'], added_by_id=request.user.id)
+            user_instance.set_password(request.data['password'])
+            user_instance.save()
+            return Response(
+                    {
+                        "message": "updated successfully",
+                        "success": True
+                    },
+                    status=status.HTTP_200_OK
+                )
+        except User.DoesNotExist:
+            return Response(
+                {
+                    "message": "invalid user id",
+                    "success": False
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            return Response(
+                {
+                    "message": str(e) + "  field is required",
+                    "success": False
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    def delete(self, request, id=None):
+        if not id:
+            return Response(
+                {
+                    "message": "id is required",
+                    "success": False
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        user_instance = User.objects.get(id=id, added_by_id=request.user.id)
+        user_instance.delete()
+        return Response(
+                {
+                    "message": "deleted successfully",
+                    "success": True
+                },
+                status=status.HTTP_200_OK
             )
