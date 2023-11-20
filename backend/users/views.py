@@ -93,7 +93,6 @@ class ForgetPassword(APIView):
 
 
 class ResetPassword(APIView):
-    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         try:
@@ -166,20 +165,17 @@ class ManageUserAPI(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-    permission_classes = [IsAdminUser]
-
     def get(self, request):
-        user = User.objects.filter(added_by_id=request.user.id).values("reference", "email")
+        user = User.objects.filter(added_by_id=request.user.id).values("reference", "email", "id")
         return Response(
                 {
-                    "message": user,
+                    "details": user,
                     "success": True
                 },
                 status=status.HTTP_200_OK
             )
-    permission_classes = [IsAdminUser]
 
-    def patch(self, request):
+    def put(self, request):
         try:
             user_instance = User.objects.get(id= request.data['user_id'], added_by_id=request.user.id)
             user_instance.set_password(request.data['password'])
@@ -208,32 +204,21 @@ class ManageUserAPI(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-    permission_classes = [IsAdminUser]
-
-    def delete(self, request):
-        try:
-            user_instance = User.objects.get(id=request.data['user_id'], added_by_id=request.user.id)
-            user_instance.delete()
-            return Response(
-                    {
-                        "message": "deleted successfully",
-                        "success": True
-                    },
-                    status=status.HTTP_200_OK
-                )
-        except User.DoesNotExist:
+    def delete(self, request, id=None):
+        if not id:
             return Response(
                 {
-                    "message": "invalid user id",
+                    "message": "id is required",
                     "success": False
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-        except Exception as e:
-            return Response(
+        user_instance = User.objects.get(id=id, added_by_id=request.user.id)
+        user_instance.delete()
+        return Response(
                 {
-                    "message": str(e) + "  field is required",
-                    "success": False
+                    "message": "deleted successfully",
+                    "success": True
                 },
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_200_OK
             )

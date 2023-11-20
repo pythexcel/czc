@@ -43,14 +43,10 @@ class CreateBotAPI(APIView):
                 status=status.HTTP_200_OK,
             )
 
-    permission_classes = [IsAuthenticated]
-
     def get(self, request, id):
         user_id = request.user.id
         data = get_bot_data(id, user_id)
         return Response({"details": data, "success": True}, status=status.HTTP_200_OK)
-
-    permission_classes = [IsAuthenticated]
 
     def put(self, request, id):
         try:
@@ -80,8 +76,6 @@ class CreateBotAPI(APIView):
         except BotModel.DoesNotExist:
             return Response({"success": False, "message": "invalid bot id"},
                             status=status.HTTP_400_BAD_REQUEST)
-
-    permission_classes = [IsAuthenticated]
 
     def delete(self, request):
         try:

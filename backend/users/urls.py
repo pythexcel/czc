@@ -13,6 +13,7 @@ urlpatterns = [
     path("logout/", LogoutAPI.as_view(), name="logout"),
     path("forget-password/", ForgetPassword.as_view(), name="forget-password"),
     path("reset-password", ResetPassword.as_view(), name="rest-password"),
-    path("manage-user", ManageUserAPI.as_view(), name="manage-user"),
+    path("manage-user/", ManageUserAPI.as_view(), name="manage-user"),
+    path("manage-user/<id>", ManageUserAPI.as_view(), name="manage-user")
 
 ]
