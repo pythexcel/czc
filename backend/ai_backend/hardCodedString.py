@@ -1,1 +1,1 @@
-resert_link_string = """http://localhost:5180/resetpassword?token={}"""
+resert_link_string = """http://116.202.210.102:5190/resetpassword?token={}"""
