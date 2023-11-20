@@ -82,6 +82,7 @@ class CreateBotAPI(APIView):
 
     def delete(self, request):
         try:
+            flag=0
             data = request.data
             serializer = DeleteBotSerializer(data=data)
             serializer.is_valid(raise_exception=True)
@@ -92,19 +93,25 @@ class CreateBotAPI(APIView):
                 bot_instance.bot_tagtype.filter(
                     id__in=serializer.validated_data["tag_type_ids"]
                 ).delete()
+                flag = 1
             if "custom_field_type_ids" in serializer.validated_data:
                 bot_instance.bot_custom.filter(
                     id__in=serializer.validated_data["custom_field_type_ids"]
                 ).delete()
+                flag = 1
             if "trigger_webhook_type_ids" in serializer.validated_data:
                 bot_instance.bot_trigger.filter(
                     id__in=serializer.validated_data["trigger_webhook_type_ids"]
                 ).delete()
+                flag = 1
             if "header_type_ids" in serializer.validated_data:
                 Header.objects.filter(
                     id__in=serializer.validated_data["header_type_ids"]
                 ).delete()
-            bot_instance.delete()  # Delete the entire bot
+                flag = 1
+            if not flag:
+                bot_instance.delete() # delete the entire bot
+
             return Response({"message": "deleted successfully", "success": True}, status=status.HTTP_200_OK)
         except BotModel.DoesNotExist:
             return Response({"success": False, "message": "invalid bot id"}, status=status.HTTP_400_BAD_REQUEST)
