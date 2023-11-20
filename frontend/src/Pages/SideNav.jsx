@@ -8,9 +8,14 @@ import { FcFaq, FcNeutralTrading } from 'react-icons/fc';
 import { FiRepeat } from 'react-icons/fi';
 import { FaUsers } from 'react-icons/fa';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { selectMange } from '../Store/slice/MngeSlice';
 
 function SideNav() {
     const navigate = useNavigate()
+
+    const Manageflag = useSelector(selectMange);
+    
     const [selectedItem, setSelectedItem] = useState(null);
 
     const [open, setOpen] = useState(true);
@@ -28,36 +33,41 @@ function SideNav() {
 
     const Navi = [
         {
-            routename: 'integrations',
-            icon: <TbTopologyRing2 className='w-[25px] h-[25px]' />,
-            name: "Integrations"
+          routename: 'integrations',
+          icon: <TbTopologyRing2 className='w-[25px] h-[25px]' />,
+          name: "Integrations"
         },
         {
-            routename: 'bots',
-            icon: <RiRobot2Line className='w-[25px] h-[25px]' />,
-            name: "Bots"
+          routename: 'bots',
+          icon: <RiRobot2Line className='w-[25px] h-[25px]' />,
+          name: "Bots"
         },
         {
-            routename: 'faqs',
-            icon: <FcFaq className='w-[25px] h-[25px]' />,
-            name: "FAQs"
+          routename: 'faqs',
+          icon: <FcFaq className='w-[25px] h-[25px]' />,
+          name: "FAQs"
         },
         {
-            routename: 'auditlogs',
-            icon: <FiRepeat className='w-[25px] h-[25px]' />,
-            name: "Audit Logs"
+          routename: 'auditlogs',
+          icon: <FiRepeat className='w-[25px] h-[25px]' />,
+          name: "Audit Logs"
         },
+        ...(Manageflag === true
+          ? [
+              {
+                routename: 'manageuser',
+                icon: <FaUsers className='w-[25px] h-[25px]' />,
+                name: "Manage Users"
+              }
+            ]
+          : []),
         {
-            routename: 'manageuser',
-            icon: <FaUsers className='w-[25px] h-[25px]' />,
-            name: "Manage Users"
-        },
-        {
-            routename: "usagetracking",
-            icon: <FcNeutralTrading className="w-[25px] h-[25px]" />,
-            name: "Usage Tracking",
+          routename: "usagetracking",
+          icon: <FcNeutralTrading className="w-[25px] h-[25px]" />,
+          name: "Usage Tracking",
         }
-    ]
+      ];
+      
 
     return (
         <div className={`flex flex-col h-[100vh] shadow-xl ${open ? 'w-[230px]' : 'w-20'} duration-300`}

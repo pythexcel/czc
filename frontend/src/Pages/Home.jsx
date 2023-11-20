@@ -11,7 +11,6 @@ import { FaUsers } from "react-icons/fa";
 import Footer from './Footer';
 import axiosInstance from "../utils/axios";
 
-
 function Home() {
     const navigate = useNavigate();
     const { pathname } = useLocation();

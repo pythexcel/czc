@@ -4,11 +4,14 @@ import InputModal from "../Modal/InputModal";
 import axiosInstance from "../utils/axios";
 import DeleteBox from "../Common-Component/DeleteBox";
 import EditBox from '../Common-Component/EditBox';
+import { getCreUser } from '../Store/slice/CreUserFlagSlice';
+import { useSelector } from "react-redux";
 
 const MngUsers = () => {
+  const referesh =  useSelector(getCreUser);
+
   const [openModal, setOpenModal] = useState(false);
   const [userdata, setUserData] = useState([]);
-  console.log(userdata, "0000000000000ia mauser management data")
 
   const getAllDetails = async () => {
     try {
@@ -23,6 +26,10 @@ const MngUsers = () => {
   useEffect(() => {
     getAllDetails()
   }, [])
+
+  if(referesh === true){
+    getAllDetails();
+  }
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -58,7 +65,7 @@ const MngUsers = () => {
                 <th className="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100">EMAIL REFERNCE</th>
                 <th className="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100">ASSIGNED LOCATION</th>
                 <th className="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100">ACTIONS</th>
-               
+
               </tr>
             </thead>
             <tbody>

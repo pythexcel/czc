@@ -9,12 +9,16 @@ import axiosInstance from "../utils/axios";
 import Name from '../Common-Component/Name';
 import Head from "../Common-Component/Head";
 import AlterText from "../Common-Component/AlterText";
+import { setManage } from "../Store/slice/MngeSlice";
+import { useDispatch } from "react-redux";
 
 function Login() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isloading, setIsLoading] = useState(false);
-  const [islogin, setIsLogin] = useState(false)
+  const [islogin, setIsLogin] = useState(false);
+
   const handleSignIn = async (values) => {
     try {
       setIsLoading(true);
@@ -23,14 +27,24 @@ function Login() {
         password: values.password,
       });
       localStorage.setItem("auth_token", response.data.access);
+      console.log("Signin successful:", response.data.role);
+
+      const isAllow = response.data.role;
+
+      if (isAllow === "Admin") {
+        dispatch(setManage(true));
+      } else if (isAllow === "User") {
+        dispatch(setManage(false))
+      }
+
       navigate("/dashboard/bots");
-      console.log("Signin successful:", response);
     } catch (error) {
       setIsLoading(false);
-      setIsLogin(true)
+      setIsLogin(true);
       console.error("Error during signup:", error);
     }
   };
+
 
 
   return (
