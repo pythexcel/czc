@@ -43,7 +43,7 @@ class SigninAPI(APIView):
             }
 
             return Response(
-                {"message": "Login successfully", "success": True, "data": data},
+                {"message": "Login successfully", "success": True, "details": data},
                 status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -153,7 +153,7 @@ class ManageUserAPI(APIView):
                 {
                     "Message": "User added with role 'User' and linked to the requester.",
                     "success": True,
-                    "data": data
+                    "details": data
                 },
                 status=status.HTTP_200_OK
             )
@@ -206,22 +206,31 @@ class ManageUserAPI(APIView):
             )
 
     def delete(self, request, id=None):
-        if not id:
+        try:
+            if not id:
+                return Response(
+                    {
+                        "message": "id is required",
+                        "success": False
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            user_instance = User.objects.get(id=id, added_by_id=request.user.id)
+            user_instance.delete()
+            return Response(
+                    {
+                        "message": "deleted successfully",
+                        "success": True
+                    },
+                    status=status.HTTP_200_OK)
+        except User.DoesNotExist:
             return Response(
                 {
-                    "message": "id is required",
+                    "message": "invalid user id",
                     "success": False
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-        user_instance = User.objects.get(id=id, added_by_id=request.user.id)
-        user_instance.delete()
-        return Response(
-                {
-                    "message": "deleted successfully",
-                    "success": True
-                },
-                status=status.HTTP_200_OK)
 
 
 class OpenAIAPI(APIView):
@@ -240,13 +249,14 @@ class OpenAIAPI(APIView):
                 )
             data = request.data
             open_ai_instance = OpenAIModel.objects.update_or_create(
-              user_id=request.user,
-              defaults=data
-
-            )
+                user_id=request.user.id,
+                defaults=data
+                )
             return Response(
                     {
-                        "id": str(open_ai_instance),
+                        "details": {
+                         "id": open_ai_instance[0].id
+                         },
                         "message": "successfully created",
                         "success": True
                     },
@@ -271,11 +281,12 @@ class HighLevelAgencyAPI(APIView):
             high_level_instance = HighLevelModel.objects.update_or_create(
                 user_id=request.user.id,
                 defaults=data
-
             )
             return Response(
                     {
-                        "id": str(high_level_instance),
+                        "details": {
+                            "id": high_level_instance[0].id
+                            },
                         "message": "successfully created",
                         "success": True
                     },
