@@ -4,6 +4,8 @@ import customFieldSlice from '../slice/CustomFieldSlice'
 import TriggerWebhookSlice from '../slice/TriggerWebhookSlice';
 import InputHeaderSlice from '../slice/InputHeaderSlice';
 import flagSlice from '../slice/flagSlice';
+import MngeSlice from '../slice/MngeSlice';
+import CreUserFlagSlice from '../slice/CreUserFlagSlice';
 
 
 export const store = configureStore({
@@ -12,6 +14,8 @@ export const store = configureStore({
     customReducer: customFieldSlice, 
     TriggerWebhook: TriggerWebhookSlice,
     inputHeader: InputHeaderSlice,
-    flag: flagSlice
+    flag: flagSlice,
+    ManageFlag: MngeSlice,
+    userRefresh: CreUserFlagSlice
   },
 });

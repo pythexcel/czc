@@ -4,20 +4,25 @@ import CustomButton from '../Common-Component/CustomButton';
 import ModalShadow from '../Common-Component/ModalShadow';
 import axiosInstance from '../utils/axios';
 import { useState } from 'react';
+import InputField from '../Component/TextInput';
+import { setCreUserFlag } from '../Store/slice/CreUserFlagSlice';
+import { useDispatch } from 'react-redux';
 
 
 
 function InputModal({ onClose }) {
+    const dispatch = useDispatch();
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
 
     const manageuser = async () => {
         try {
-            const resp = await axiosInstance.post("api/create-user", {
+            const resp = await axiosInstance.post("api/manage-user/", {
                 "email": email,
                 "password": password
             })
+            dispatch(setCreUserFlag(true))
             onClose();
             console.log(resp,"i ama done boss")
         } catch (error) {
@@ -28,7 +33,6 @@ function InputModal({ onClose }) {
     const handleEmail = (event) => {
         const useremail = event.target.value;
         setEmail(useremail)
-
     }
 
     const handlepassword = (event) => {
@@ -54,7 +58,7 @@ function InputModal({ onClose }) {
                     </div>
                     <div>
                         <ModalPara>Password</ModalPara>
-                        <textarea type='text' onChange={handlepassword} className='w-full border border-gray-300 rounded-lg p-2' placeholder='Password' />
+                        <InputField type='password' onChange={handlepassword} className='w-full border border-gray-300 rounded-lg p-2' placeholder='Password' />
                     </div>
                 </div>
                 <hr />
