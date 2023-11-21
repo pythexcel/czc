@@ -6,7 +6,6 @@ import Bots from "./Pages/Bots";
 import Integrations from "./Pages/Integrations";
 import AuditLog from "./Pages/AuditLog";
 import MngUsers from "./Pages/MngUsers";
-import UsageTracking from "./Pages/UsageTracking";
 import FAQs from "./Pages/FAQs";
 import ForgetPassword from "./Pages/ForgetPassword";
 import ResetPassword from "./Pages/ResetPassword";
@@ -38,9 +37,9 @@ function App() {
           <Route path="faqs" element={<FAQs />} />
           <Route path="auditlogs" element={<AuditLog />} />
           <Route path="manageuser" element={<MngUsers />} />
-          <Route path="usagetracking" element={<UsageTracking />} />
           <Route path="createBot" element={<CreateBot />} />
           <Route path="termCondition" element={<TermAndC />} />
+
         </Route>
       </Routes>
     </BrowserRouter>

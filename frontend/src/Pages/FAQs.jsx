@@ -5,10 +5,13 @@ import { AiFillEye } from "react-icons/ai";
 import { MdDelete } from "react-icons/md";
 import { useState } from "react";
 import FaqsModal from "../Modal/FaqsModal";
+import WidgetDrawer from "../Component/WidgetDrawer";
 
 const FAQs = () => {
   const [isenableModal, setIsEnableModal] = useState(false);
   const [isdisableModal, setIsDisableModal] = useState(false);
+  const [iswidgetdrawer, setIsWidgetDrawer] = useState(false);
+  console.log(iswidgetdrawer, "===========>>>>>>>>>>>>>>ddd");
   // const [isOpen, setIsOpen] = useState(false);
   const buttonsData = [
     { text: "Enable All Locations", onClick: () => setIsEnableModal(true) },
@@ -34,7 +37,7 @@ const FAQs = () => {
   //   setIsOpen((prevIsOpen) => !prevIsOpen);
   // };
   return (
-    <div>
+    <div className="relative">
       <div className="p-6">
         <div className="flex justify-between flex-wrap">
           <div>
@@ -139,7 +142,11 @@ const FAQs = () => {
                     <div className="text-[#8392AB] cursor-pointer  p-4 shadow-lg px-2 py-2 bg-opacity-17 bg-[#f8fafc] rounded-lg flex items-center">
                       <FaFileImport />
                     </div>
-                    <div className="flex cursor-pointer item-center ml-[5%]  mr-[3%] p-4 shadow-lg px-2 py-2 bg-opacity-17 bg-[#f8fafc] rounded-lg">
+
+                    <div
+                      className="flex cursor-pointer item-center ml-[5%]  mr-[3%] p-4 shadow-lg px-2 py-2 bg-opacity-17 bg-[#f8fafc] rounded-lg"
+                      onClick={() => setIsWidgetDrawer(true)}
+                    >
                       <i className="text-[#8392AB] mr-[2%] mt-[6%]">
                         <AiFillEye />
                       </i>
@@ -193,6 +200,12 @@ const FAQs = () => {
         <FaqsModal
           heading="Are you Sure You want to Disable all location"
           onClose={() => setIsDisableModal(false)}
+        />
+      )}
+      {iswidgetdrawer && (
+        <WidgetDrawer
+          iswidgetdrawer={iswidgetdrawer}
+          setIsWidgetDrawer={setIsWidgetDrawer}
         />
       )}
     </div>

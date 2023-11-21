@@ -554,7 +554,7 @@ function CreateBot() {
         {foreignElements}
         <div className="flex gap-2 my-6">
           <Link to="/dashboard/bots">
-            <button type="btn" className="border border-blue-600 rounded-md text-blue-600 px-12 font-semibold py-2 text-md hover:bg-blue-600 hover:text-white">Cancel</button>
+            <button type="button" className="border border-blue-600 rounded-md text-blue-600 px-12 font-semibold py-2 text-md hover:bg-blue-600 hover:text-white">Cancel</button>
           </Link>
           {update ? <Updatebutton type="submit" handleSubmitForUpdate={handleSubmitForUpdate} /> : <LoadingButton type="submit" isLoading={isLoading} /> }
         </div>
