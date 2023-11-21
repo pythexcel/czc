@@ -6,9 +6,6 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { useState } from "react";
 import BackgroundSection from "../Component/BackgroundSection";
 import axiosInstance from "../utils/axios";
-import Name from '../Common-Component/Name';
-import Head from "../Common-Component/Head";
-import AlterText from "../Common-Component/AlterText";
 import { setManage } from "../Store/slice/MngeSlice";
 import { useDispatch } from "react-redux";
 
@@ -26,10 +23,11 @@ function Login() {
         username: values.email,
         password: values.password,
       });
-      localStorage.setItem("auth_token", response.data.access);
-      console.log("Signin successful:", response.data.role);
-
-      const isAllow = response.data.role;
+      localStorage.setItem("auth_token", response.details.access);
+      // console.log("Signin successful:", response.data.access);
+     
+      navigate("/dashboard/bots");
+      const isAllow = response.details.role;
 
       if (isAllow === "Admin") {
         dispatch(setManage(true));
@@ -37,14 +35,13 @@ function Login() {
         dispatch(setManage(false))
       }
 
-      navigate("/dashboard/bots");
+      
     } catch (error) {
       setIsLoading(false);
       setIsLogin(true);
       console.error("Error during signup:", error);
     }
   };
-
 
 
   return (
@@ -81,18 +78,20 @@ function Login() {
                 onSubmit={handleSubmit}
                 className="w-[100%] md:w-[400px] bg-white rounded-lg p-8 flex flex-col md:ml-auto mt-10 mx-auto md:mt-0 shadow-md"
               >
-                <Head>
+                <h2 className="text-gray-700 text-3xl font-bold title-font mb-5 mx-auto">
                   Welcome back
-                </Head>
-                {islogin &&
+                </h2>
+                {islogin && (
                   <div>
-                    <AlterText>Please enter Valid Login details</AlterText>
+                    <h1 className="py-4 px-4 bg-red-500 text-slate-50 flex item-center rounded-lg font-semibold mb-2">
+                      Please enter Valid Login details
+                    </h1>
                   </div>
-                }
+                )}
                 <div className="relative mb-4">
-                  <Name>
+                  <label className="text-sm font-bold text-gray-700">
                     Email
-                  </Name>
+                  </label>
                   <input
                     type="email"
                     id="email"
@@ -105,9 +104,9 @@ function Login() {
                   />
                 </div>
                 <div className="relative mb-4">
-                  <Name>
+                  <label className="text-sm font-bold text-gray-700">
                     Password
-                  </Name>
+                  </label>
                   <div className="w-full bg-white rounded border border-gray-300 text-base outline-none text-gray-700 py-1 px-3 mt-2 leading-8 transition-colors duration-200 ease-in-out">
                     <input
                       type={passwordVisible ? "text" : "password"}
@@ -207,7 +206,6 @@ function Login() {
           </section>
         )}
       </Formik>
-
     </BackgroundSection>
   );
 }
