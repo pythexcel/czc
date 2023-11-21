@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "users",
     "bot",
     "rest_framework",
+    "faq",
     "rest_framework_simplejwt",
     #'phonenumber_field',
     "corsheaders",
