@@ -12,8 +12,8 @@ from rest_framework.permissions import IsAuthenticated
 from bot.utils import (add_goals,
                        get_bot_data,
                        update_bot_record,
-                       open_ai_is_valid,
                        clone_bot_data)
+from ai_backend.utils import open_ai_is_valid
 
 
 class CreateBotAPI(APIView):

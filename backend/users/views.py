@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from .serializers import UserSerializer
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import User
+from .models import User, OpenAIModel, HighLevelModel
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -12,6 +12,7 @@ import base64
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from ai_backend.hardCodedString import resert_link_string
+from ai_backend.utils import open_ai_is_valid
 
 
 class SignupAPI(APIView):
@@ -42,7 +43,7 @@ class SigninAPI(APIView):
             }
 
             return Response(
-                {"message": "Login successfully", "success": True, "data": data},
+                {"message": "Login successfully", "success": True, "details": data},
                 status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -152,7 +153,7 @@ class ManageUserAPI(APIView):
                 {
                     "Message": "User added with role 'User' and linked to the requester.",
                     "success": True,
-                    "data": data
+                    "details": data
                 },
                 status=status.HTTP_200_OK
             )
@@ -205,20 +206,97 @@ class ManageUserAPI(APIView):
             )
 
     def delete(self, request, id=None):
-        if not id:
+        try:
+            if not id:
+                return Response(
+                    {
+                        "message": "id is required",
+                        "success": False
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            user_instance = User.objects.get(id=id, added_by_id=request.user.id)
+            user_instance.delete()
+            return Response(
+                    {
+                        "message": "deleted successfully",
+                        "success": True
+                    },
+                    status=status.HTTP_200_OK)
+        except User.DoesNotExist:
             return Response(
                 {
-                    "message": "id is required",
+                    "message": "invalid user id",
                     "success": False
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-        user_instance = User.objects.get(id=id, added_by_id=request.user.id)
-        user_instance.delete()
-        return Response(
+
+
+class OpenAIAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            result = open_ai_is_valid(request.data['open_ai_key'])
+            if not result:
+                return Response(
+                    {
+                        "message": "invalid open ai key",
+                        "success": False
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            data = request.data
+            open_ai_instance = OpenAIModel.objects.update_or_create(
+                user_id=request.user.id,
+                defaults=data
+                )
+            return Response(
+                    {
+                        "details": {
+                         "id": open_ai_instance[0].id
+                         },
+                        "message": "successfully created",
+                        "success": True
+                    },
+                    status=status.HTTP_200_OK
+                )
+        except Exception as e:
+            return Response(
                 {
-                    "message": "deleted successfully",
-                    "success": True
+                    "message": str(e) + " field is required",
+                    "success": False
                 },
-                status=status.HTTP_200_OK
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+class HighLevelAgencyAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            data = request.data
+            high_level_instance = HighLevelModel.objects.update_or_create(
+                user_id=request.user.id,
+                defaults=data
+            )
+            return Response(
+                    {
+                        "details": {
+                            "id": high_level_instance[0].id
+                            },
+                        "message": "successfully created",
+                        "success": True
+                    },
+                    status=status.HTTP_200_OK
+                )
+        except Exception as e:
+            return Response(
+                {
+                    "message": str(e) + " field is required",
+                    "success": False
+                },
+                status=status.HTTP_400_BAD_REQUEST
             )
