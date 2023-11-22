@@ -18,7 +18,7 @@ class BotModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     ai_type = models.CharField(max_length=100, choices=AI_TYPE_CHOICES)
-    bot_name = models.CharField(max_length=100, unique=True)
+    bot_name = models.CharField(max_length=100,)
     bot_description = models.CharField(max_length=500, blank=True, null=True)
     prompt_type = models.CharField(max_length=20, choices=PROMPT_TYPE_CHOICES)
     prompt = models.CharField(max_length=100)

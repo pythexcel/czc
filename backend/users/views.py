@@ -12,7 +12,7 @@ import base64
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from ai_backend.hardCodedString import resert_link_string
-from ai_backend.utils import open_ai_is_valid
+from utils.helperfunction import open_ai_is_valid
 
 
 class SignupAPI(APIView):

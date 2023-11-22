@@ -4,10 +4,8 @@ from users.models import HighLevelModel
 from .serializers import FAQSerializer
 from rest_framework.permissions import IsAuthenticated
 from .models import FAQ
-import csv
-from django.conf import settings
 from django.shortcuts import get_object_or_404
-
+from utils.helperfunction import download_csv_file
 
 class FAQAPI(APIView):
     permission_classes = [IsAuthenticated]
@@ -98,17 +96,12 @@ class DownloadFAQAPI(APIView):
         try:
             high_level_instance = HighLevelModel.objects.get(user_id=request.user.id)
             faq_data = list(FAQ.objects.filter(high_level_id=high_level_instance.id).values("question", "answer"))
-            filename = 'data.csv'
-            with open(filename, 'w') as csvfile:
-                csvwriter = csv.writer(csvfile)
-                for faq in faq_data:
-                    csvwriter.writerow(faq.values())
-                   
+            download_csv_file(faq_data)
             return Response(
                 {
-                    "details": "download csv file ",
+                    "details": "download csv file",
                     "success": True
                 },
                 status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response("your error is "+str(e))
+        except Exception:
+            return Response("Please integrate your high level Integrations")

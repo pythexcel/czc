@@ -13,7 +13,7 @@ from bot.utils import (add_goals,
                        get_bot_data,
                        update_bot_record,
                        clone_bot_data)
-from ai_backend.utils import open_ai_is_valid
+from utils.helperfunction import open_ai_is_valid
 
 
 class CreateBotAPI(APIView):
@@ -53,13 +53,12 @@ class CreateBotAPI(APIView):
 
     def put(self, request, id):
         try:
-            bot_instance = BotModel.objects.get(id=id)
+            bot_instance = BotModel.objects.get(id=id, user_id=request.user.id)
             serializer = CreateBotSerializer(
                 data=request.data,
                 context={"request": request},
                 partial=True
             )
-
             if not serializer.is_valid(raise_exception=True):
                 return Response({"success": False, "message": serializer.errors}, status=status.HTTPHTTP_400_BAD_REQUEST)
 
@@ -128,7 +127,6 @@ class CloneBotAPI(APIView):
                                 status=status.HTTP_200_OK)
             return Response({"success": False, "message": message},
                             status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            print("eeee", e)
+        except Exception:
             return Response({"success": False, "message": str(e)+" field is required"},
                             status=status.HTTP_400_BAD_REQUEST)
