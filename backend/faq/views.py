@@ -4,6 +4,9 @@ from users.models import HighLevelModel
 from .serializers import FAQSerializer
 from rest_framework.permissions import IsAuthenticated
 from .models import FAQ
+import csv
+from django.conf import settings
+from django.shortcuts import get_object_or_404
 
 
 class FAQAPI(APIView):
@@ -18,7 +21,7 @@ class FAQAPI(APIView):
                 data=data
             )
             seralizer.is_valid(raise_exception=True)
-            instance = seralizer.create()
+            instance = seralizer.save().id
             return Response(
                 {
                     "details": {
@@ -28,7 +31,8 @@ class FAQAPI(APIView):
                     "success": True
                 },
                 status=status.HTTP_200_OK)
-        except Exception:
+        except Exception as e:
+            print("error e",e)
             return Response(
                 {
                     "message": "Please select your HighLevel",
@@ -37,8 +41,7 @@ class FAQAPI(APIView):
                 status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
-        high_level_instance = HighLevelModel.objects.get(user_id=request.user.id)
-        data = FAQ.objects.filter(high_level_id=high_level_instance.id).values("id", "question", "answer")
+        data = FAQ.objects.filter(high_level__user_id=request.user.id).values("id", "question", "answer")    
         return Response(
             {
                 "details": data,
@@ -48,36 +51,64 @@ class FAQAPI(APIView):
 
     def patch(self, request):
         try:
-            instance = FAQ.objects.filter(id=request.data['id']).update(**request.data)
+            instance = FAQ.objects.get(id=request.data['id'])
+            serializer = FAQSerializer(instance, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
             return Response(
                 {
+                    "id": instance.id,
                     "details": "updated successfully",
                     "success": True
                 },
-                status=status.HTTP_200_OK)
+                status=status.HTTP_200_OK
+            )
+        except FAQ.DoesNotExist:
+            return Response(
+                {
+                    "details": "Invalid ID",
+                    "success": False
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
         except Exception:
             return Response(
                 {
-                    "details": "in valid id",
-                    "success": True
+                    "details":serializer.errors,
+                    "success": False
                 },
-                status=status.HTTP_200_OK)
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     def delete(self, request, id):
+        instance = get_object_or_404(FAQ, id=id)
+        instance.delete()
+        return Response(
+            {
+                "details": "deleted successfully",
+                "success": True
+            },
+            status=status.HTTP_200_OK)
+
+
+class DownloadFAQAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
         try:
             high_level_instance = HighLevelModel.objects.get(user_id=request.user.id)
-            instance = FAQ.objects.get(high_level_id=high_level_instance.id,id=id)
-            instance.delete()
+            faq_data = list(FAQ.objects.filter(high_level_id=high_level_instance.id).values("question", "answer"))
+            filename = 'data.csv'
+            with open(filename, 'w') as csvfile:
+                csvwriter = csv.writer(csvfile)
+                for faq in faq_data:
+                    csvwriter.writerow(faq.values())
+                   
             return Response(
                 {
-                    "details": "deleted successfully",
+                    "details": "download csv file ",
                     "success": True
                 },
                 status=status.HTTP_200_OK)
-        except Exception:
-            return Response(
-                {
-                    "details": "in valid id",
-                    "success": True
-                },
-                status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response("your error is "+str(e))
