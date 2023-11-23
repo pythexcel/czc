@@ -7,6 +7,7 @@ from .models import FAQ
 from django.shortcuts import get_object_or_404
 from utils.helperfunction import download_csv_file
 
+
 class FAQAPI(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -103,5 +104,6 @@ class DownloadFAQAPI(APIView):
                     "success": True
                 },
                 status=status.HTTP_200_OK)
+          
         except Exception:
             return Response("Please integrate your high level Integrations")
