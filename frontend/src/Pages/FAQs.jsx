@@ -11,7 +11,6 @@ const FAQs = () => {
   const [isenableModal, setIsEnableModal] = useState(false);
   const [isdisableModal, setIsDisableModal] = useState(false);
   const [iswidgetdrawer, setIsWidgetDrawer] = useState(false);
-  console.log(iswidgetdrawer, "===========>>>>>>>>>>>>>>ddd");
   // const [isOpen, setIsOpen] = useState(false);
   const buttonsData = [
     { text: "Enable All Locations", onClick: () => setIsEnableModal(true) },
@@ -111,7 +110,7 @@ const FAQs = () => {
             </thead>
             <tbody>
               <tr>
-                <td className="py-4 px-4 ml-9 text-xl text-[#8392AB]">
+                <td className="py-4 px-4  text-xl text-[#8392AB]">
                   <input
                     id="link-checkbox"
                     type="checkbox"

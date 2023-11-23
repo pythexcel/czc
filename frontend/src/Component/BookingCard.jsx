@@ -7,6 +7,7 @@ import Botname from "../Common-Component/Botname";
 import Bars from "../Common-Component/Bars";
 import NonBookingbtn from "../Common-Component/Nonbookingbtn";
 import { useState } from "react";
+import CopyLink from "../Modal/CopyLink";
 
 function BookingCard({
   handleCopy,
@@ -16,18 +17,21 @@ function BookingCard({
   userData,
 }) {
   const [showCopyButton, setShowCopyButton] = useState(false);
+  const [isshowmodal, setIsShowModal] = useState(false);
 
-  
+  const onClose = () => {
+    setIsShowModal(false);
+  };
   const handleParaClick = () => {
     const paraText = "https://chat.botwebhook.com/message?b=8681698042045389";
-
-    // Copy the text to the clipboard
-    navigator.clipboard.writeText(paraText)
+    setIsShowModal(true);
+    navigator.clipboard
+      .writeText(paraText)
       .then(() => {
-        console.log('Text copied to clipboard');
+        console.log("Text copied to clipboard");
       })
       .catch((err) => {
-        console.error('Error copying text to clipboard: ', err);
+        console.error("Error copying text to clipboard: ", err);
       });
   };
 
@@ -39,8 +43,8 @@ function BookingCard({
         <Botname>{bot_name}</Botname>
         <p
           className="cursor-pointer font-thin  "
-          onMouseEnter={()=>setShowCopyButton(true)}
-          onMouseLeave={()=>setShowCopyButton(false)}
+          onMouseEnter={() => setShowCopyButton(true)}
+          onMouseLeave={() => setShowCopyButton(false)}
         >
           https://chat.botwebhook .com/message?b=8681698042045389
           {showCopyButton && (
@@ -97,6 +101,7 @@ function BookingCard({
           </div>
         </div>
       </div>
+      {isshowmodal && <CopyLink onClose={onClose} />}
     </Card>
   );
 }

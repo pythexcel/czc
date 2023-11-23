@@ -13,6 +13,10 @@ const MngUsers = () => {
 
   const [openModal, setOpenModal] = useState(false);
   const [userdata, setUserData] = useState([]);
+  const [isuserdelete, setIsUserDelete] = useState(false);
+  const [isedituser, setIsEditUser] = useState(false);
+  const [editData, setEditData]= useState({})
+  console.log(editData, '==============>>>>>>>>>>>>>>>>>>>>>editttttttttttttt')
   const dispatch = useDispatch();
 
   const getAllDetails = async () => {
@@ -24,6 +28,17 @@ const MngUsers = () => {
       console.log(error, "i am error");
     }
   };
+
+  const deleteUser = async ({ id }) => {
+    try {
+      const res = await axiosInstance.delete(`api/manage-user/${id}`);
+      getAllDetails();
+      console.log("User deleted successfully", res);
+    } catch (error) {
+      console.error("Error deleting user", error);
+    }
+  };
+
 
   useEffect(() => {
     getAllDetails();
@@ -38,7 +53,10 @@ const MngUsers = () => {
   };
 
   const handleCloseModal = () => {
+    setEditData({})
     setOpenModal(false);
+    setIsUserDelete(false);
+    setIsEditUser(false);
   };
 
   const removeHyphens = (inputString) => {
@@ -87,7 +105,15 @@ const MngUsers = () => {
                   <td className="px-4 py-2">{item.email}</td>
                   <td className=" text-center">Location</td>
                   <td className="px-4 py-2 text-lg text-gray-900 flex space-x-2">
-                    <EditBox /> <DeleteBox />
+                    <i onClick={() => {
+                      setEditData(item)
+                      setIsEditUser(true)
+                    }}>
+                      <EditBox />
+                    </i>
+                    <i onClick={() => deleteUser(item)}>
+                      <DeleteBox />
+                    </i>
                   </td>
                 </tr>
               ))}
@@ -95,7 +121,8 @@ const MngUsers = () => {
           </table>
         </div>
       </div>
-      {openModal && <InputModal onClose={handleCloseModal} />}
+      {(openModal || isedituser) && <InputModal onClose={handleCloseModal} isedituser={isedituser} editData={editData} />}
+      {/* {isuserdelete && <Deleted onClose={handleCloseModal} />} */}
     </div>
   );
 };
