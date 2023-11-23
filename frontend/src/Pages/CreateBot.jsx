@@ -1,59 +1,34 @@
 import { useEffect, useState } from "react";
-import { HiOutlineChevronDown } from 'react-icons/hi';
+import { HiOutlineChevronDown } from "react-icons/hi";
 import ChevronDownIcon from "../Component/ChevronDownIcon";
 import CustomField from "../Component/CustomField";
 import DropDown from "../Component/DropDown";
 import LoadingButton from "../Component/LoadingButton";
 import TagType from "../Component/TagType";
-import InputField from '../Component/TextInput';
+import InputField from "../Component/TextInput";
 import Title from "../Component/Title";
 import TriggerWebhook from "../Component/TriggerWebhook";
-import { useFormik } from 'formik';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useFormik } from "formik";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../utils/axios";
 import TextArea from "../Common-Component/TextArea";
 import Updatebutton from "../Common-Component/Updatebutton";
 import { setFlag } from "../Store/slice/flagSlice";
 
-const Intromessage = [
-  "Text",
-  "Custom Field",
-  "Custom Value"
-]
+const Intromessage = ["Text", "Custom Field", "Custom Value"];
 
-const TzReference = [
-  "Contact",
-  "Location"
-]
+const TzReference = ["Contact", "Location"];
 
-const Tzformate = [
-  "Abbreviated",
-  "Hidden"
-]
+const Tzformate = ["Abbreviated", "Hidden"];
 
-const Timeformat = [
-  "12H",
-  "24H"
-]
+const Timeformat = ["12 H", "24 H"];
 
-const opt = [
-  "Tag Type",
-  "Custom Field Type",
-  "Trigger Webhook"
-]
+const opt = ["Tag Type", "Custom Field Type", "Trigger Webhook"];
 
-const optGpt = [
-  "GPT-3",
-  "GPT-3.5",
-  "GPT-4"
-]
+const optGpt = ["GPT-3", "GPT-3.5", "GPT-4"];
 
-const OptAi = [
-  "Booking",
-  "Non-Booking"
-]
-
+const OptAi = ["Booking", "Non-Booking"];
 
 function CreateBot() {
   const navigate = useNavigate();
@@ -61,7 +36,7 @@ function CreateBot() {
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const uniqueId = queryParams.get('id');
+  const uniqueId = queryParams.get("id");
 
   const [headerValues, setHeaderValues] = useState({});
   const [nameValues, setNameValues] = useState({});
@@ -71,191 +46,201 @@ function CreateBot() {
   const [update, setUpdate] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-
   console.log(headerValues, nameValues, "this is values");
 
   const childData = useSelector((state) => state.tag.childData);
-  console.log(childData, "I am child component data")
+  console.log(childData, "I am child component data");
 
-  const customfieldata = useSelector((state) => state.customReducer.customfieldData);
-  console.log(customfieldata, "this is data of custom Fields")
+  const customfieldata = useSelector(
+    (state) => state.customReducer.customfieldData
+  );
+  console.log(customfieldata, "this is data of custom Fields");
 
-  const triggerwebhookdata = useSelector((state) => state.TriggerWebhook.triggerWebhookData);
-  console.log(triggerwebhookdata, "triggerwebhookdata,,,,")
+  const triggerwebhookdata = useSelector(
+    (state) => state.TriggerWebhook.triggerWebhookData
+  );
+  console.log(triggerwebhookdata, "triggerwebhookdata,,,,");
 
   const headerdata = useSelector((state) => state.inputHeader.inputHeaderData);
-  console.log(headerdata)
+  console.log(headerdata);
 
   const [addtag, setAddTag] = useState([]);
   const [customfield, setCustomfield] = useState([]);
   const [triggerWebhook, setTriggerWebhook] = useState([]);
 
   const HandleAddTage = () => {
-    setAddTag([...addtag, addtag.length])
-  }
+    setAddTag([...addtag, addtag.length]);
+  };
 
   const handleDeleteTage = (index) => {
-    setAddTag(p => p.filter(addtagIndex => addtagIndex !== index))
-  }
+    setAddTag((p) => p.filter((addtagIndex) => addtagIndex !== index));
+  };
 
   const handleAddCustomField = () => {
-    setCustomfield([...customfield, customfield.length])
-  }
+    setCustomfield([...customfield, customfield.length]);
+  };
 
   const handleDeleteCustomeField = (index) => {
-    setCustomfield(p => p.filter(addCustomIndex => addCustomIndex !== index))
-  }
+    setCustomfield((p) =>
+      p.filter((addCustomIndex) => addCustomIndex !== index)
+    );
+  };
 
   const handleAddTriggerWebhook = () => {
-    setTriggerWebhook([...triggerWebhook, triggerWebhook.length])
-  }
+    setTriggerWebhook([...triggerWebhook, triggerWebhook.length]);
+  };
 
   const handleDeleteTriggerWebhook = (index) => {
-    setTriggerWebhook(p => p.filter(addWebhookIndex => addWebhookIndex !== index))
-  }
+    setTriggerWebhook((p) =>
+      p.filter((addWebhookIndex) => addWebhookIndex !== index)
+    );
+  };
 
   const handleSelectChange = (event) => {
     const renderComponent = event.target.value;
-    if (renderComponent === 'Tag Type') {
+    if (renderComponent === "Tag Type") {
       HandleAddTage();
-    } else if (renderComponent === 'Custom Field Type') {
+    } else if (renderComponent === "Custom Field Type") {
       handleAddCustomField();
-    } else if (renderComponent === 'Trigger Webhook') {
+    } else if (renderComponent === "Trigger Webhook") {
       handleAddTriggerWebhook();
     }
   };
 
   const toggleIsOpen = () => {
-    setIsOpen(prevIsOpen => !prevIsOpen);
+    setIsOpen((prevIsOpen) => !prevIsOpen);
   };
 
-  const foreignElements =
+  const foreignElements = (
     <div>
-      {Array.isArray(addtag) && addtag.map((index) => (
-        <TagType
-          onDeleteClick={handleDeleteTage}
-          index={index}
-          key={index}
-        />
-      ))}
+      {Array.isArray(addtag) &&
+        addtag.map((index) => (
+          <TagType onDeleteClick={handleDeleteTage} index={index} key={index} />
+        ))}
 
-      {Array.isArray(customfield) && customfield.map((index) => (
-        <CustomField
-          onDeleteClick={handleDeleteCustomeField}
-          index={index}
-          key={index} />
-      ))}
+      {Array.isArray(customfield) &&
+        customfield.map((index) => (
+          <CustomField
+            onDeleteClick={handleDeleteCustomeField}
+            index={index}
+            key={index}
+          />
+        ))}
 
-      {Array.isArray(triggerWebhook) && triggerWebhook.map((index) => (
-        <TriggerWebhook
-          setHeaderValues={setHeaderValues}
-          setNameValues={setNameValues}
-          onDeleteWebhook={handleDeleteTriggerWebhook}
-          index={index}
-          key={index}
-        />
-      ))}
+      {Array.isArray(triggerWebhook) &&
+        triggerWebhook.map((index) => (
+          <TriggerWebhook
+            setHeaderValues={setHeaderValues}
+            setNameValues={setNameValues}
+            onDeleteWebhook={handleDeleteTriggerWebhook}
+            index={index}
+            key={index}
+          />
+        ))}
     </div>
+  );
 
   const tag_type = childData.map((item, index) => ({
-    "tag_name": item.tagname,
-    "goal_description": item.description
+    tag_name: item.tagname,
+    goal_description: item.description,
   }));
 
   const customfields = customfieldata.map((item, index) => ({
-    "field_name": item.customFieldTagname,
-    "field_type": item.customFieldType,
-    "field_description": item.customFieldDescription,
-    "allow_overwrite": item.allowCustomOverWright
+    field_name: item.customFieldTagname,
+    field_type: item.customFieldType,
+    field_description: item.customFieldDescription,
+    allow_overwrite: item.allowCustomOverWright,
   }));
 
   const tiggerwebhook = triggerwebhookdata.map((item, index) => ({
-    "goal_name": item.Triggergoalname,
-    "triggers": item.TriggerselectTriggers,
-    "webhook_request_method": item.TriggervalueOfheaders,
-    "webhook_url": item.TriggerwebhookUrl,
-    "webhook_description": item.Triggerwebhookdesc
-  }))
+    goal_name: item.Triggergoalname,
+    triggers: item.TriggerselectTriggers,
+    webhook_request_method: item.TriggervalueOfheaders,
+    webhook_url: item.TriggerwebhookUrl,
+    webhook_description: item.Triggerwebhookdesc,
+  }));
 
   const CreateAIBot = async (values) => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const createBot = await axiosInstance.post("bot", {
-        "bot_type": {
-          "ai_type": values.AiType,
-          "bot_name": values.Botname,
-          "bot_description": values.BotDescription,
-          "prompt_type": values.PromptType,
-          "prompt": values.Prompt,
-          "intro_message_type": values.IntroMessageType,
-          "intro_message": values.IntroMessage,
-          "converstation_limit": values.Conversation,
-          "time_zone_reference": values.TimeZoneReference,
-          "time_zone_format": values.TimeZoneFormat,
-          "time_format": values.TimeFormat,
-          "gpt_model": values.GPTmodel,
-          "open_ai_api_key": values.OpenAikey,
-          "message_delay": values.messageDelay
+        bot_type: {
+          ai_type: values.AiType,
+          bot_name: values.Botname,
+          bot_description: values.BotDescription,
+          prompt_type: values.PromptType,
+          prompt: values.Prompt,
+          intro_message_type: values.IntroMessageType,
+          intro_message: values.IntroMessage,
+          converstation_limit: values.Conversation,
+          time_zone_reference: values.TimeZoneReference,
+          time_zone_format: values.TimeZoneFormat,
+          time_format: values.TimeFormat,
+          gpt_model: values.GPTmodel,
+          open_ai_api_key: values.OpenAikey,
+          message_delay: values.messageDelay,
         },
-        "tag_type": tag_type,
-        "custom_field_type": customfields,
-        "trigger_webhook_type": tiggerwebhook
-      })
-      navigate("/dashboard/bots")
-      console.log(createBot.response.data, ">>>>>>>>>>")
+        tag_type: tag_type,
+        custom_field_type: customfields,
+        trigger_webhook_type: tiggerwebhook,
+      });
+    
+      navigate("/dashboard/bots");
+      console.log(createBot.response.data, ">>>>>>>>>>");
     } catch (error) {
-      console.log("i am error")
+      console.log("i am error");
     }
-  }
+  };
 
   const handleSubmitForUpdate = async (values) => {
+    console.log(values, "----------------????????????????");
     try {
       const createBot = await axiosInstance.put(`bot/${uniqueId}`, {
-        "bot_type": {
-          "ai_type": values.AiType,
-          "bot_name": values.Botname,
-          "bot_description": values.BotDescription,
-          "prompt_type": values.PromptType,
-          "prompt": values.Prompt,
-          "intro_message_type": values.IntroMessageType,
-          "intro_message": values.IntroMessage,
-          "converstation_limit": values.Conversation,
-          "time_zone_reference": values.TimeZoneReference,
-          "time_zone_format": values.TimeZoneFormat,
-          "time_format": values.TimeFormat,
-          "gpt_model": values.GPTmodel,
-          "open_ai_api_key": values.OpenAikey,
-          "message_delay": values.messageDelay
+        bot_type: {
+          ai_type: values.AiType,
+          bot_name: values.Botname,
+          bot_description: values.BotDescription,
+          prompt_type: values.PromptType,
+          prompt: values.Prompt,
+          intro_message_type: values.IntroMessageType,
+          intro_message: values.IntroMessage,
+          converstation_limit: values.Conversation,
+          time_zone_reference: values.TimeZoneReference,
+          time_zone_format: values.TimeZoneFormat,
+          time_format: values.TimeFormat,
+          gpt_model: values.GPTmodel,
+          open_ai_api_key: values.OpenAikey,
+          message_delay: values.messageDelay,
         },
-        "tag_type": tag_type,
-        "custom_field_type": customfields,
-        "trigger_webhook_type": tiggerwebhook
-      })
-      setUpdate(false)
+        tag_type: tag_type,
+        custom_field_type: customfields,
+        trigger_webhook_type: tiggerwebhook,
+      });
+      setUpdate(false);
       dispatch(setFlag(true));
-      navigate("/dashboard/bots")
-      console.log(createBot.response.data, "udpate data as well")
+      navigate("/dashboard/bots");
+      console.log(createBot.response.data, "udpate data as well");
     } catch (error) {
-      console.log(error, "i am error")
+      console.log(error, "i am error");
     }
-  }
+  };
 
   const formik = useFormik({
     initialValues: {
-      AiType: '',
-      Botname: '',
-      BotDescription: '',
-      PromptType: '',
-      Prompt: '',
-      IntroMessageType: '',
-      IntroMessage: '',
-      OpenAikey: '',
-      Conversation: '',
-      TimeZoneReference: '',
-      TimeZoneFormat: '',
-      TimeFormat: '',
-      GPTmodel: '',
-      messageDelay: ''
+      AiType: "",
+      Botname: "",
+      BotDescription: "",
+      PromptType: "",
+      Prompt: "",
+      IntroMessageType: "",
+      IntroMessage: "",
+      OpenAikey: "",
+      Conversation: "",
+      TimeZoneReference: "",
+      TimeZoneFormat: "",
+      TimeFormat: "",
+      GPTmodel: "",
+      messageDelay: "",
     },
     onSubmit: async (values, { resetForm }) => {
       console.log(JSON.stringify(values, null, 2));
@@ -270,7 +255,7 @@ function CreateBot() {
 
   const getBotForUpdate = async (uniqueId) => {
     try {
-      const resp = await axiosInstance.get(`bot/${uniqueId}`)
+      const resp = await axiosInstance.get(`bot/${uniqueId}`);
       const data = resp.details[0];
       formik.setValues({
         AiType: data.ai_type,
@@ -286,18 +271,20 @@ function CreateBot() {
         TimeZoneFormat: data.time_zone_format,
         TimeFormat: data.time_format,
         GPTmodel: data.gpt_model,
-        messageDelay: data.message_delay
-      })
-      setUpdate(true)
-      console.log(resp.details[0], "i am ready for update ")
+        messageDelay: data.message_delay,
+      });
+      setUpdate(true);
+      console.log(resp.details[0], "i am ready for update ");
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   useEffect(() => {
-    getBotForUpdate(uniqueId)
-  }, [uniqueId])
+    if(uniqueId){
+      getBotForUpdate(uniqueId);
+    }
+  }, [uniqueId]);
 
   return (
     <div className="w-[100%] bg-white border border-gray-400 rounded-lg px-8 py-6 shadow-lg">
@@ -314,7 +301,9 @@ function CreateBot() {
                 onBlur={formik.handleBlur}
                 value={formik.values.AiType}
               >
-                <option default value={""} className="hidden">Select</option>
+                <option default value={""} className="hidden">
+                  Select
+                </option>
                 {OptAi.map((item, i) => (
                   <option key={i}>{item}</option>
                 ))}
@@ -356,7 +345,9 @@ function CreateBot() {
                 onBlur={formik.handleBlur}
                 value={formik.values.PromptType}
               >
-                <option default value={""} className="hidden">Select</option>
+                <option default value={""} className="hidden">
+                  Select
+                </option>
                 {Intromessage.map((option, i) => (
                   <option key={i}>{option}</option>
                 ))}
@@ -386,8 +377,11 @@ function CreateBot() {
                 name="IntroMessageType"
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                value={formik.values.IntroMessageType}>
-                <option default value={""} className="hidden">Select</option>
+                value={formik.values.IntroMessageType}
+              >
+                <option default value={""} className="hidden">
+                  Select
+                </option>
                 {Intromessage.map((option, i) => (
                   <option key={i}>{option}</option>
                 ))}
@@ -447,7 +441,9 @@ function CreateBot() {
                   onBlur={formik.handleBlur}
                   value={formik.values.TimeZoneReference}
                 >
-                  <option default value={""} className="hidden">Select</option>
+                  <option default value={""} className="hidden">
+                    Select
+                  </option>
                   {TzReference.map((option, index) => (
                     <option key={index}>{option}</option>
                   ))}
@@ -465,7 +461,9 @@ function CreateBot() {
                   onBlur={formik.handleBlur}
                   value={formik.values.TimeZoneFormat}
                 >
-                  <option default value={""} className="hidden">Select</option>
+                  <option default value={""} className="hidden">
+                    Select
+                  </option>
                   {Tzformate.map((option, index) => (
                     <option key={index}>{option}</option>
                   ))}
@@ -483,7 +481,9 @@ function CreateBot() {
                   onBlur={formik.handleBlur}
                   value={formik.values.TimeFormat}
                 >
-                  <option default value={""} className="hidden">Select</option>
+                  <option default value={""} className="hidden">
+                    Select
+                  </option>
                   {Timeformat.map((option, index) => (
                     <option key={index}>{option}</option>
                   ))}
@@ -502,10 +502,11 @@ function CreateBot() {
                 onBlur={formik.handleBlur}
                 value={formik.values.GPTmodel}
               >
-                <option default value={""} className="hidden">Select</option>
-                {Array.isArray(optGpt) && optGpt.map((item, i) => (
-                  <option key={i}>{item}</option>
-                ))}
+                <option default value={""} className="hidden">
+                  Select
+                </option>
+                {Array.isArray(optGpt) &&
+                  optGpt.map((item, i) => <option key={i}>{item}</option>)}
               </DropDown>
               <ChevronDownIcon />
             </div>
@@ -526,26 +527,35 @@ function CreateBot() {
           </div>
           <div className="w-[50%]">
             <div className="relative gap-3">
-              <select className="rounded-lg border border-blue-600 appearance-none py-2 text-base justify-center focus:shadow-lg pl-5 pr-8 text-center font-semibold text-blue-600 focus:outline-none focus:border-blue-500 hover:bg-[#0F45F5] hover:text-white cursor-pointer"
+              <select
+                className="rounded-lg border border-blue-600 appearance-none py-2 text-base justify-center focus:shadow-lg pl-5 pr-8 text-center font-semibold text-blue-600 focus:outline-none focus:border-blue-500 hover:bg-[#0F45F5] hover:text-white cursor-pointer"
                 onChange={handleSelectChange}
                 onClick={toggleIsOpen}
                 value={"+ add a Goal"}
               >
-                <option className="font-bold text-blue-600 hidden">+ Add a Goal</option>
+                <option className="font-bold text-blue-600 hidden">
+                  + Add a Goal
+                </option>
                 {opt.map((item, i) => (
                   <option
                     key={i}
                     className="hover:text-blue-400 bg-white text-gray-500 text-start p-5"
-                    value={item}>
+                    value={item}
+                  >
                     {item}
                   </option>
                 ))}
               </select>
-              <span className={`absolute top-0 h-full ml-[18%] text-center font-bold pointer-events-none flex items-center justify-center duration-300 ${isOpen ? 'transform rotate-180' : ''}`} style={{
-                hover: {
-                  color: "white"
-                }
-              }}>
+              <span
+                className={`absolute top-0 h-full ml-[18%] text-center font-bold pointer-events-none flex items-center justify-center duration-300 ${
+                  isOpen ? "transform rotate-180" : ""
+                }`}
+                style={{
+                  hover: {
+                    color: "white",
+                  },
+                }}
+              >
                 <HiOutlineChevronDown className="text-blue-500 hover:text-white font-bold" />
               </span>
             </div>
@@ -554,13 +564,24 @@ function CreateBot() {
         {foreignElements}
         <div className="flex gap-2 my-6">
           <Link to="/dashboard/bots">
-            <button type="button" className="border border-blue-600 rounded-md text-blue-600 px-12 font-semibold py-2 text-md hover:bg-blue-600 hover:text-white">Cancel</button>
+            <button
+              type="button"
+              className="border border-blue-600 rounded-md text-blue-600 px-12 font-semibold py-2 text-md hover:bg-blue-600 hover:text-white"
+            >
+              Cancel
+            </button>
           </Link>
-          {update ? <Updatebutton type="submit" handleSubmitForUpdate={handleSubmitForUpdate} /> : <LoadingButton type="submit" isLoading={isLoading} /> }
+          {update ? (
+            <Updatebutton
+              type="submit"
+            />
+          ) : (
+            <LoadingButton type="submit" isLoading={isLoading} />
+          )}
         </div>
       </form>
     </div>
-  )
+  );
 }
 
 export default CreateBot;

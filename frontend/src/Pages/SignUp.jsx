@@ -21,6 +21,7 @@ function SignUp() {
         password: password,
       });
       setIsSignUp(true);
+      navigate("/")
       console.log("Signup successful:", response);
     } catch (error) {
       setIsSignUp(false);
