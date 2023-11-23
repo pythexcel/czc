@@ -15,6 +15,7 @@ import axiosInstance from "../utils/axios";
 import TextArea from "../Common-Component/TextArea";
 import Updatebutton from "../Common-Component/Updatebutton";
 import { setFlag } from "../Store/slice/flagSlice";
+import { addEmptyWebhookObject, deleteWebhook } from "../Store/slice/TriggerWebhookSlice";
 
 const Intromessage = ["Text", "Custom Field", "Custom Value"];
 
@@ -28,7 +29,7 @@ const opt = ["Tag Type", "Custom Field Type", "Trigger Webhook"];
 
 const optGpt = ["GPT-3", "GPT-3.5", "GPT-4"];
 
-const OptAi = ["Booking", "Non-Booking"];
+const OptAi = ["Booking", "Non Booking"];
 
 function CreateBot() {
   const navigate = useNavigate();
@@ -38,35 +39,25 @@ function CreateBot() {
   const queryParams = new URLSearchParams(location.search);
   const uniqueId = queryParams.get("id");
 
-  const [headerValues, setHeaderValues] = useState({});
-  const [nameValues, setNameValues] = useState({});
-  // const [headerData, setHeaderData] = useState([])
 
   const [isLoading, setIsLoading] = useState(false);
   const [update, setUpdate] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  console.log(headerValues, nameValues, "this is values");
 
   const childData = useSelector((state) => state.tag.childData);
-  console.log(childData, "I am child component data");
 
   const customfieldata = useSelector(
     (state) => state.customReducer.customfieldData
   );
-  console.log(customfieldata, "this is data of custom Fields");
 
   const triggerwebhookdata = useSelector(
     (state) => state.TriggerWebhook.triggerWebhookData
   );
   console.log(triggerwebhookdata, "triggerwebhookdata,,,,");
 
-  const headerdata = useSelector((state) => state.inputHeader.inputHeaderData);
-  console.log(headerdata);
-
   const [addtag, setAddTag] = useState([]);
   const [customfield, setCustomfield] = useState([]);
-  const [triggerWebhook, setTriggerWebhook] = useState([]);
 
   const HandleAddTage = () => {
     setAddTag([...addtag, addtag.length]);
@@ -87,13 +78,11 @@ function CreateBot() {
   };
 
   const handleAddTriggerWebhook = () => {
-    setTriggerWebhook([...triggerWebhook, triggerWebhook.length]);
+    dispatch(addEmptyWebhookObject())
   };
 
   const handleDeleteTriggerWebhook = (index) => {
-    setTriggerWebhook((p) =>
-      p.filter((addWebhookIndex) => addWebhookIndex !== index)
-    );
+    dispatch(deleteWebhook(index))
   };
 
   const handleSelectChange = (event) => {
@@ -127,37 +116,40 @@ function CreateBot() {
           />
         ))}
 
-      {Array.isArray(triggerWebhook) &&
-        triggerWebhook.map((index) => (
+      {Array.isArray(triggerwebhookdata) &&
+        triggerwebhookdata.map((item, index) => (
           <TriggerWebhook
-            setHeaderValues={setHeaderValues}
-            setNameValues={setNameValues}
             onDeleteWebhook={handleDeleteTriggerWebhook}
             index={index}
             key={index}
+            data={item}
           />
         ))}
     </div>
   );
 
-  const tag_type = childData.map((item, index) => ({
+  const tag_type = childData.map((item) => ({
     tag_name: item.tagname,
     goal_description: item.description,
   }));
 
-  const customfields = customfieldata.map((item, index) => ({
+  const customfields = customfieldata.map((item) => ({
     field_name: item.customFieldTagname,
     field_type: item.customFieldType,
     field_description: item.customFieldDescription,
     allow_overwrite: item.allowCustomOverWright,
   }));
 
-  const tiggerwebhook = triggerwebhookdata.map((item, index) => ({
+  const tiggerwebhook = triggerwebhookdata.map((item) => ({
     goal_name: item.Triggergoalname,
     triggers: item.TriggerselectTriggers,
     webhook_request_method: item.TriggervalueOfheaders,
     webhook_url: item.TriggerwebhookUrl,
     webhook_description: item.Triggerwebhookdesc,
+    header_type: item.headers.map((data) => ({
+      headers: data.headerName,
+      value_of_header: data.valueOfHeader
+    }))
   }));
 
   const CreateAIBot = async (values) => {
@@ -184,7 +176,7 @@ function CreateBot() {
         custom_field_type: customfields,
         trigger_webhook_type: tiggerwebhook,
       });
-    
+
       navigate("/dashboard/bots");
       console.log(createBot.response.data, ">>>>>>>>>>");
     } catch (error) {
@@ -281,7 +273,7 @@ function CreateBot() {
   };
 
   useEffect(() => {
-    if(uniqueId){
+    if (uniqueId) {
       getBotForUpdate(uniqueId);
     }
   }, [uniqueId]);
@@ -547,9 +539,8 @@ function CreateBot() {
                 ))}
               </select>
               <span
-                className={`absolute top-0 h-full ml-[18%] text-center font-bold pointer-events-none flex items-center justify-center duration-300 ${
-                  isOpen ? "transform rotate-180" : ""
-                }`}
+                className={`absolute top-0 h-full ml-[18%] text-center font-bold pointer-events-none flex items-center justify-center duration-300 ${isOpen ? "transform rotate-180" : ""
+                  }`}
                 style={{
                   hover: {
                     color: "white",

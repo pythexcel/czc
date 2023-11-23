@@ -6,12 +6,11 @@ import Title from "./Title";
 import InputField from '../Component/TextInput';
 import DropDown from "./DropDown";
 import { useDispatch } from "react-redux";
-import { setTriggerWebhookSlice } from '../Store/slice/TriggerWebhookSlice';
+import { addHeadersSlice, deleteHeaders, setTriggerWebhookSlice } from '../Store/slice/TriggerWebhookSlice';
 
 
-function TriggerWebhook({ onDeleteWebhook, index }) {
+function TriggerWebhook({ data, onDeleteWebhook, index }) {
     const dispatch = useDispatch();
-    const [headers, setHeaders] = useState([]);
 
     const handleGoalName = (e) => {
         dispatch(setTriggerWebhookSlice({ index, Triggergoalname: e.target.value }));
@@ -38,11 +37,18 @@ function TriggerWebhook({ onDeleteWebhook, index }) {
     }
 
     const handleAddHeaders = () => {
-        setHeaders([...headers, headers.length + 1]);
+        dispatch(addHeadersSlice({
+            index: index
+        }))
+
     }
 
-    const handleDelete = (index) => {
-        setHeaders(prevHeaders => prevHeaders.filter(headerIndex => headerIndex !== index));
+    const handleDelete = (index, webhookIndex) => {
+        const payload = {
+            headerIndex: index,
+            webHookIndex: webhookIndex
+        }
+        dispatch(deleteHeaders(payload))
     }
 
     const opt = [
@@ -63,13 +69,14 @@ function TriggerWebhook({ onDeleteWebhook, index }) {
                     <InputField
                         type="text"
                         placeholder="Name"
+                        value={data?.Triggergoalname}
                         onChange={handleGoalName}
                     />
                 </div>
                 <div className="w-[40%]">
                     <Title>Triggers</Title>
                     <div className="relative flex">
-                        <DropDown
+                        <DropDown value={data?.TriggerselectTriggers}
                             onChange={handleSelectTriggers}
                         >
                             <option value={""} className="hidden">Select</option>
@@ -88,6 +95,7 @@ function TriggerWebhook({ onDeleteWebhook, index }) {
                 <InputField
                     type="text"
                     placeholder="https://app.zappychat/example/webhook"
+                    value={data.TriggerwebhookUrl}
                     onChange={handleWebhookUrl}
                 />
             </div>
@@ -96,6 +104,7 @@ function TriggerWebhook({ onDeleteWebhook, index }) {
                 <textarea
                     id="message"
                     name="message"
+                    value={data.Triggerwebhookdesc}
                     onChange={handleWebhookDesc}
                     className="bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 h-[60px] text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out w-full focus:shadow-lg" placeholder="Description"></textarea>
             </div>
@@ -103,10 +112,12 @@ function TriggerWebhook({ onDeleteWebhook, index }) {
                 <button type="button" onClick={handleAddHeaders} className="border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-semibold px-6 py-2 text-center rounded-lg">Add Headers +</button>
             </div>
 
-            {headers.map((index) => (
+            {data?.headers.map((item, headerIndex) => (
                 <InputHeaders
-                    key={index}
-                    index={index}
+                    key={headerIndex}
+                    webHookIndex={index}
+                    index={headerIndex}
+                    data={item}
                     onDelete={handleDelete}
                 />
             ))}
@@ -115,7 +126,7 @@ function TriggerWebhook({ onDeleteWebhook, index }) {
                 <div className="w-[20%]">
                     <Title>Value Of header</Title>
                     <div className="relative items-center">
-                        <DropDown onChange={handleValueOfHeaders}>
+                        <DropDown value={data.TriggervalueOfheaders} onChange={handleValueOfHeaders}>
                             <option value={""} className="hidden">Select</option>
                             {op.map((item, i) => (
                                 <option key={i} value={item}>{item}</option>
