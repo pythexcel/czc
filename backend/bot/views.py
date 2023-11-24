@@ -45,10 +45,7 @@ class CreateBotAPI(APIView):
 
     def get(self, request, id=None):
         user_id = request.user.id
-        if id:
-            data = get_bot_data(bot_id=id, user_id=user_id)
-        else:
-            data = get_bot_data(user_id=user_id)
+        data = get_bot_data(bot_id=id, user_id=user_id)
         return Response({"details": data, "success": True}, status=status.HTTP_200_OK)
 
     def put(self, request, id):
