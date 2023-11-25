@@ -1,3 +1,5 @@
+import pandas as pd
+import os
 from rest_framework.views import APIView, status
 from rest_framework.response import Response
 from users.models import HighLevelModel
@@ -6,10 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 from .models import FAQ
 from django.shortcuts import get_object_or_404
 from utils.helperfunction import download_csv_file
-import pandas as pd
-import os
-from django.http import HttpResponse
-import csv
+
+
 
 class FAQAPI(APIView):
     permission_classes = [IsAuthenticated]
@@ -100,10 +100,9 @@ class DownloadFAQAPI(APIView):
         try:
             high_level_instance = HighLevelModel.objects.get(user_id=request.user.id)
             faq_data = list(FAQ.objects.filter(high_level_id=high_level_instance.id).values("question", "answer"))
-            message = download_csv_file(faq_data)
+            download_csv_file(faq_data)
             return Response(
                 {    
-                    "file": message,
                     "details": "download csv file",
                     "success": True
                 },
@@ -127,16 +126,19 @@ class ImportFAQFile(APIView):
                     "success": False
                  },
                  status=status.HTTP_400_BAD_REQUEST)
-            delete_exiting_faq = request.data.get('delete_exiting_faq', None)
-            if delete_exiting_faq == "yes":
+            delete_existing_faq = request.data.get('delete_exiting_faq', None)
+            if delete_existing_faq == "yes":
                 FAQ.objects.filter(high_level_id=high_level_instance.id).delete()
                 
 
             df = pd.read_csv(filename)
-            data = df.to_numpy()
-            for x in data:
-                faq_list = {"question": x[0], "answer": x[1], "high_level_id":high_level_instance.id}
-                FAQ.objects.create(**faq_list)
+            # data = df.to_numpy()
+            df_dict = df.to_dict()
+            print(df_dict)
+            # for x in df.iterrows:
+            #     print("dfsdkjfldkfjsl",x)
+                # faq_list = {"question": x[0], "answer": x[1], "high_level_id":high_level_instance.id}
+                # FAQ.objects.create(**faq_list)
             return Response(
                     {
                         "details": "added data successfully",

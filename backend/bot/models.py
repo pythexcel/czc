@@ -1,6 +1,8 @@
 from django.db import models
 from users.models import User
 import uuid
+import random
+
 
 
 class BotModel(models.Model):
@@ -16,7 +18,7 @@ class BotModel(models.Model):
     TIME_ZONE_CHOICES = (("Contact", "Contact"), ("Location", "Location"))
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-   # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+  #  id = models.PositiveIntegerField(primary_key=True, editable=False, default= )
     ai_type = models.CharField(max_length=100, choices=AI_TYPE_CHOICES)
     bot_name = models.CharField(max_length=100,)
     bot_description = models.CharField(max_length=500, blank=True, null=True)

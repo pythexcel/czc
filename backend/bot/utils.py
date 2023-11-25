@@ -5,6 +5,7 @@ from bot.models import (
      Header,
      BotModel,
 )
+from .serializers import BotModelSerializer
 
 
 def add_goals(validate_data, bot_instance):
@@ -38,31 +39,17 @@ def add_goals(validate_data, bot_instance):
 
 def get_bot_data(bot_id=None, user_id=None):
     try:
-        data_list = []
         bot_filter = {'user_id': user_id}
         if bot_id:
             bot_filter['id'] = bot_id
-        bot_data_list = list(BotModel.objects.filter(**bot_filter).values())
-        for bot in bot_data_list:
-            tag = TagType.objects.filter(bot_id_id=bot['id']).values("tag_name", "goal_description")
-            custom = CustomFieldType.objects.filter(bot_id_id=bot['id']).values("field_name",
-                                                                            "field_type",
-                                                                            "field_description",
-                                                                            "allow_overwrite")
-            webhook = list(TriggerWebhook.objects.filter(bot_id_id=bot['id']).values("id","goal_name",
-                                                                            "triggers",
-                                                                            "webhook_description",
-                                                                            "webhook_url",
-                                                                            "webhook_request_method"))
-            for web in webhook:
-                print(web['id'])
-                header = Header.objects.filter(triggerwebhook_id_id=web['id']).values()
-                web['header_field_type'] = header
-            data = {"bot_type": bot, "tag_type": tag, "custom_field_type": custom, "webhook_field_type": webhook}
-            data_list.append(data)
-        return data_list
-    except Exception:
-        return "Invalid bot id"
+            bot_data = BotModel.objects.get(**bot_filter)
+            serializer = BotModelSerializer(bot_data)
+        else:
+            bot_data = BotModel.objects.all().filter(**bot_filter)
+            serializer = BotModelSerializer(bot_data, many=True)
+        return serializer.data
+    except BotModel.DoesNotExist:
+        return "Invaild Id"
 
 
 def update_bot_record(request,  validated_data, bot_instance):

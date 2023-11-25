@@ -18,7 +18,7 @@ from utils.helperfunction import open_ai_is_valid
 
 class CreateBotAPI(APIView):
     permission_classes = [IsAuthenticated]
-
+    
     def post(self, request):
         serializer = CreateBotSerializer(
             data=request.data,
