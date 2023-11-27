@@ -32,8 +32,7 @@ class FAQAPI(APIView):
                     "success": True
                 },
                 status=status.HTTP_200_OK)
-        except Exception as e:
-            print("error e",e)
+        except Exception:
             return Response(
                 {
                     "message": "Please select your HighLevel",
@@ -128,16 +127,11 @@ class ImportFAQFile(APIView):
             delete_existing_faq = request.data.get('delete_exiting_faq', None)
             if delete_existing_faq == "yes":
                 FAQ.objects.filter(high_level_id=high_level_instance.id).delete()
-                
 
-            df = pd.read_csv(filename)
-            # data = df.to_numpy()
-            df_dict = df.to_dict()
-            print(df_dict)
-            # for x in df.iterrows:
-            #     print("dfsdkjfldkfjsl",x)
-                # faq_list = {"question": x[0], "answer": x[1], "high_level_id":high_level_instance.id}
-                # FAQ.objects.create(**faq_list)
+            df = pd.read_csv(filename, skiprows=0)
+            for i in range(len(df)):
+                faq_list = {"question": df['question'][i], "answer": df['answer'][i], "high_level_id":high_level_instance.id}
+                FAQ.objects.create(**faq_list)
             return Response(
                     {
                         "details": "added data successfully",

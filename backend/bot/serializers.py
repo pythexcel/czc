@@ -54,7 +54,7 @@ class CreateBotSerializer(serializers.Serializer):
 class HeaderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Header
-        fields ="__all__"
+        fields = "__all__"
 
 
 class TriggerWebhookSerializer(serializers.ModelSerializer):
@@ -66,7 +66,7 @@ class TriggerWebhookSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TriggerWebhook
-        fields = '__all__'
+        fields = "__all__"
 
 
 class TagTypeSerializer(serializers.ModelSerializer):
@@ -99,6 +99,7 @@ class BotModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = BotModel
         fields = "__all__"
+
 
 class DeleteBotSerializer(serializers.Serializer):
     bot_id = serializers.IntegerField()

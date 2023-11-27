@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "faq",
     "rest_framework_simplejwt",
-    #'phonenumber_field',
     "corsheaders",
 ]
 
