@@ -10,28 +10,21 @@ from django.shortcuts import get_object_or_404
 
 
 def add_goals(validate_data, bot_instance):
-    all_goal_list = validate_data.keys()
-    if "tag_type" in all_goal_list:
-        tag_goal_list = validate_data['tag_type']
-        for tag_goal in tag_goal_list:
-            tag_goal["bot"] = bot_instance
-            TagType.objects.create(**tag_goal)
-    if "custom_field_type" in all_goal_list:
-        custom_goal_list = validate_data['custom_field_type']
-        for custom_goal in custom_goal_list:
-            custom_goal['bot'] = bot_instance
-            CustomFieldType.objects.create(**custom_goal)
-    if "trigger_webhook_type" in all_goal_list:
-        trigger_webhook_goal_list = validate_data['trigger_webhook_type']
-        for trigger_goal in trigger_webhook_goal_list:
+    if "tag_type" in validate_data:
+        tag_type_objects = [TagType(**{**tag_goal, "bot": bot_instance}) for tag_goal in validate_data['tag_type']]
+        TagType.objects.bulk_create(tag_type_objects)
+    if "custom_field_type" in validate_data:
+        custom_field_objects = [CustomFieldType(**{**custom_goal, "bot": bot_instance}) for custom_goal in validate_data['custom_field_type']]
+        CustomFieldType.objects.bulk_create(custom_field_objects)
+    if "trigger_webhook_type" in validate_data:
+        for trigger_goal in validate_data['trigger_webhook_type']:
             trigger_goal["bot"] = bot_instance
             if "header_type" in trigger_goal.keys():
                 header_data = trigger_goal['header_type']
                 trigger_goal.pop("header_type")
                 webhook_id = TriggerWebhook.objects.create(**trigger_goal)
-                for header in header_data:
-                    header["triggerwebhook"] = webhook_id
-                    Header.objects.create(**header)
+                header_field_objects = [Header(**{**header, "triggerwebhook": webhook_id}) for header in header_data] 
+                Header.objects.bulk_create(header_field_objects)
             else:
                 TriggerWebhook.objects.create(**trigger_goal)
     message = "register successfully"

@@ -8,8 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import FAQ
 from django.shortcuts import get_object_or_404
 from utils.helperfunction import download_csv_file
-import tempfile
-from django.http import FileResponse
+
 
 class FAQAPI(APIView):
     permission_classes = [IsAuthenticated]
