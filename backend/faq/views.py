@@ -129,11 +129,16 @@ class ImportFAQFile(APIView):
                 FAQ.objects.filter(high_level_id=high_level_instance.id).delete()
 
             df = pd.read_csv(filename, skiprows=0)
-            df['high_level_id'] = high_level_instance.id
-            faq_list = [FAQ(question=q['question'], answer=q['answer'], high_level_id=q['high_level_id']) for q in df[['question', 'answer', 'high_level_id']].to_dict(orient='records')]
+            faq_list = []
+            for row in df.iterrows():
+                faq_list.append(
+                    FAQ(question=row[1]['question'],
+                        answer=row[1]['answer'],
+                        high_level_id=high_level_instance.id)
+                    )
             FAQ.objects.bulk_create(faq_list)
             return Response(
-                    {  
+                    {
                         "details": "added data successfully",
                         "success": True
                     },

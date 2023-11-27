@@ -16,4 +16,3 @@ db.sqlite3
 backend/nohup.out
 .vscode
 frontend/node_modules
-backend/media
