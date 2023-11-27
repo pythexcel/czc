@@ -51,12 +51,6 @@ class CreateBotSerializer(serializers.Serializer):
         return bot_instance
 
 
-class BotModelSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BotModel
-        fields = "__all__"
-
-
 class HeaderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Header
@@ -65,6 +59,10 @@ class HeaderSerializer(serializers.ModelSerializer):
 
 class TriggerWebhookSerializer(serializers.ModelSerializer):
     header_type = HeaderSerializer(many=True, required=False)
+    header_field = serializers.SerializerMethodField()
+
+    def get_header_field(self, obj):
+        return obj.webhook_header.values()
 
     class Meta:
         model = TriggerWebhook
@@ -72,14 +70,34 @@ class TriggerWebhookSerializer(serializers.ModelSerializer):
 
 
 class TagTypeSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = TagType
         fields = "__all__"
 
 
 class CustomFieldTypeSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = CustomFieldType
+        fields = "__all__"
+
+
+class BotModelSerializer(serializers.ModelSerializer):
+    goal = serializers.SerializerMethodField()
+
+    def get_goal(self, obj):
+        data = {
+                "tag_type": obj.bot_tagtype.values(),
+                "custom_field_type": obj.bot_custom.values(),
+                "trigger_webhook_field": TriggerWebhookSerializer(
+                    obj.bot_trigger.all(), many=True
+                  ).data,
+                }
+        return data
+
+    class Meta:
+        model = BotModel
         fields = "__all__"
 
 
@@ -89,3 +107,4 @@ class DeleteBotSerializer(serializers.Serializer):
     custom_field_type_ids = serializers.ListField(required=False)
     trigger_webhook_type_ids = serializers.ListField(required=False)
     header_type_ids = serializers.ListField(required=False)
+
