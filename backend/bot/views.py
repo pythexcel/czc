@@ -31,7 +31,7 @@ class CreateBotAPI(APIView):
                 {"success": False, "message": "please enter a valid openAi key"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        bot_instance = serializer.create()
+        bot_instance = serializer.create() 
         message, response = add_goals(serializer.validated_data, bot_instance)
         if not response:
             return Response(

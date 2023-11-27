@@ -6,6 +6,7 @@ from bot.models import (
      BotModel,
 )
 from .serializers import BotModelSerializer
+from django.shortcuts import get_object_or_404
 
 
 def add_goals(validate_data, bot_instance):
@@ -13,23 +14,23 @@ def add_goals(validate_data, bot_instance):
     if "tag_type" in all_goal_list:
         tag_goal_list = validate_data['tag_type']
         for tag_goal in tag_goal_list:
-            tag_goal["bot_id"] = bot_instance
+            tag_goal["bot"] = bot_instance
             TagType.objects.create(**tag_goal)
     if "custom_field_type" in all_goal_list:
         custom_goal_list = validate_data['custom_field_type']
         for custom_goal in custom_goal_list:
-            custom_goal['bot_id'] = bot_instance
+            custom_goal['bot'] = bot_instance
             CustomFieldType.objects.create(**custom_goal)
     if "trigger_webhook_type" in all_goal_list:
         trigger_webhook_goal_list = validate_data['trigger_webhook_type']
         for trigger_goal in trigger_webhook_goal_list:
-            trigger_goal["bot_id"] = bot_instance
+            trigger_goal["bot"] = bot_instance
             if "header_type" in trigger_goal.keys():
                 header_data = trigger_goal['header_type']
                 trigger_goal.pop("header_type")
                 webhook_id = TriggerWebhook.objects.create(**trigger_goal)
                 for header in header_data:
-                    header["triggerwebhook_id"] = webhook_id
+                    header["triggerwebhook"] = webhook_id
                     Header.objects.create(**header)
             else:
                 TriggerWebhook.objects.create(**trigger_goal)
@@ -38,18 +39,15 @@ def add_goals(validate_data, bot_instance):
 
 
 def get_bot_data(bot_id=None, user_id=None):
-    try:
-        bot_filter = {'user_id': user_id}
-        if bot_id:
-            bot_filter['id'] = bot_id
-            bot_data = BotModel.objects.get(**bot_filter)
-            serializer = BotModelSerializer(bot_data)
-        else:
-            bot_data = BotModel.objects.all().filter(**bot_filter)
-            serializer = BotModelSerializer(bot_data, many=True)
-        return serializer.data
-    except BotModel.DoesNotExist:
-        return "Invaild Id"
+    bot_filter = {'user_id': user_id}
+    if bot_id:
+        bot_filter['id'] = bot_id
+        bot_data = get_object_or_404(BotModel, **bot_filter)
+        serializer = BotModelSerializer(bot_data)
+    else:
+        bot_data = BotModel.objects.filter(**bot_filter)
+        serializer = BotModelSerializer(bot_data, many=True)
+    return serializer.data
 
 
 def update_bot_record(request,  validated_data, bot_instance):
