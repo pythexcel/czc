@@ -1,7 +1,6 @@
 from django.db import models
 from users.models import User
-import uuid
-
+import uuid 
 
 class BotModel(models.Model):
     AI_TYPE_CHOICES = (("Booking", "Booking"), ("Non Booking", "Non Booking"))
@@ -14,11 +13,10 @@ class BotModel(models.Model):
     TIME_ZONE_FORMAT_CHOICES = (("Abbreviated", "Abbreviated"), ("Hidden", "Hidden"))
     GPT_MODEL_CHOICES = (("GPT-3", "GPT-3"), ("GPT-3.5", "GPT-3.5"), ("GPT-4", "GPT-4"),("GPT-4-turbo","GPT-4-turbo"))
     TIME_ZONE_CHOICES = (("Contact", "Contact"), ("Location", "Location"))
-
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-   # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     ai_type = models.CharField(max_length=100, choices=AI_TYPE_CHOICES)
-    bot_name = models.CharField(max_length=100, unique=True)
+    bot_name = models.CharField(max_length=100,)
     bot_description = models.CharField(max_length=500, blank=True, null=True)
     prompt_type = models.CharField(max_length=20, choices=PROMPT_TYPE_CHOICES)
     prompt = models.CharField(max_length=100)
@@ -35,7 +33,7 @@ class BotModel(models.Model):
 
 class TagType(models.Model):
    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    bot_id = models.ForeignKey(BotModel, on_delete=models.CASCADE,
+    bot = models.ForeignKey(BotModel, on_delete=models.CASCADE,
                                null=True,
                                related_name="bot_tagtype")
     tag_name = models.CharField(
@@ -58,7 +56,7 @@ class CustomFieldType(models.Model):
                                 ("Phone", "Phone"),
                                 ("Email", "Email"),
                                 ("Contact Business Name", "Contact Business Name"))
-    bot_id = models.ForeignKey(
+    bot = models.ForeignKey(
         BotModel, on_delete=models.CASCADE,
         null=True,
         related_name="bot_custom"
@@ -77,7 +75,7 @@ class TriggerWebhook(models.Model):
     )
     REQUEST_METHOD_CHOICES = (("GET", "GET"), ("POST", "POST"))
 
-    bot_id = models.ForeignKey(
+    bot = models.ForeignKey(
         BotModel, on_delete=models.CASCADE,
         null=True,
         related_name="bot_trigger"
@@ -98,7 +96,7 @@ class TriggerWebhook(models.Model):
 
 class Header(models.Model):
     #id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    triggerwebhook_id = models.ForeignKey(TriggerWebhook,
+    triggerwebhook = models.ForeignKey(TriggerWebhook,
                                           on_delete=models.CASCADE,
                                           null=True,
                                           related_name="webhook_header")
