@@ -15,6 +15,8 @@ import axiosInstance from "../utils/axios";
 import TextArea from "../Common-Component/TextArea";
 import Updatebutton from "../Common-Component/Updatebutton";
 import { setFlag } from "../Store/slice/flagSlice";
+import { addEmptyWebhookObject, deleteWebhook, handleReset, setTriggerWebhookSlice } from "../Store/slice/TriggerWebhookSlice";
+import CustomSelector from "../Common-Component/CustomSelector";
 
 const Intromessage = ["Text", "Custom Field", "Custom Value"];
 
@@ -28,7 +30,7 @@ const opt = ["Tag Type", "Custom Field Type", "Trigger Webhook"];
 
 const optGpt = ["GPT-3", "GPT-3.5", "GPT-4"];
 
-const OptAi = ["Booking", "Non-Booking"];
+const OptAi = ["Booking", "Non Booking"];
 
 function CreateBot() {
   const navigate = useNavigate();
@@ -38,35 +40,28 @@ function CreateBot() {
   const queryParams = new URLSearchParams(location.search);
   const uniqueId = queryParams.get("id");
 
-  const [headerValues, setHeaderValues] = useState({});
-  const [nameValues, setNameValues] = useState({});
-  // const [headerData, setHeaderData] = useState([])
-
   const [isLoading, setIsLoading] = useState(false);
   const [update, setUpdate] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [opentag, setOpenTag] = useState([]);
+  const [openCustom, setOpenCustom] = useState([]);
+  const [openTrigger, setOpenTrigger] = useState([]);
 
-  console.log(headerValues, nameValues, "this is values");
+  console.log(opentag, openCustom, openTrigger, "this is the trigger data as well")
 
   const childData = useSelector((state) => state.tag.childData);
-  console.log(childData, "I am child component data");
 
   const customfieldata = useSelector(
     (state) => state.customReducer.customfieldData
   );
-  console.log(customfieldata, "this is data of custom Fields");
 
   const triggerwebhookdata = useSelector(
     (state) => state.TriggerWebhook.triggerWebhookData
   );
-  console.log(triggerwebhookdata, "triggerwebhookdata,,,,");
-
-  const headerdata = useSelector((state) => state.inputHeader.inputHeaderData);
-  console.log(headerdata);
+  // console.log(triggerwebhookdata, "triggerwebhookdata,,,,");
 
   const [addtag, setAddTag] = useState([]);
   const [customfield, setCustomfield] = useState([]);
-  const [triggerWebhook, setTriggerWebhook] = useState([]);
 
   const HandleAddTage = () => {
     setAddTag([...addtag, addtag.length]);
@@ -87,13 +82,11 @@ function CreateBot() {
   };
 
   const handleAddTriggerWebhook = () => {
-    setTriggerWebhook([...triggerWebhook, triggerWebhook.length]);
+    dispatch(addEmptyWebhookObject())
   };
 
   const handleDeleteTriggerWebhook = (index) => {
-    setTriggerWebhook((p) =>
-      p.filter((addWebhookIndex) => addWebhookIndex !== index)
-    );
+    dispatch(deleteWebhook(index))
   };
 
   const handleSelectChange = (event) => {
@@ -106,6 +99,10 @@ function CreateBot() {
       handleAddTriggerWebhook();
     }
   };
+
+  // for (let i = 0; i < opentag.length; i++) {
+  //   HandleAddTage();
+  // }
 
   const toggleIsOpen = () => {
     setIsOpen((prevIsOpen) => !prevIsOpen);
@@ -127,37 +124,40 @@ function CreateBot() {
           />
         ))}
 
-      {Array.isArray(triggerWebhook) &&
-        triggerWebhook.map((index) => (
+      {Array.isArray(triggerwebhookdata) &&
+        triggerwebhookdata.map((item, index) => (
           <TriggerWebhook
-            setHeaderValues={setHeaderValues}
-            setNameValues={setNameValues}
             onDeleteWebhook={handleDeleteTriggerWebhook}
             index={index}
             key={index}
+            data={item}
           />
         ))}
     </div>
   );
 
-  const tag_type = childData.map((item, index) => ({
+  const tag_type = childData.map((item) => ({
     tag_name: item.tagname,
     goal_description: item.description,
   }));
 
-  const customfields = customfieldata.map((item, index) => ({
+  const customfields = customfieldata.map((item) => ({
     field_name: item.customFieldTagname,
     field_type: item.customFieldType,
     field_description: item.customFieldDescription,
     allow_overwrite: item.allowCustomOverWright,
   }));
 
-  const tiggerwebhook = triggerwebhookdata.map((item, index) => ({
+  const tiggerwebhook = triggerwebhookdata.map((item) => ({
     goal_name: item.Triggergoalname,
     triggers: item.TriggerselectTriggers,
     webhook_request_method: item.TriggervalueOfheaders,
     webhook_url: item.TriggerwebhookUrl,
     webhook_description: item.Triggerwebhookdesc,
+    header_type: item.headers.map((data) => ({
+      headers: data.headerName,
+      value_of_header: data.valueOfHeader
+    }))
   }));
 
   const CreateAIBot = async (values) => {
@@ -184,7 +184,6 @@ function CreateBot() {
         custom_field_type: customfields,
         trigger_webhook_type: tiggerwebhook,
       });
-    
       navigate("/dashboard/bots");
       console.log(createBot.response.data, ">>>>>>>>>>");
     } catch (error) {
@@ -193,7 +192,6 @@ function CreateBot() {
   };
 
   const handleSubmitForUpdate = async (values) => {
-    console.log(values, "----------------????????????????");
     try {
       const createBot = await axiosInstance.put(`bot/${uniqueId}`, {
         bot_type: {
@@ -256,7 +254,7 @@ function CreateBot() {
   const getBotForUpdate = async (uniqueId) => {
     try {
       const resp = await axiosInstance.get(`bot/${uniqueId}`);
-      const data = resp.details[0];
+      const data = resp.details;
       formik.setValues({
         AiType: data.ai_type,
         Botname: data.bot_name,
@@ -273,16 +271,24 @@ function CreateBot() {
         GPTmodel: data.gpt_model,
         messageDelay: data.message_delay,
       });
+      console.log(resp.details.goal.tag_type, "i am tag type")
+      setOpenTag(resp.details.goal.tag_type)
+      console.log(resp.details.goal.custom_field_type, "i am custom field")
+      setOpenCustom(resp.details.goal.custom_field_type)
+      console.log(resp.details.goal.trigger_webhook_field, "i am triggerwebhook data")
+      setOpenTrigger(resp.details.goal.trigger_webhook_field)
       setUpdate(true);
-      console.log(resp.details[0], "i am ready for update ");
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    if(uniqueId){
+    if (uniqueId) {
       getBotForUpdate(uniqueId);
+    }
+    return () => {
+      dispatch(handleReset())
     }
   }, [uniqueId]);
 
@@ -327,11 +333,13 @@ function CreateBot() {
         <div className="w-full my-4">
           <Title>Bot Description</Title>
           <TextArea
+            type="text"
             id="BotDescription"
             name="BotDescription"
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             value={formik.values.BotDescription}
+            placeholder="Description"
           />
         </div>
         <div className="flex gap-6 my-4">
@@ -523,12 +531,12 @@ function CreateBot() {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values.messageDelay}
+              min={0}
             />
           </div>
           <div className="w-[50%]">
             <div className="relative gap-3">
-              <select
-                className="rounded-lg border border-blue-600 appearance-none py-2 text-base justify-center focus:shadow-lg pl-5 pr-8 text-center font-semibold text-blue-600 focus:outline-none focus:border-blue-500 hover:bg-[#0F45F5] hover:text-white cursor-pointer"
+              <CustomSelector
                 onChange={handleSelectChange}
                 onClick={toggleIsOpen}
                 value={"+ add a Goal"}
@@ -545,11 +553,10 @@ function CreateBot() {
                     {item}
                   </option>
                 ))}
-              </select>
+              </CustomSelector>
               <span
-                className={`absolute top-0 h-full ml-[18%] text-center font-bold pointer-events-none flex items-center justify-center duration-300 ${
-                  isOpen ? "transform rotate-180" : ""
-                }`}
+                className={`absolute top-0 h-full ml-[18%] text-center font-bold pointer-events-none flex items-center justify-center duration-300 ${isOpen ? "transform rotate-180" : ""
+                  }`}
                 style={{
                   hover: {
                     color: "white",

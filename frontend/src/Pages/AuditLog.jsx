@@ -1,13 +1,16 @@
 import { FiRefreshCcw } from "react-icons/fi";
-import { HiOutlineChevronDown, HiSearch } from "react-icons/hi";
+import { HiSearch } from "react-icons/hi";
 import { useState } from "react";
 import { useEffect, useRef } from "react";
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 import { AiOutlineCalendar } from "react-icons/ai";
+import CustomDropdown from "../Common-Component/CustomDropdown";
+import { locationOptions } from "../utils";
 
 const AuditLog = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(null);
 
   const inputRef = useRef(null);
 
@@ -22,18 +25,10 @@ const AuditLog = () => {
     };
   }, []);
 
-  const opt = [
-    "180 Transformations",
-    "415 Media Group",
-    "Aaron Burgess's Account",
-    "Aaron Huey's Account",
-    "Abdi Yassin's Account",
-    "Abdul Qadir's Account",
-    "Abraham O's Account",
-    "Adonnis Howard's Account",
-    "Adrian Hazzi's Account",
-    "Advanced GPT Snapshot",
-  ];
+  const handleSelect = (item) => {
+    setSelectedOption(item)
+    setIsOpen(p=>!p);
+  };
 
   const toggleIsOpen = () => {
     setIsOpen((prevIsOpen) => !prevIsOpen);
@@ -43,7 +38,7 @@ const AuditLog = () => {
     <div className="p-6">
       <div className="w-full flex justify-between flex-grow">
         <p className="font-bold text-[#344767] text-2xl w-[30%] ">Audit Logs</p>
-        <div className="flex  justify-between">
+        <div className="flex justify-around">
           <form className="w-[5%] ">
             <div className="relative mr-4">
               <div className="absolute inset-y-0 left-0 flex items-center px-3 pointer-events-none bg-blue-600 rounded-l-md">
@@ -71,7 +66,7 @@ const AuditLog = () => {
           <div>
             <button
               className="bg-[#0F45F5] text-white font-semibold items-center  rounded-lg flex px-6 py-2 "
-              onClick={() => {}}
+              onClick={() => { }}
             >
               <i className="text-slate-50 text-lg mr-2">
                 <FiRefreshCcw />
@@ -79,30 +74,14 @@ const AuditLog = () => {
               Refresh Logs
             </button>
           </div>
-          <div className=" relative">
-            <select
-              onClick={toggleIsOpen}
-              className="rounded-lg border border-blue-600 appearance-none py-2 text-base justify-between focus:shadow-lg pl-5 font-semibold text-blue-600 focus:outline-none focus:border-blue-500 hover:bg-[#0F45F5] hover:text-white cursor-pointer"
-            >
-              <option className="hover:text-blue-600 bg-white hidden">
-                Select Location
-              </option>
-              {opt.map((item, i) => (
-                <option
-                  className="hover:text-blue-400 bg-white text-gray-500 text-start p-5"
-                  key={i}
-                >
-                  {item}
-                </option>
-              ))}
-            </select>
-            <span
-              className={`absolute top-0 h-full ml-[180px] text-center font-bold pointer-events-none flex items-center justify-center duration-300 ${
-                isOpen ? "transform rotate-180" : ""
-              }`}
-            >
-              <HiOutlineChevronDown className="text-blue-500 hover:text-white font-bold" />
-            </span>
+          <div className="relative">
+            <CustomDropdown
+              toggleIsOpen={toggleIsOpen}
+              locationOptions={locationOptions}
+              handleSelect={(item) => handleSelect(item)}
+              selectedOption={selectedOption}
+              isOpen={isOpen}
+            />
           </div>
         </div>
       </div>
@@ -111,7 +90,7 @@ const AuditLog = () => {
           <thead>
             <tr className="bg-[#F3F5FE]">
               <th className="py-2 font-normal text-[#8392AB]">CONTACT ID</th>
-            <th className="py-2 font-normal px-2 text-[#8392AB]">QUESTION</th>
+              <th className="py-2 font-normal px-2 text-[#8392AB]">QUESTION</th>
               <th className="py-2 font-normal px-2 text-[#8392AB]">ANSWER</th>
               <th className="py-2 font-normal px-2 text-[#8392AB]">STATUS</th>
               <th className="py-2 font-normal px-2 text-[#8392AB]">

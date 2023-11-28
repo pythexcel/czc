@@ -22,6 +22,7 @@ function BookingCard({
   const onClose = () => {
     setIsShowModal(false);
   };
+
   const handleParaClick = () => {
     const paraText = "https://chat.botwebhook.com/message?b=8681698042045389";
     setIsShowModal(true);
@@ -60,7 +61,7 @@ function BookingCard({
       <div className="py-3">
         <hr />
         <div className="font-medium text-end flex justify-between items-center gap-2 px-5 mt-3">
-          {ai_type === "Non-Booking" ? (
+          {ai_type === "Non Booking" ? (
             <NonBookingbtn>{ai_type.toUpperCase()}</NonBookingbtn>
           ) : (
             <BookingBtn>{ai_type.toUpperCase()}</BookingBtn>

@@ -37,12 +37,12 @@ function Bots() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const getAllBots = async () => {
+    dispatch(setFlag(false));
     try {
       const response = await axiosInstance.get("bot");
       setBot(response.details);
-      dispatch(setFlag(false));
     } catch (error) {
-      console.error("Error duriong get all data", error);
+      console.error("Error during get all data", error);
     }
   };
 
@@ -64,7 +64,7 @@ function Bots() {
     setIdforclone(cloneforId);
   };
 
-  const handleCloseCloneBot = () => {
+  const handleCloseCloneBot = () => {   
     setClone(false);
   };
 

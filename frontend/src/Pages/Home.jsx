@@ -45,9 +45,6 @@ function Home() {
         }
     }, [pathname]);
 
-    console.log(pathname, "pathnamepathnamepathname")
-
-
     const toggleVisibility = () => {
         setOpenSideDrawer(openSideDrawer => !openSideDrawer);
     };

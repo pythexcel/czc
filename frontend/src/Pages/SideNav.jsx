@@ -4,19 +4,22 @@ import brand from "../assets/logo.png";
 import { CgMenuRight } from "react-icons/cg";
 import { TbTopologyRing2 } from "react-icons/tb";
 import { RiRobot2Line } from "react-icons/ri";
-import { FcFaq } from "react-icons/fc";
+import { FcFaq, FcNeutralTrading } from "react-icons/fc";
 import { FiRepeat } from "react-icons/fi";
 import { FaUsers } from "react-icons/fa";
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import { selectManage } from "../Store/slice/MngeSlice";
 
 function SideNav() {
   const navigate = useNavigate();
-
-
   const [selectedItem, setSelectedItem] = useState(null);
 
   const [open, setOpen] = useState(true);
   const [hoverOpen, setHoverOpen] = useState(false);
+
+  const manageName = useSelector(selectManage);
+  console.log(manageName,"am i allowed")
 
   // const handleNavigate = (route) => {
   //     setSelectedItem(route);
@@ -30,37 +33,41 @@ function SideNav() {
 
   const Navi = [
     {
-      routename: "integrations",
-      icon: <TbTopologyRing2 className="w-[25px] h-[25px]" />,
-      name: "Integrations",
+      routename: 'integrations',
+      icon: <TbTopologyRing2 className='w-[25px] h-[25px]' />,
+      name: "Integrations"
     },
     {
-      routename: "bots",
-      icon: <RiRobot2Line className="w-[25px] h-[25px]" />,
-      name: "Bots",
+      routename: 'bots',
+      icon: <RiRobot2Line className='w-[25px] h-[25px]' />,
+      name: "Bots"
     },
     {
-      routename: "faqs",
-      icon: <FcFaq className="w-[25px] h-[25px]" />,
-      name: "FAQs",
+      routename: 'faqs',
+      icon: <FcFaq className='w-[25px] h-[25px]' />,
+      name: "FAQs"
     },
     {
-      routename: "auditlogs",
-      icon: <FiRepeat className="w-[25px] h-[25px]" />,
-      name: "Audit Logs",
+      routename: 'auditlogs',
+      icon: <FiRepeat className='w-[25px] h-[25px]' />,
+      name: "Audit Logs"
     },
-    {
-      routename: "manageuser",
-      icon: <FaUsers className="w-[25px] h-[25px]" />,
-      name: "Manage Users",
-    },
-
+    ...(manageName === "Admin"
+      ? [
+          {
+            routename: 'manageuser',
+            icon: <FaUsers className='w-[25px] h-[25px]' />,
+            name: "Manage Users"
+          }
+        ]
+      : []),
     // {
     //   routename: "usagetracking",
     //   icon: <FcNeutralTrading className="w-[25px] h-[25px]" />,
     //   name: "Usage Tracking",
-    // },
+    // }
   ];
+
 
   return (
     <div
