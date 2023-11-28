@@ -13,8 +13,9 @@ class BotModel(models.Model):
     TIME_ZONE_FORMAT_CHOICES = (("Abbreviated", "Abbreviated"), ("Hidden", "Hidden"))
     GPT_MODEL_CHOICES = (("GPT-3", "GPT-3"), ("GPT-3.5", "GPT-3.5"), ("GPT-4", "GPT-4"),("GPT-4-turbo","GPT-4-turbo"))
     TIME_ZONE_CHOICES = (("Contact", "Contact"), ("Location", "Location"))
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) 
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) 
     ai_type = models.CharField(max_length=100, choices=AI_TYPE_CHOICES)
     bot_name = models.CharField(max_length=100,)
     bot_description = models.CharField(max_length=500, blank=True, null=True)

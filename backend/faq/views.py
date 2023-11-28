@@ -7,7 +7,7 @@ from .serializers import FAQSerializer
 from rest_framework.permissions import IsAuthenticated
 from .models import FAQ
 from django.shortcuts import get_object_or_404
-from utils.helperfunction import download_csv_file
+from django.http import HttpResponse
 
 
 class FAQAPI(APIView):
@@ -41,7 +41,7 @@ class FAQAPI(APIView):
                 status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
-        data = FAQ.objects.filter(high_level__user_id=request.user.id).values("id", "question", "answer")    
+        data = FAQ.objects.filter(high_level__user_id=request.user.id).values("id", "question", "answer")
         return Response(
             {
                 "details": data,
@@ -98,15 +98,14 @@ class DownloadFAQAPI(APIView):
         try:
             high_level_instance = HighLevelModel.objects.get(user_id=request.user.id)
             faq_data = list(FAQ.objects.filter(high_level_id=high_level_instance.id).values("question", "answer"))
-            download_csv_file(faq_data)
-            return Response(
-                {    
-                    "details": "download csv file",
-                    "success": True
-                },
-                status=status.HTTP_200_OK)
-        except Exception:
-            return Response("Please integrate your high level Integrations")
+            df = pd.DataFrame(faq_data)
+            csv_data = df.to_csv(index=False)
+            response = HttpResponse(csv_data, content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="my_file.csv"'
+            return response
+        except Exception as e:
+            print("your eroor is ", e)
+            return response(str(e))
 
 
 class ImportFAQFile(APIView):
