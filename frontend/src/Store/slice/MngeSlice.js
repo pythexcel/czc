@@ -1,16 +1,15 @@
-
 import { createSlice } from '@reduxjs/toolkit';
 
 const MngeSlice = createSlice({
     name: 'ManageFlag',
-    initialState: { value: false },
+    initialState: { name: '' },
     reducers: {
         setManage: (state, action) => {
-            state.value = action.payload;
+            state.name = action.payload;
         },
     },
 });
 
 export const { setManage } = MngeSlice.actions;
-export const selectMange = (state) => state.ManageFlag.value;
+export const selectManage = (state) => state.ManageFlag.name;
 export default MngeSlice.reducer;

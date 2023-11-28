@@ -15,7 +15,6 @@ import { useNavigate } from "react-router-dom";
 import { selectFlag } from "../Store/slice/flagSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { setFlag } from "../Store/slice/flagSlice";
-import Copied from "../Modal/Copied";
 
 function Bots() {
   const navigate = useNavigate();
@@ -28,7 +27,6 @@ function Bots() {
   const [openModal, setOpenModal] = useState(false);
   const [deleteBot, setDeleteBot] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [Clone, setClone] = useState(false);
 
   const [clonedBotName, setClonedBotName] = useState("");
@@ -39,10 +37,10 @@ function Bots() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const getAllBots = async () => {
+    dispatch(setFlag(false));
     try {
       const response = await axiosInstance.get("bot");
       setBot(response.details);
-      dispatch(setFlag(false));
     } catch (error) {
       console.error("Error during get all data", error);
     }
@@ -66,7 +64,7 @@ function Bots() {
     setIdforclone(cloneforId);
   };
 
-  const handleCloseCloneBot = () => {
+  const handleCloseCloneBot = () => {   
     setClone(false);
   };
 
@@ -144,10 +142,6 @@ function Bots() {
     }
   };
 
-  const handleCloseCopied = () => {
-    setCopied(false)
-  }
-
   const renderModals = (
     <div>
       {openModal && (
@@ -165,7 +159,6 @@ function Bots() {
         <IsDelete onClose={handleDeleted} handleDeleteBot={handleDeleteBot} />
       )}
       {deleteSuccess && <Deleted onClose={handleSuccessfullyDelete} />}
-      {copied && <Copied onClose={handleCloseCopied} />}
     </div>
   );
 

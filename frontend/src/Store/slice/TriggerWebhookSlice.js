@@ -38,7 +38,7 @@ const triggerWebhookSlice = createSlice({
         }
         webhookToAddHeaders.headers.push({ headerName: "", valueOfHeader: "" })
       }
-    },
+    },   
     deleteWebhook: (state, action) => {
       const newTriggerWebhookData = state.triggerWebhookData.filter((item, i) => i !== action.payload)
       state.triggerWebhookData = newTriggerWebhookData
@@ -56,9 +56,12 @@ const triggerWebhookSlice = createSlice({
       let webhookToModify = newWebHookData[webHookIndex]
       webhookToModify.headers[headerIndex][name] = value
       state.triggerWebhookData = newWebHookData
-    }
+    },
+    handleReset: (state) => {
+      state.triggerWebhookData = []
+    },
   },
 });
 
-export const { setTriggerWebhookSlice, addHeadersSlice, addEmptyWebhookObject, deleteWebhook, deleteHeaders, handleHeaderChange } = triggerWebhookSlice.actions;
+export const { setTriggerWebhookSlice, addHeadersSlice, addEmptyWebhookObject, deleteWebhook, deleteHeaders, handleHeaderChange, handleReset } = triggerWebhookSlice.actions;
 export default triggerWebhookSlice.reducer;

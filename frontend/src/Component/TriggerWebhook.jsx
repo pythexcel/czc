@@ -1,7 +1,6 @@
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { FiChevronDown } from 'react-icons/fi';
 import InputHeaders from "./InputHeaders";
-import { useState } from "react";
 import Title from "./Title";
 import InputField from '../Component/TextInput';
 import DropDown from "./DropDown";
@@ -40,7 +39,6 @@ function TriggerWebhook({ data, onDeleteWebhook, index }) {
         dispatch(addHeadersSlice({
             index: index
         }))
-
     }
 
     const handleDelete = (index, webhookIndex) => {

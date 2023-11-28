@@ -7,16 +7,9 @@ import { handleHeaderChange } from "../Store/slice/TriggerWebhookSlice";
 
 
 const InputHeaders = ({ data, onDelete, index, webHookIndex }) => {
+    
     const dispatch = useDispatch();
 
-    // const [currentIndex, setCurrentIndex] = useState(i); // Set the initial index as needed
-
-    // const dispatchAddHeader = (header) => {
-    //     const addHeaderData = [
-    //         { name: header.headername, header: header.valueOfHeader }
-    //     ];
-    //     dispatch(addHeadersSlice({ index, addHeader: addHeaderData }));
-    // };
 
     const handleheaderChange = (event) => {
         const { name, value } = event.target

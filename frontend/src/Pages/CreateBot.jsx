@@ -15,7 +15,8 @@ import axiosInstance from "../utils/axios";
 import TextArea from "../Common-Component/TextArea";
 import Updatebutton from "../Common-Component/Updatebutton";
 import { setFlag } from "../Store/slice/flagSlice";
-import { addEmptyWebhookObject, deleteWebhook } from "../Store/slice/TriggerWebhookSlice";
+import { addEmptyWebhookObject, deleteWebhook, handleReset, setTriggerWebhookSlice } from "../Store/slice/TriggerWebhookSlice";
+import CustomSelector from "../Common-Component/CustomSelector";
 
 const Intromessage = ["Text", "Custom Field", "Custom Value"];
 
@@ -39,11 +40,14 @@ function CreateBot() {
   const queryParams = new URLSearchParams(location.search);
   const uniqueId = queryParams.get("id");
 
-
   const [isLoading, setIsLoading] = useState(false);
   const [update, setUpdate] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [opentag, setOpenTag] = useState([]);
+  const [openCustom, setOpenCustom] = useState([]);
+  const [openTrigger, setOpenTrigger] = useState([]);
 
+  console.log(opentag, openCustom, openTrigger, "this is the trigger data as well")
 
   const childData = useSelector((state) => state.tag.childData);
 
@@ -54,7 +58,7 @@ function CreateBot() {
   const triggerwebhookdata = useSelector(
     (state) => state.TriggerWebhook.triggerWebhookData
   );
-  console.log(triggerwebhookdata, "triggerwebhookdata,,,,");
+  // console.log(triggerwebhookdata, "triggerwebhookdata,,,,");
 
   const [addtag, setAddTag] = useState([]);
   const [customfield, setCustomfield] = useState([]);
@@ -95,6 +99,10 @@ function CreateBot() {
       handleAddTriggerWebhook();
     }
   };
+
+  // for (let i = 0; i < opentag.length; i++) {
+  //   HandleAddTage();
+  // }
 
   const toggleIsOpen = () => {
     setIsOpen((prevIsOpen) => !prevIsOpen);
@@ -176,7 +184,6 @@ function CreateBot() {
         custom_field_type: customfields,
         trigger_webhook_type: tiggerwebhook,
       });
-
       navigate("/dashboard/bots");
       console.log(createBot.response.data, ">>>>>>>>>>");
     } catch (error) {
@@ -185,7 +192,6 @@ function CreateBot() {
   };
 
   const handleSubmitForUpdate = async (values) => {
-    console.log(values, "----------------????????????????");
     try {
       const createBot = await axiosInstance.put(`bot/${uniqueId}`, {
         bot_type: {
@@ -248,7 +254,7 @@ function CreateBot() {
   const getBotForUpdate = async (uniqueId) => {
     try {
       const resp = await axiosInstance.get(`bot/${uniqueId}`);
-      const data = resp.details[0];
+      const data = resp.details;
       formik.setValues({
         AiType: data.ai_type,
         Botname: data.bot_name,
@@ -265,8 +271,13 @@ function CreateBot() {
         GPTmodel: data.gpt_model,
         messageDelay: data.message_delay,
       });
+      console.log(resp.details.goal.tag_type, "i am tag type")
+      setOpenTag(resp.details.goal.tag_type)
+      console.log(resp.details.goal.custom_field_type, "i am custom field")
+      setOpenCustom(resp.details.goal.custom_field_type)
+      console.log(resp.details.goal.trigger_webhook_field, "i am triggerwebhook data")
+      setOpenTrigger(resp.details.goal.trigger_webhook_field)
       setUpdate(true);
-      console.log(resp.details[0], "i am ready for update ");
     } catch (error) {
       console.log(error);
     }
@@ -275,6 +286,9 @@ function CreateBot() {
   useEffect(() => {
     if (uniqueId) {
       getBotForUpdate(uniqueId);
+    }
+    return () => {
+      dispatch(handleReset())
     }
   }, [uniqueId]);
 
@@ -319,11 +333,13 @@ function CreateBot() {
         <div className="w-full my-4">
           <Title>Bot Description</Title>
           <TextArea
+            type="text"
             id="BotDescription"
             name="BotDescription"
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             value={formik.values.BotDescription}
+            placeholder="Description"
           />
         </div>
         <div className="flex gap-6 my-4">
@@ -515,12 +531,12 @@ function CreateBot() {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values.messageDelay}
+              min={0}
             />
           </div>
           <div className="w-[50%]">
             <div className="relative gap-3">
-              <select
-                className="rounded-lg border border-blue-600 appearance-none py-2 text-base justify-center focus:shadow-lg pl-5 pr-8 text-center font-semibold text-blue-600 focus:outline-none focus:border-blue-500 hover:bg-[#0F45F5] hover:text-white cursor-pointer"
+              <CustomSelector
                 onChange={handleSelectChange}
                 onClick={toggleIsOpen}
                 value={"+ add a Goal"}
@@ -537,7 +553,7 @@ function CreateBot() {
                     {item}
                   </option>
                 ))}
-              </select>
+              </CustomSelector>
               <span
                 className={`absolute top-0 h-full ml-[18%] text-center font-bold pointer-events-none flex items-center justify-center duration-300 ${isOpen ? "transform rotate-180" : ""
                   }`}

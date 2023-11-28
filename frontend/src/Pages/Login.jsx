@@ -30,12 +30,10 @@ function Login() {
       const isAllow = response.details.role;
 
       if (isAllow === "Admin") {
-        dispatch(setManage(true));
+        dispatch(setManage('Admin'));
       } else if (isAllow === "User") {
-        dispatch(setManage(false))
+        dispatch(setManage('User'));
       }
-
-      
     } catch (error) {
       setIsLoading(false);
       setIsLogin(true);
