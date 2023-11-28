@@ -39,6 +39,7 @@ class SigninAPI(APIView):
             data = {
                 "id": user_data.id,
                 "email": user_data.email,
+                "role": user_data.role,
                 "access": access_token,
             }
 
