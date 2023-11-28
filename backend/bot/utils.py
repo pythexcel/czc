@@ -52,14 +52,14 @@ def update_bot_record(request,  validated_data, bot_instance):
     )
     tag_goal_list = validated_data['tag_type']
     [TagType.objects.update_or_create(
-            bot_id=bot_instance,
+            bot=bot_instance.id,
             tag_name=tag_goal['tag_name'],
             defaults=tag_goal
         ) for tag_goal in tag_goal_list]
 
     custom_goal_list = validated_data['custom_field_type']
     [CustomFieldType.objects.update_or_create(
-            bot_id=bot_instance, 
+            bot=bot_instance.id,
             field_name=custom_goal['field_name'],
             defaults=custom_goal
          ) for custom_goal in custom_goal_list]
@@ -69,13 +69,13 @@ def update_bot_record(request,  validated_data, bot_instance):
         header_type = webhook_goal['header_type']
         webhook_goal.pop('header_type')
         webhook_type = TriggerWebhook.objects.update_or_create(
-            bot_id=bot_instance,
+            bot=bot_instance.id,
             goal_name=webhook_goal['goal_name'],
             defaults=webhook_goal
         )
         for header_goal in header_type:
             Header.objects.update_or_create(
-               triggerwebhook_id=webhook_type[0],
+               triggerwebhook_id=webhook_type[0].id,
                headers=header_goal['headers'],
                defaults=header_goal
             )
@@ -93,25 +93,25 @@ def clone_bot_data(bot_id, bot_name):
         tag_data = list(TagType.objects.filter(bot_id=bot_id).values())
         for tag_goal in tag_data:
             tag_goal.pop('id')
-            tag_goal['bot_id_id'] = bot_instance.id
+            tag_goal['bot_id'] = bot_instance.id
             TagType.objects.create(**tag_goal)
 
         custom_data = list(CustomFieldType.objects.filter(bot_id=bot_id).values())
         for custom_goal in custom_data:
             custom_goal.pop('id')
-            custom_goal['bot_id_id'] = bot_instance.id
+            custom_goal['bot_id'] = bot_instance.id
             CustomFieldType.objects.create(**custom_goal)
 
         webhook_data = list(TriggerWebhook.objects.filter(bot_id=bot_id).values())
         for webhook_goal in webhook_data:
             webhook_id = webhook_goal['id']
             webhook_goal.pop('id')
-            webhook_goal['bot_id_id'] = bot_instance.id
+            webhook_goal['bot_id'] = bot_instance.id
             header_data = list(Header.objects.filter(triggerwebhook_id=webhook_id).values())
             webhook_instance = TriggerWebhook.objects.create(**webhook_goal)
             for header_goal in header_data:
                 header_goal.pop('id')
-                header_goal['triggerwebhook_id_id'] = webhook_instance.id
+                header_goal['triggerwebhook_id'] = webhook_instance.id
                 Header.objects.create(**header_goal)
 
         message = "clone successfully"
