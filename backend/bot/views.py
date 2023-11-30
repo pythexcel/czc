@@ -63,7 +63,7 @@ class CreateBotAPI(APIView):
                     trigger_serializer.save()
 
         return Response(
-                    {"success": True, "message": "register successfully"},
+                    {"success": True, "message": "bot created successfully"},
                     status=status.HTTP_200_OK,
                 )
 

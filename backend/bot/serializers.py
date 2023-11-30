@@ -111,7 +111,6 @@ class BotModelSerializer(serializers.ModelSerializer):
         custom_field_type = validated_data.pop('custom_field_type', None)
         trigger_webhook_type = validated_data.pop('trigger_webhook_type', None)
         header_type = validated_data.pop('header_type', None)
-        
 
         if tag_type:
             for tag in tag_type:
