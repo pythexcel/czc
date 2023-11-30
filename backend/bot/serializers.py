@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.shortcuts import get_object_or_404
 
 from bot.models import (BotModel,
                         TriggerWebhook,
@@ -7,7 +8,7 @@ from bot.models import (BotModel,
                         CustomFieldType)
 
 
-class CreateBotSerializer(serializers.Serializer):
+class ValidateAllSerializer(serializers.Serializer):
     bot_type = serializers.JSONField()
     tag_type = serializers.ListField(required=False)
     custom_field_type = serializers.ListField(required=False)
@@ -51,6 +52,7 @@ class CreateBotSerializer(serializers.Serializer):
         return bot_instance
 
 
+
 class HeaderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Header
@@ -85,6 +87,10 @@ class CustomFieldTypeSerializer(serializers.ModelSerializer):
 
 class BotModelSerializer(serializers.ModelSerializer):
     goal = serializers.SerializerMethodField()
+    tag_type = serializers.ListField(required=False)
+    custom_field_type = serializers.ListField(required=False)
+    trigger_webhook_type = serializers.ListField(required=False)
+    header_type = serializers.ListField(required=False)
 
     def get_goal(self, obj):
         data = {
@@ -99,6 +105,43 @@ class BotModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = BotModel
         fields = "__all__"
+
+    def update(self, instance, validated_data):
+        tag_type = validated_data.pop('tag_type', None)
+        custom_field_type = validated_data.pop('custom_field_type', None)
+        trigger_webhook_type = validated_data.pop('trigger_webhook_type', None)
+        header_type = validated_data.pop('header_type', None)
+        
+
+        if tag_type:
+            for tag in tag_type:
+                tag_instance = get_object_or_404(TagType, id=tag['id'])
+                serializer = TagTypeSerializer(tag_instance, data=tag, partial=True)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+
+        if custom_field_type:
+            for custom_field in custom_field_type:
+                custom_field_instance = get_object_or_404(CustomFieldType, id=custom_field.pop('id'))
+                serializer = CustomFieldTypeSerializer(custom_field_instance, data=custom_field, partial=True)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+
+        if trigger_webhook_type:
+            for trigger_webhook in trigger_webhook_type:
+                trigger_webhook_instance = get_object_or_404(CustomFieldType, id=trigger_webhook.pop('id'))
+                serializer = TriggerWebhookSerializer(trigger_webhook_instance, data=trigger_webhook, partial=True)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+
+        if header_type:
+            for header in header_type:
+                header_instance = get_object_or_404(Header, id=header.pop('id'))
+                serializer = HeaderSerializer(header_instance, data=header, partial=True)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+
+        return super().update(instance, validated_data)    
 
 
 class DeleteBotSerializer(serializers.Serializer):
