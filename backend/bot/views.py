@@ -1,13 +1,16 @@
 from bot.serializers import (
      ValidateAllSerializer,
      BotModelSerializer,
-     DeleteBotSerializer
+     DeleteBotSerializer,
+     TagTypeListSerializer,
+     CustomTypeListSerializer,
+     HeaderListTypeSerializer,
+     TriggerWebhookSerializer
 )
 from bot.models import (
     BotModel,
-    Header, CustomFieldType,
+    Header,
     TriggerWebhook,
-    TagType
     )
 from rest_framework.response import Response
 from rest_framework.views import APIView, status
@@ -35,11 +38,15 @@ class CreateBotAPI(APIView):
         bot_instance = serializer.create()
         validate_data = serializer.validated_data
         if "tag_type" in validate_data:
-            tag_type_objects = [TagType(**{**tag_goal, "bot": bot_instance}) for tag_goal in validate_data['tag_type']]
-            TagType.objects.bulk_create(tag_type_objects)
+            tag_serializer = TagTypeListSerializer(data=validate_data['tag_type'],
+                  context ={"bot_instance": bot_instance})
+            tag_serializer.is_valid(raise_exception=True)
+            tag_serializer.save()
         if "custom_field_type" in validate_data:
-            custom_field_objects = [CustomFieldType(**{**custom_goal, "bot": bot_instance}) for custom_goal in validate_data['custom_field_type']]
-            CustomFieldType.objects.bulk_create(custom_field_objects)
+            tag_serializer = CustomTypeListSerializer(data=validate_data['custom_field_type'],
+                                               context={"bot_instance": bot_instance})
+            tag_serializer.is_valid(raise_exception=True)
+            tag_serializer.save()
         if "trigger_webhook_type" in validate_data:
             for trigger_goal in validate_data['trigger_webhook_type']:
                 trigger_goal["bot"] = bot_instance
@@ -47,10 +54,14 @@ class CreateBotAPI(APIView):
                     header_data = trigger_goal['header_type']
                     trigger_goal.pop("header_type")
                     webhook_id = TriggerWebhook.objects.create(**trigger_goal)
-                    header_field_objects = [Header(**{**header, "triggerwebhook": webhook_id}) for header in header_data] 
-                    Header.objects.bulk_create(header_field_objects)
+                    header_serializer = HeaderListTypeSerializer(data=header_data, context={"webhook_instance": webhook_id})
+                    header_serializer.is_valid(raise_exception=True)
+                    header_serializer.save()
                 else:
-                    TriggerWebhook.objects.create(**trigger_goal)
+                    trigger_serializer = TriggerWebhookSerializer(data=trigger_goal)
+                    trigger_serializer.is_valid()
+                    trigger_serializer.save()
+
         return Response(
                     {"success": True, "message": "register successfully"},
                     status=status.HTTP_200_OK,
@@ -70,7 +81,7 @@ class CreateBotAPI(APIView):
 
     def patch(self, request, id):
         try:
-            bot_instance = BotModel.objects.get(id=id, user_id=request.user.id)
+            bot_instance = get_object_or_404(BotModel, id=id, user_id=request.user.id)
             if not open_ai_is_valid(request.data['bot_type']['open_ai_api_key']):
                 return Response(
                     {"success": False, "message": "please enter a valid openAi key"},
@@ -85,11 +96,7 @@ class CreateBotAPI(APIView):
 
             return Response({"message": "updated successfully", "success": True}, status=status.HTTP_200_OK)
 
-        except BotModel.DoesNotExist:
-            return Response({"success": False, "message": "invalid bot id"},
-                            status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            print("error is ",str(e))
             return Response({"success": False, "message": str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
 

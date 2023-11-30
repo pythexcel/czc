@@ -150,3 +150,33 @@ class DeleteBotSerializer(serializers.Serializer):
     custom_field_type_ids = serializers.ListField(required=False)
     trigger_webhook_type_ids = serializers.ListField(required=False)
     header_type_ids = serializers.ListField(required=False)
+
+
+class TagTypeListSerializer(serializers.ListSerializer):
+    child = TagTypeSerializer()
+
+    def create(self, validated_data):
+        bot_instance = self.context['bot_instance']
+        tag_type_objects = [TagType(**{**tag_goal, "bot": bot_instance})
+                            for tag_goal in validated_data]
+        return TagType.objects.bulk_create(tag_type_objects)
+
+
+class CustomTypeListSerializer(serializers.ListSerializer):
+    child = CustomFieldTypeSerializer()
+
+    def create(self, validated_data):
+        bot_instance = self.context['bot_instance']
+        custom_type_objects = [CustomFieldType(**{**custom_goal, "bot": bot_instance})
+                            for custom_goal in validated_data]
+        return CustomFieldType.objects.bulk_create(custom_type_objects)
+
+
+class HeaderListTypeSerializer(serializers.ListSerializer):
+    child = HeaderSerializer()
+
+    def create(self, validated_data):
+        webhook_instance = self.context['webhook_instance']
+        header_type_objects = [Header(**{**header_goal, "triggerwebhook": webhook_instance})
+                            for header_goal in validated_data]
+        return Header.objects.bulk_create(header_type_objects)
