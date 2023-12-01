@@ -44,7 +44,6 @@ class FAQAPI(APIView):
         if id:
             data = get_object_or_404(FAQ, id=id)
             serializer = FAQSerializer(data)
-
         else:
             data = FAQ.objects.filter(high_level__user_id=request.user.id)
             serializer = FAQSerializer(data, many=True)
@@ -55,24 +54,23 @@ class FAQAPI(APIView):
             },
             status=status.HTTP_200_OK)
 
-    def patch(self, request):
+    def patch(self, request, id=None):
         try:
-            instance = FAQ.objects.get(id=request.data['id'])
-            serializer = FAQSerializer(instance, data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+            if id:
+                instance = get_object_or_404(FAQ, id=id)
+                serializer = FAQSerializer(instance, data=request.data)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(
+                    {
+                        "details": "updated successfully",
+                        "success": True
+                    },
+                    status=status.HTTP_200_OK
+                )
             return Response(
                 {
-                    "id": instance.id,
-                    "details": "updated successfully",
-                    "success": True
-                },
-                status=status.HTTP_200_OK
-            )
-        except FAQ.DoesNotExist:
-            return Response(
-                {
-                    "details": "Invalid ID",
+                    "details": "Id is required",
                     "success": False
                 },
                 status=status.HTTP_400_BAD_REQUEST
