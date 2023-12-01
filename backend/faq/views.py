@@ -3,7 +3,7 @@ import os
 from rest_framework.views import APIView, status
 from rest_framework.response import Response
 from users.models import HighLevelModel
-from .serializers import FAQSerializer
+from .serializers import FAQSerializer 
 from rest_framework.permissions import IsAuthenticated
 from .models import FAQ
 from django.shortcuts import get_object_or_404
@@ -40,11 +40,17 @@ class FAQAPI(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST)
 
-    def get(self, request):
-        data = FAQ.objects.filter(high_level__user_id=request.user.id).values("id", "question", "answer")
+    def get(self, request, id=None):
+        if id:
+            data = get_object_or_404(FAQ, id=id)
+            serializer = FAQSerializer(data)
+
+        else:
+            data = FAQ.objects.filter(high_level__user_id=request.user.id)
+            serializer = FAQSerializer(data, many=True)
         return Response(
             {
-                "details": data,
+                "details": serializer.data,
                 "success": True
             },
             status=status.HTTP_200_OK)
@@ -103,15 +109,14 @@ class DownloadFAQAPI(APIView):
             response = HttpResponse(csv_data, content_type='text/csv')
             response['Content-Disposition'] = 'attachment; filename="my_file.csv"'
             return response
-        except Exception as e:
-            print("your eroor is ", e)
-            return response(str(e))
+        except Exception:
+            return Response("Download failed")
 
 
 class ImportFAQFile(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
+    def post(self, request):
         try:
             high_level_instance = HighLevelModel.objects.get(user_id=request.user.id)
             filename = request.data.get('file')
