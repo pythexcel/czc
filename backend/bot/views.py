@@ -73,7 +73,7 @@ class CreateBotAPI(APIView):
     def patch(self, request, id):
         try:
             bot_instance = get_object_or_404(BotModel, id=id, user_id=request.user.id)
-            if not open_ai_is_valid(request.data['bot_type']['open_ai_api_key']):
+            if not open_ai_is_valid(request.data['open_ai_api_key']):
                 return Response(
                     {"success": False, "message": "please enter a valid openAi key"},
                     status=status.HTTP_400_BAD_REQUEST,
