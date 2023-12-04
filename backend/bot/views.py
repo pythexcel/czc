@@ -49,19 +49,10 @@ class CreateBotAPI(APIView):
             tag_serializer.save()
         if "trigger_webhook_type" in validate_data:
             for trigger_goal in validate_data['trigger_webhook_type']:
-                trigger_goal["bot"] = bot_instance
-                if "header_type" in trigger_goal.keys():
-                    header_data = trigger_goal['header_type']
-                    trigger_goal.pop("header_type")
-                    webhook_id = TriggerWebhook.objects.create(**trigger_goal)
-                    header_serializer = HeaderListTypeSerializer(data=header_data, context={"webhook_instance": webhook_id})
-                    header_serializer.is_valid(raise_exception=True)
-                    header_serializer.save()
-                else:
-                    trigger_serializer = TriggerWebhookSerializer(data=trigger_goal)
-                    trigger_serializer.is_valid()
-                    trigger_serializer.save()
-
+                trigger_serializer = TriggerWebhookSerializer(data=trigger_goal,
+                                                            context={"bot_instance": bot_instance})
+                trigger_serializer.is_valid(raise_exception=True)
+                trigger_serializer.save()
         return Response(
                     {"success": True, "message": "bot created successfully"},
                     status=status.HTTP_200_OK,
@@ -87,7 +78,6 @@ class CreateBotAPI(APIView):
                     {"success": False, "message": "please enter a valid openAi key"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-
             serializer = BotModelSerializer(bot_instance, data=request.data, partial=True)
             if not serializer.is_valid():
                 return Response({"success": False, "message": serializer.errors},
