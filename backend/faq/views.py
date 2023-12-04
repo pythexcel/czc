@@ -44,7 +44,6 @@ class FAQAPI(APIView):
         if id:
             data = get_object_or_404(FAQ, id=id)
             serializer = FAQSerializer(data)
-
         else:
             data = FAQ.objects.filter(high_level__user_id=request.user.id)
             serializer = FAQSerializer(data, many=True)
@@ -55,28 +54,20 @@ class FAQAPI(APIView):
             },
             status=status.HTTP_200_OK)
 
-    def patch(self, request):
+    def patch(self, request, id=None):
         try:
-            instance = FAQ.objects.get(id=request.data['id'])
+            instance = get_object_or_404(FAQ, id=id)
             serializer = FAQSerializer(instance, data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(
                 {
-                    "id": instance.id,
                     "details": "updated successfully",
                     "success": True
                 },
                 status=status.HTTP_200_OK
             )
-        except FAQ.DoesNotExist:
-            return Response(
-                {
-                    "details": "Invalid ID",
-                    "success": False
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+
         except Exception:
             return Response(
                 {
@@ -107,7 +98,7 @@ class DownloadFAQAPI(APIView):
             df = pd.DataFrame(faq_data)
             csv_data = df.to_csv(index=False)
             response = HttpResponse(csv_data, content_type='text/csv')
-            response['Content-Disposition'] = 'attachment; filename="my_file.csv"'
+            response['Content-Disposition'] = 'attachment; filename="data.csv"'
             return response
         except Exception:
             return Response("Download failed")
