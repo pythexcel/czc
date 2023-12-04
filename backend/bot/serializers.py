@@ -52,7 +52,6 @@ class ValidateAllSerializer(serializers.Serializer):
         return bot_instance
 
 
-
 class HeaderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Header
@@ -69,6 +68,16 @@ class TriggerWebhookSerializer(serializers.ModelSerializer):
     class Meta:
         model = TriggerWebhook
         fields = "__all__"
+
+    def create(self, validated_data):
+        bot_instance = self.context['bot_instance']
+        header_data = validated_data.pop('header_type')
+        validated_data['bot'] = bot_instance
+        webhook_id = TriggerWebhook.objects.create(**validated_data) 
+        header_serializer = HeaderListTypeSerializer(data=header_data, context={"webhook_instance": webhook_id})
+        header_serializer.is_valid(raise_exception=True)
+        header_serializer.save()
+        return webhook_id
 
 
 class TagTypeSerializer(serializers.ModelSerializer):
@@ -90,7 +99,6 @@ class BotModelSerializer(serializers.ModelSerializer):
     tag_type = serializers.ListField(required=False)
     custom_field_type = serializers.ListField(required=False)
     trigger_webhook_type = serializers.ListField(required=False)
-    header_type = serializers.ListField(required=False)
 
     def get_goal(self, obj):
         data = {
@@ -107,12 +115,9 @@ class BotModelSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def update(self, instance, validated_data):
-       # bot_type = validated_data.pop('bot_type')
         tag_type = validated_data.pop('tag_type', None)
         custom_field_type = validated_data.pop('custom_field_type', None)
         trigger_webhook_type = validated_data.pop('trigger_webhook_type', None)
-        header_type = validated_data.pop('header_type', None)
-
         if tag_type:
             for tag in tag_type:
                 if 'id' in tag:
@@ -137,22 +142,22 @@ class BotModelSerializer(serializers.ModelSerializer):
 
         if trigger_webhook_type:
             for trigger_webhook in trigger_webhook_type:
+                header_type = trigger_webhook['header_type']
                 if 'id' in trigger_webhook:
-                    trigger_webhook_instance = get_object_or_404(CustomFieldType, id=trigger_webhook.pop('id'))
+                    webhook_id = trigger_webhook['id']
+                    trigger_webhook_instance = get_object_or_404(TriggerWebhook, id=trigger_webhook.pop('id'))
                     serializer = TriggerWebhookSerializer(trigger_webhook_instance, data=trigger_webhook, partial=True)
+                    for header in header_type:
+                        header['triggerwebhook'] = webhook_id
+                        if 'id' in header:
+                            header_instance = get_object_or_404(Header, id=header.pop('id'))
+                            serializer = HeaderSerializer(header_instance, data=header, partial=True)
+                        else:
+                            serializer = HeaderSerializer(data=header)
+                        serializer.is_valid(raise_exception=True)
+                        serializer.save()
                 else:
-                    trigger_webhook['bot'] = instance.id
-                    serializer = TriggerWebhookSerializer(data=trigger_webhook)
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-
-        if header_type:
-            for header in header_type:
-                if 'id' in header:
-                    header_instance = get_object_or_404(Header, id=header.pop('id'))
-                    serializer = HeaderSerializer(header_instance, data=header, partial=True)
-                else:
-                    serializer = HeaderSerializer(data=header)
+                    serializer = TriggerWebhookSerializer(data=trigger_webhook, context={"bot_instance": instance})
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
 
@@ -193,5 +198,5 @@ class HeaderListTypeSerializer(serializers.ListSerializer):
     def create(self, validated_data):
         webhook_instance = self.context['webhook_instance']
         header_type_objects = [Header(**{**header_goal, "triggerwebhook": webhook_instance})
-                            for header_goal in validated_data]
+                             for header_goal in validated_data]
         return Header.objects.bulk_create(header_type_objects)
