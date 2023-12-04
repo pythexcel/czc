@@ -107,6 +107,7 @@ class BotModelSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def update(self, instance, validated_data):
+       # bot_type = validated_data.pop('bot_type')
         tag_type = validated_data.pop('tag_type', None)
         custom_field_type = validated_data.pop('custom_field_type', None)
         trigger_webhook_type = validated_data.pop('trigger_webhook_type', None)

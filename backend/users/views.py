@@ -177,9 +177,9 @@ class ManageUserAPI(APIView):
                 status=status.HTTP_200_OK
             )
 
-    def put(self, request):
+    def patch(self, request, id):
         try:
-            user_instance = User.objects.get(id= request.data['user_id'], added_by_id=request.user.id)
+            user_instance = User.objects.get(id=id, added_by_id=request.user.id)
             user_instance.set_password(request.data['password'])
             user_instance.save()
             return Response(
