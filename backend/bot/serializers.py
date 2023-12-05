@@ -165,11 +165,10 @@ class BotModelSerializer(serializers.ModelSerializer):
 
 
 class DeleteBotSerializer(serializers.Serializer):
-    bot_id = serializers.CharField()
-    tag_type_ids = serializers.ListField(required=False)
-    custom_field_type_ids = serializers.ListField(required=False)
-    trigger_webhook_type_ids = serializers.ListField(required=False)
-    header_type_ids = serializers.ListField(required=False)
+    tag_type_ids = serializers.CharField(required=False)
+    custom_field_type_ids = serializers.CharField(required=False)
+    trigger_webhook_type_ids = serializers.CharField(required=False)
+    header_type_ids = serializers.CharField(required=False)
 
 
 class TagTypeListSerializer(serializers.ListSerializer):
