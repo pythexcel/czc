@@ -90,18 +90,18 @@ class CreateBotAPI(APIView):
             return Response({"success": False, "message": str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request):
+    def delete(self, request, id):
         try:
             flag=0
             data = request.data
             serializer = DeleteBotSerializer(data=data)
             serializer.is_valid(raise_exception=True)
             bot_instance = BotModel.objects.get(
-                id=serializer.validated_data["bot_id"]
+                id=id
             )
             if "tag_type_ids" in serializer.validated_data:
                 bot_instance.bot_tagtype.filter(
-                    id__in=serializer.validated_data["tag_type_ids"]
+                    id=serializer.validated_data["tag_type_ids"]
                 ).delete()
                 flag = 1
             if "custom_field_type_ids" in serializer.validated_data:
