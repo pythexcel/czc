@@ -4,13 +4,11 @@ from bot.serializers import (
      DeleteBotSerializer,
      TagTypeListSerializer,
      CustomTypeListSerializer,
-     HeaderListTypeSerializer,
      TriggerWebhookSerializer
 )
 from bot.models import (
     BotModel,
     Header,
-    TriggerWebhook,
     )
 from rest_framework.response import Response
 from rest_framework.views import APIView, status
@@ -65,10 +63,10 @@ class CreateBotAPI(APIView):
             bot_filter['id'] = id
             bot_data = get_object_or_404(BotModel, **bot_filter)
             serializer = BotModelSerializer(bot_data)
+            return Response({"details": serializer.data, "success": True}, status=status.HTTP_200_OK)
         else:
-            bot_data = BotModel.objects.filter(**bot_filter)
-            serializer = BotModelSerializer(bot_data, many=True)
-        return Response({"details": serializer.data, "success": True}, status=status.HTTP_200_OK)
+            bot_data = BotModel.objects.filter(**bot_filter).values()
+            return Response({"details": bot_data, "success": True}, status=status.HTTP_200_OK)
 
     def patch(self, request, id):
         try:
@@ -106,17 +104,17 @@ class CreateBotAPI(APIView):
                 flag = 1
             if "custom_field_type_ids" in serializer.validated_data:
                 bot_instance.bot_custom.filter(
-                    id__in=serializer.validated_data["custom_field_type_ids"]
+                    id=serializer.validated_data["custom_field_type_ids"]
                 ).delete()
                 flag = 1
             if "trigger_webhook_type_ids" in serializer.validated_data:
                 bot_instance.bot_trigger.filter(
-                    id__in=serializer.validated_data["trigger_webhook_type_ids"]
+                    id=serializer.validated_data["trigger_webhook_type_ids"]
                 ).delete()
                 flag = 1
             if "header_type_ids" in serializer.validated_data:
                 Header.objects.filter(
-                    id__in=serializer.validated_data["header_type_ids"]
+                    id=serializer.validated_data["header_type_ids"]
                 ).delete()
                 flag = 1
             if not flag:
