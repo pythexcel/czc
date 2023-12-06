@@ -1,21 +1,35 @@
-import { configureStore } from '@reduxjs/toolkit';
+// Store.js
+
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 import TagTypeSlice from '../slice/TagTypeSlice';
-import customFieldSlice from '../slice/CustomFieldSlice'
+import customFieldSlice from '../slice/CustomFieldSlice';
 import TriggerWebhookSlice from '../slice/TriggerWebhookSlice';
-// import InputHeaderSlice from '../slice/InputHeaderSlice';
 import flagSlice from '../slice/flagSlice';
 import MngeSlice from '../slice/MngeSlice';
 import CreUserFlagSlice from '../slice/CreUserFlagSlice';
+import FaqsSlice from '../slice/FaqsSlice';
 
+const persistConfig = {
+  key: 'root',
+  storage,
+};
+
+const rootReducer = combineReducers({
+  tag: TagTypeSlice,
+  custom: customFieldSlice,
+  TriggerWebhook: TriggerWebhookSlice,
+  FaqsAccess: FaqsSlice,
+  flag: flagSlice,
+  ManageFlag: MngeSlice,
+  userRefresh: CreUserFlagSlice
+});
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
-  reducer: {
-    tag: TagTypeSlice,
-    customReducer: customFieldSlice, 
-    TriggerWebhook: TriggerWebhookSlice,
-    // inputHeader: InputHeaderSlice,
-    flag: flagSlice,
-    ManageFlag: MngeSlice,
-    userRefresh: CreUserFlagSlice
-  },
+  reducer: persistedReducer,
 });
+
+export const persistor = persistStore(store);

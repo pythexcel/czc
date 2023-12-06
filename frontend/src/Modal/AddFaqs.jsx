@@ -3,41 +3,68 @@ import ModalPara from "../Component/ModalPara";
 import CustomButton from "../Common-Component/CustomButton";
 import ModalShadow from "../Common-Component/ModalShadow";
 import axiosInstance from "../utils/axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-function AddFaqs({ onClose }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+function AddFaqs({ onClose, ids }) {
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [update, setUpdate] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const manageuser = async () => {
+  const handleAddQuestion = async () => {
+    setLoading(true)
     try {
-      const resp = await axiosInstance.post("api/create-user", {
-        email: email,
-        password: password,
+      const resp = await axiosInstance.post("frequently-asked-ques/", {
+        question: question,
+        answer: answer,
       });
       onClose();
-      console.log(resp, "i ama done boss");
+      console.log(resp);
     } catch (error) {
-      console.log(error, "i am error");
+      console.log(error);
     }
   };
 
-  const handleEmail = (event) => {
-    const useremail = event.target.value;
-    setEmail(useremail);
-  };
+  const handleUdpate = async () => {
+    setLoading(true)
+    try {
+      const result = await axiosInstance.patch(`frequently-asked-ques/${ids}`, {
+        question: question,
+        answer: answer
+      })
+      setUpdate(false)
+      onClose();
+      console.log(result);
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
-  const handlepassword = (event) => {
-    const UserPasssword = event.target.value;
-    setPassword(UserPasssword);
-  };
+  const getUpdateData = async () => {
+    setUpdate(true)
+    try {
+      const resp = await axiosInstance.get(`frequently-asked-ques/${ids}`)
+      const forUpdate = resp.details
+      setAnswer(forUpdate.answer)
+      setQuestion(forUpdate.question)
+      // console.log(forUpdate)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    if (typeof ids === 'number') {
+      getUpdateData();
+    }
+  }, [ids])
 
   return (
     <ModalShadow onClose={onClose}>
       <div className="SlideModal relative bg-white rounded-xl shadow-lg dark:bg-gray-700 mx-auto  w-[400px] z-50">
         <div className="flex items-start bg-[#0F45F5] justify-between p-4 rounded-t-xl ">
           <h3 className="text-xl font-bold text-white">
-            Add FAQs
+            {!update ? "Add FAQs" : "Update FAQs"}
           </h3>
           <button
             type="button"
@@ -52,7 +79,8 @@ function AddFaqs({ onClose }) {
             <ModalPara>Question</ModalPara>
             <textarea
               type="text"
-              onChange={handleEmail}
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
               className="w-full border border-gray-300 rounded-lg p-2"
               placeholder="Question"
             />
@@ -61,7 +89,8 @@ function AddFaqs({ onClose }) {
             <ModalPara>Answer</ModalPara>
             <textarea
               type="text"
-              onChange={handlepassword}
+              value={answer}
+              onChange={(e) => setAnswer(e.target.value)}
               className="w-full border border-gray-300 rounded-lg p-2"
               placeholder="Answer"
             />
@@ -72,13 +101,18 @@ function AddFaqs({ onClose }) {
           <CustomButton type="button" onClick={onClose} text="Close">
             Close
           </CustomButton>
-          <button
-            onClick={manageuser}
+          {update == true ? <button
+            onClick={handleUdpate}
             type="button"
             className="focus:ring-4 focus:outline-none rounded-lg text-sm font-medium px-5 py-2.5 text-white bg-blue-600"
-          >
-            Add
-          </button>
+          >{loading ? "Updating..." : "Update"}
+          </button> : <button
+            onClick={handleAddQuestion}
+            type="button"
+            className="focus:ring-4 focus:outline-none rounded-lg text-sm font-medium px-5 py-2.5 text-white bg-blue-600"
+          >{loading ? "Adding..." :
+            "Add" }
+          </button>}
         </div>
       </div>
     </ModalShadow>

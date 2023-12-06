@@ -8,13 +8,9 @@ import { useState } from "react";
 
 function UpdateModal({ onClose }) {
     const [openAIKey, setOpenAIKey] = useState("")
-    const [enable, setEnable] = useState(false);
 
     const handleCreateOpenAI = async () => {
-        if (!openAIKey) {
-            setEnable(true)
-            return;
-        }
+        onClose()
         try {
             const resp = await axiosInstance.post("api/manage-open-ai/", {
                 open_ai_key: openAIKey
@@ -48,7 +44,6 @@ function UpdateModal({ onClose }) {
                     <button
                         type="button"
                         onClick={handleCreateOpenAI}
-                        disabled={enable}
                         className="focus:outline-none rounded-lg text-sm font-medium px-10 py-2.5 text-white bg-[#2dce89] hover:bg-[#02E002] cursor-pointer">Update</button>
                 </div>
             </div>

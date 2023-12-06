@@ -86,7 +86,7 @@ function Bots() {
   };
 
   const handleEdit = (id) => {
-    navigate(`/dashboard/createBot?id=${id}`);
+    navigate(`/dashboard/updatebot?id=${id}`);
   };
 
   const handleDeleted = () => {
@@ -120,13 +120,10 @@ function Bots() {
 
   const handleDeleteBot = async () => {
     try {
-      await axiosInstance.delete(`bot`, {
-        data: {
-          bot_id: cnfDeleteBot,
-        },
-      });
+      await axiosInstance.delete(`bot/${cnfDeleteBot}`);
       setDeleteBot(true);
       setDeletedSuccess(true);
+      getAllBots()
     } catch (error) {
       console.error("Error deleting bot:", error);
     }

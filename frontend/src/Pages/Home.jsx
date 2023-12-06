@@ -20,7 +20,7 @@ function Home() {
 
     const HandleLogout = async () => {
         try {
-          const response = await axiosInstance.post("logout/", {});
+          const response = await axiosInstance.post("api/logout/", {});
           localStorage.clear();
           console.log("logout successful:", response);
           navigate("/");
