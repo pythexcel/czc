@@ -110,6 +110,7 @@ class BotModelSerializer(serializers.ModelSerializer):
                 }
         return data
 
+  
     class Meta:
         model = BotModel
         fields = "__all__"
