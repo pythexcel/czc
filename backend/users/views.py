@@ -13,6 +13,8 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from utils.hardCodedString import resert_link_string
 from utils.helperfunction import open_ai_is_valid
+from .tasks import get_celery_task
+from locations.models import LocationModel
 
 
 class SignupAPI(APIView):
@@ -168,7 +170,7 @@ class ManageUserAPI(APIView):
             )
 
     def get(self, request):
-        user = User.objects.filter(added_by_id=request.user.id).values("reference", "email", "id")
+        user = User.objects.filter(added_by_id=request.user.id).values("email", "id")
         return Response(
                 {
                     "details": user,
@@ -179,9 +181,11 @@ class ManageUserAPI(APIView):
 
     def patch(self, request, id):
         try:
-            user_instance = User.objects.get(id=id, added_by_id=request.user.id)
-            user_instance.set_password(request.data['password'])
-            user_instance.save()
+
+            user_instance = get_object_or_404(User, id=id, added_by_id=request.user.id)
+            print("fkdkfjsldkf",user_instance)
+            data = UserSerializer(user_instance, data=request.data)
+            print("ddddd",data)
             return Response(
                     {
                         "message": "updated successfully",
@@ -189,14 +193,7 @@ class ManageUserAPI(APIView):
                     },
                     status=status.HTTP_200_OK
                 )
-        except User.DoesNotExist:
-            return Response(
-                {
-                    "message": "invalid user id",
-                    "success": False
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+       
         except Exception as e:
             return Response(
                 {
@@ -277,27 +274,18 @@ class HighLevelAgencyAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        try:
-            data = request.data
-            high_level_instance = HighLevelModel.objects.update_or_create(
-                user_id=request.user.id,
-                defaults=data
-            )
-            return Response(
+        data = request.data
+        HighLevelModel.objects.update_or_create(
+            user_id=request.user.id,
+            defaults=data
+        )
+        agency_api_key = request.data['agency_api_key']
+        data = get_celery_task(agency_api_key)
+        LocationModel.objects.bulk_create(data)
+        return Response(
                     {
-                        "details": {
-                            "id": high_level_instance[0].id
-                            },
-                        "message": "successfully created",
+                        "message": "Selected agency updated successfully!",
                         "success": True
                     },
                     status=status.HTTP_200_OK
                 )
-        except Exception as e:
-            return Response(
-                {
-                    "message": str(e) + " field is required",
-                    "success": False
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )

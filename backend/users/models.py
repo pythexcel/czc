@@ -9,12 +9,11 @@ class User(AbstractUser):
         ("Admin", "Admin"),
         ("User", "User")
     )
-
+    id = models.UUIDField(primary_key=True, max_length=60, unique=True, default=uuid4)
     email = models.EmailField(("email_address"), unique=True, max_length=200)
     remember_me = models.BooleanField(default=False)
     reset_password = models.BooleanField(default=False)
     role = models.CharField(max_length=10, choices=ROLE_CHOICE, default="User")
-    reference = models.UUIDField(max_length=60, unique=True, default=uuid4)
     added_by = models.ForeignKey('self', on_delete=models.CASCADE, null=True,
                                  blank=True)
     USERNAME_FIELD = "email"
@@ -23,7 +22,6 @@ class User(AbstractUser):
 
     def save(self, *args, **kwargs):
         self.username = self.email
-        self.reference = str(self.reference).replace("-", "")
         super().save(*args, **kwargs)
 
 
