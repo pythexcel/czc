@@ -19,7 +19,6 @@ function SideNav() {
   const [hoverOpen, setHoverOpen] = useState(false);
 
   const manageName = useSelector(selectManage);
-  console.log(manageName,"am i allowed")
 
   // const handleNavigate = (route) => {
   //     setSelectedItem(route);

@@ -9,13 +9,12 @@ const customFieldSlice = createSlice({
         setCustomFieldSlice: (state, action) => {
             const { index, customFieldTagname, customFieldType, customFieldDescription, allowCustomOverWright } = action.payload;
 
-            // Use spread operator to copy existing values
             state.customfieldData[index] = {
-                ...state.customfieldData[index], // Copy existing values
+                ...state.customfieldData[index],
                 customFieldTagname: customFieldTagname !== undefined ? customFieldTagname : state.customfieldData[index]?.customFieldTagname,
                 customFieldType: customFieldType !== undefined ? customFieldType : state.customfieldData[index]?.customFieldType,
                 customFieldDescription: customFieldDescription !== undefined ? customFieldDescription : state.customfieldData[index]?.customFieldDescription,
-                allowCustomOverWright: allowCustomOverWright !== undefined ? allowCustomOverWright : false, // Set to false by default
+                allowCustomOverWright: allowCustomOverWright !== undefined ? allowCustomOverWright : false,
             };
         },
     },

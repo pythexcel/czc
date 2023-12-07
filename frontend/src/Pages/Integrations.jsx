@@ -45,13 +45,17 @@ function Integrations() {
         }
     }
 
+    const handlesuccess = () => {
+        setSuccess(true)
+    }
+
     const data = [
         { img: heighlevel, brand: 'level_Brand', name: 'HighLevel' },
         { img: OpenAI, brand: 'OpenAI', name: 'OpenAI' }
     ]
 
     const renderModals = <div>
-        {openModal && <IntegrationModal onClose={handleCloseModal} />}
+        {openModal && <IntegrationModal onClose={handleCloseModal} handlesuccess={handlesuccess} />}
         {openUpdateModal && <UpdateModal onClose={handleCloseUpdateModal} />}
         {success && <ToastSuccess
             title="Success"

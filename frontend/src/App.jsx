@@ -13,6 +13,7 @@ import PrivateRoute from "./Component/PrivateRoute";
 import CreateBot from "./Pages/CreateBot";
 import TermAndC from './Pages/TermAndC';
 import './App.css';
+import UpdateBot from "./Pages/UpdateBot/UpdateBot";
 
 
 function App() {
@@ -39,7 +40,7 @@ function App() {
           <Route path="manageuser" element={<MngUsers />} />
           <Route path="createBot" element={<CreateBot />} />
           <Route path="termCondition" element={<TermAndC />} />
-
+          <Route path="updatebot" element={<UpdateBot />} />
         </Route>
       </Routes>
     </BrowserRouter>

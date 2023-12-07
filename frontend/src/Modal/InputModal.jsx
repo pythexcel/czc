@@ -30,7 +30,7 @@ function InputModal({ onClose, editData, isedituser }) {
   const Edituser = async ({ id }) => {
 
     try {
-      const res = await axiosInstance.put(`api/manage-user/${id}`, {
+      const res = await axiosInstance.patch(`api/manage-user/${id}`, {
         password: password,
       });
      onClose()

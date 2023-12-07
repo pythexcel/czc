@@ -7,6 +7,7 @@ import DropDown from "./DropDown";
 import { setCustomFieldSlice } from '../Store/slice/CustomFieldSlice';
 import { useDispatch } from "react-redux";
 import { useState } from "react";
+import TextArea from "../Common-Component/TextArea";
 
 function CustomField({ onDeleteClick, index }) {
     const dispatch = useDispatch();
@@ -53,7 +54,7 @@ function CustomField({ onDeleteClick, index }) {
     return (
         <div className="flex gap-6 my-4 border border-blue-500 rounded-2xl p-4 -mx-3">
             <div className="w-[15%]">
-                <Title>Tag Name</Title>
+                <Title>Field Name</Title>
                 <InputField
                     type="text"
                     placeholder="Name"
@@ -75,11 +76,10 @@ function CustomField({ onDeleteClick, index }) {
             </div>
             <div className="w-[40%]">
                 <Title>Goal Description</Title>
-                <textarea
+                <TextArea
                     onChange={handleCustomFieldGoalDescription}
                     id="message"
                     name="message"
-                    className=" bg-gray-100 bg-opacity-50 rounded-lg border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 h-[60px] text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out w-full focus:shadow-lg"
                     placeholder="Description" />
             </div>
             <div className="flex justify-between items-center mx-4 w-[30%]">

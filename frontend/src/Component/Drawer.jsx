@@ -6,25 +6,27 @@ import { FaUsers } from "react-icons/fa";
 
 function Drawer() {
 
+    const size = 'w-[25px] h-[25px]'
+
     const Navi = [
         {   routename: 'integrations', 
-            icon: <TbTopologyRing2 className='w-[25px] h-[25px]' />, 
+            icon: <TbTopologyRing2 className={size} />, 
             name: "Integrations" 
         },
         {   routename: 'bots', 
-            icon: <RiRobot2Line className='w-[25px] h-[25px]' />, 
+            icon: <RiRobot2Line className={size} />, 
             name: "Bots" 
         },
         {   routename: 'faqs', 
-            icon: <FcFaq className='w-[25px] h-[25px]' />, 
+            icon: <FcFaq className={size} />, 
             name: "FAQs" 
         },
         {   routename: 'auditlogs', 
-            icon: <FiRepeat className='w-[25px] h-[25px]' />, 
+            icon: <FiRepeat className={size} />, 
             name: "Audit Logs" 
         },
         {   routename: 'mngusers', 
-            icon: <FaUsers className='w-[25px] h-[25px]' />, 
+            icon: <FaUsers className={size} />, 
             name: "Manage Users" 
         }
     ]

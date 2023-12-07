@@ -47,18 +47,14 @@ function CreateBot() {
   const [openCustom, setOpenCustom] = useState([]);
   const [openTrigger, setOpenTrigger] = useState([]);
 
-  console.log(opentag, openCustom, openTrigger, "this is the trigger data as well")
+  console.log(opentag, openCustom, openTrigger, "this is the trigger data as well");
+
 
   const childData = useSelector((state) => state.tag.childData);
 
-  const customfieldata = useSelector(
-    (state) => state.customReducer.customfieldData
-  );
+  const customfieldata = useSelector((state) => state.custom.customfieldData);
 
-  const triggerwebhookdata = useSelector(
-    (state) => state.TriggerWebhook.triggerWebhookData
-  );
-  // console.log(triggerwebhookdata, "triggerwebhookdata,,,,");
+  const triggerwebhookdata = useSelector((state) => state.TriggerWebhook.triggerWebhookData);
 
   const [addtag, setAddTag] = useState([]);
   const [customfield, setCustomfield] = useState([]);
@@ -100,10 +96,6 @@ function CreateBot() {
     }
   };
 
-  // for (let i = 0; i < opentag.length; i++) {
-  //   HandleAddTage();
-  // }
-
   const toggleIsOpen = () => {
     setIsOpen((prevIsOpen) => !prevIsOpen);
   };
@@ -112,7 +104,11 @@ function CreateBot() {
     <div>
       {Array.isArray(addtag) &&
         addtag.map((index) => (
-          <TagType onDeleteClick={handleDeleteTage} index={index} key={index} />
+          <TagType
+            onDeleteClick={handleDeleteTage}
+            index={index}
+            key={index}
+          />
         ))}
 
       {Array.isArray(customfield) &&
@@ -136,19 +132,19 @@ function CreateBot() {
     </div>
   );
 
-  const tag_type = childData.map((item) => ({
-    tag_name: item.tagname,
-    goal_description: item.description,
+  const tag_type = childData?.map((item) => ({
+    tag_name: item?.tagname,
+    goal_description: item?.description,
   }));
 
-  const customfields = customfieldata.map((item) => ({
+  const customfields = customfieldata?.map((item) => ({
     field_name: item.customFieldTagname,
     field_type: item.customFieldType,
     field_description: item.customFieldDescription,
     allow_overwrite: item.allowCustomOverWright,
   }));
 
-  const tiggerwebhook = triggerwebhookdata.map((item) => ({
+  const tiggerwebhook = triggerwebhookdata?.map((item) => ({
     goal_name: item.Triggergoalname,
     triggers: item.TriggerselectTriggers,
     webhook_request_method: item.TriggervalueOfheaders,
@@ -185,41 +181,8 @@ function CreateBot() {
         trigger_webhook_type: tiggerwebhook,
       });
       navigate("/dashboard/bots");
-      console.log(createBot.response.data, ">>>>>>>>>>");
     } catch (error) {
       console.log("i am error");
-    }
-  };
-
-  const handleSubmitForUpdate = async (values) => {
-    try {
-      const createBot = await axiosInstance.put(`bot/${uniqueId}`, {
-        bot_type: {
-          ai_type: values.AiType,
-          bot_name: values.Botname,
-          bot_description: values.BotDescription,
-          prompt_type: values.PromptType,
-          prompt: values.Prompt,
-          intro_message_type: values.IntroMessageType,
-          intro_message: values.IntroMessage,
-          converstation_limit: values.Conversation,
-          time_zone_reference: values.TimeZoneReference,
-          time_zone_format: values.TimeZoneFormat,
-          time_format: values.TimeFormat,
-          gpt_model: values.GPTmodel,
-          open_ai_api_key: values.OpenAikey,
-          message_delay: values.messageDelay,
-        },
-        tag_type: tag_type,
-        custom_field_type: customfields,
-        trigger_webhook_type: tiggerwebhook,
-      });
-      setUpdate(false);
-      dispatch(setFlag(true));
-      navigate("/dashboard/bots");
-      console.log(createBot.response.data, "udpate data as well");
-    } catch (error) {
-      console.log(error, "i am error");
     }
   };
 
@@ -241,12 +204,9 @@ function CreateBot() {
       messageDelay: "",
     },
     onSubmit: async (values, { resetForm }) => {
-      console.log(JSON.stringify(values, null, 2));
-      if (update) {
-        await handleSubmitForUpdate(values);
-      } else {
-        await CreateAIBot(values);
-      }
+
+      await CreateAIBot(values);
+
       resetForm();
     },
   });
@@ -273,8 +233,10 @@ function CreateBot() {
       });
       console.log(resp.details.goal.tag_type, "i am tag type")
       setOpenTag(resp.details.goal.tag_type)
+
       console.log(resp.details.goal.custom_field_type, "i am custom field")
       setOpenCustom(resp.details.goal.custom_field_type)
+
       console.log(resp.details.goal.trigger_webhook_field, "i am triggerwebhook data")
       setOpenTrigger(resp.details.goal.trigger_webhook_field)
       setUpdate(true);

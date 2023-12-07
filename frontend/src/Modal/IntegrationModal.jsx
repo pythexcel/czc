@@ -1,36 +1,39 @@
 import { RxCross2 } from "react-icons/rx";
 import ModalPara from "../Component/ModalPara";
-import DropDown from "../Component/DropDown";
-import ChevronDownIcon from "../Component/ChevronDownIcon";
 import InputField from '../Component/TextInput';
 import Spinner from "../Component/Spinner";
 import { useState } from "react";
 import CustomButton from "../Common-Component/CustomButton";
 import ModalShadow from "../Common-Component/ModalShadow";
+import axiosInstance from "../utils/axios";
+import { useDispatch } from "react-redux";
+import { setFaqs } from "../Store/slice/FaqsSlice";
 
 
-function IntegrationModal({ onClose }) {
-    const [selectedValue, setSelectedValue] = useState("");
-    const [hide, setHide] = useState(true);
+function IntegrationModal({ onClose, handlesuccess }) {
+    const dispatch = useDispatch();
+    const [name, setName] = useState("")
+    const [domain, setDomain] = useState("")
+    const [api, setApi] = useState("")
     const [isLoading, setIsLoading] = useState(false);
 
-    const option = [
-        "Agency",
-        "Location"
-    ]
 
-    const handleSelectChange = (event) => {
-        const selectedOption = event.target.value;
-        setSelectedValue(selectedOption);
-        if (selectedOption === 'Location') {
-            setHide(false)
-        } else if (selectedOption === 'Agency') {
-            setHide(true)
+    const handleUpdate = async () => {
+        setIsLoading(true)
+        try {
+            const resp = await axiosInstance.post("api/high-level/", {
+                agency_name: name,
+                domain: domain,
+                agency_api_key: api
+            })
+            console.log(resp,"this is respocne");
+            dispatch(setFaqs('Allow'));
+            handlesuccess();
+            onClose();
+        } catch (error) {
+            onClose();
+            console.log(error, "this is error")
         }
-    }
-
-    const handleUpdate = () => {
-        
     }
 
     return (
@@ -45,31 +48,19 @@ function IntegrationModal({ onClose }) {
                     </button>
                 </div>
                 <div className="p-6 space-y-6 bg-white">
+
                     <div>
-                        <ModalPara>Account Type</ModalPara>
-                        <div className="relative shadow-lg">
-                            <DropDown value={selectedValue} onChange={handleSelectChange}>
-                                {option.map((item, i) => (
-                                    <option key={i}>{item}</option>
-                                ))}
-                            </DropDown>
-                            <ChevronDownIcon />
-                        </div>
-                    </div>
-                    {hide && <><div>
                         <ModalPara>Agency Name</ModalPara>
-                        <InputField type="text" placeholder="CoachGrowth" />
+                        <InputField onChange={(event)=>setName(event.target.value)} type="text" placeholder="CoachGrowth" />
                     </div>
-                        <div>
-                            <ModalPara>Agency Domain</ModalPara>
-                            <InputField type="text" placeholder="app.coachgrowth.io" />
-                        </div>
-                        <div>
-                            <ModalPara>HighLevel Agency API Key</ModalPara>
-                            <InputField type="text" placeholder="eyJh********************eY" />
-                        </div>
-                    </>
-                    }
+                    <div>
+                        <ModalPara>Agency Domain</ModalPara>
+                        <InputField onChange={(event)=>setDomain(event.target.value)} type="text" placeholder="app.coachgrowth.io" />
+                    </div>
+                    <div>
+                        <ModalPara>HighLevel Agency API Key</ModalPara>
+                        <InputField onChange={(event)=>setApi(event.target.value)} type="text" placeholder="eyJh********************eY" />
+                    </div>
                 </div>
                 <hr />
                 <div className="flex justify-start p-6 space-x-2 rounded-b-lg dark:border-gray-600 bg-white">

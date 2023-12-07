@@ -7,12 +7,16 @@ import { useState } from "react";
 import FaqsModal from "../Modal/FaqsModal";
 import WidgetDrawer from "../Component/WidgetDrawer";
 import TextPage from './TextPage';
+import { useSelector } from "react-redux";
+import { selectFaqs } from "../Store/slice/FaqsSlice";
+import LocationUpdate from "../Modal/LocationUpdate";
 
 const FAQs = () => {
   const [isenableModal, setIsEnableModal] = useState(false);
   const [isdisableModal, setIsDisableModal] = useState(false);
   const [iswidgetdrawer, setIsWidgetDrawer] = useState(false);
-  const [defaultPage, setDefaultPage] = useState(false);
+  const [updatelocation, setUpdatelocation] = useState(false);
+  // const [defaultPage, setDefaultPage] = useState(false);
   // const [isOpen, setIsOpen] = useState(false);
   const buttonsData = [
     { text: "Enable All Locations", onClick: () => setIsEnableModal(true) },
@@ -21,24 +25,27 @@ const FAQs = () => {
     { text: "Disable Location", onClick: () => { } },
     { text: "Import FAQS", onClick: () => { } },
   ];
-  // const opt = [
-  //   "180 Transformations",
-  //   "415 Media Group",
-  //   "Aaron Burgess's Account",
-  //   "Aaron Huey's Account",
-  //   "Abdi Yassin's Account",
-  //   "Abdul Qadir's Account",
-  //   "Abraham O's Account",
-  //   "Adonnis Howard's Account",
-  //   "Adrian Hazzi's Account",
-  //   "Advanced GPT Snapshot",
-  // ];
+
+  const faqsPermission = useSelector(selectFaqs);
+  console.log(faqsPermission,">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+  
+  // if(faqsPermission === "Allow"){
+  //   setDefaultPage(true)
+  // }  
 
   // const toggleIsOpen = () => {
   //   setIsOpen((prevIsOpen) => !prevIsOpen);
   // };
+
+  const handleUpdateLocation = () => {
+    setTimeout(() => {
+      setUpdatelocation(true);
+    }, 700);
+  };
+  
+
   return (
-    <div>{!defaultPage ? <TextPage /> :
+    <div>{!faqsPermission ? <TextPage /> :
       <div className="relative">
         <div className="p-6">
           <div className="flex justify-between flex-wrap">
@@ -89,7 +96,7 @@ const FAQs = () => {
             <table className="w-full border-collapse rounded-lg  ">
               <thead>
                 <tr className="bg-blue-50">
-                  <th className="py-4 px-4 text-xl text-[#8392AB]">
+                  <th className="text-xl px-4 text-[#8392AB] text-start">
                     <input
                       id="link-checkbox"
                       type="checkbox"
@@ -100,15 +107,15 @@ const FAQs = () => {
                   <th className="py-2 font-normal text-[#8392AB]">
                     SUB-ACCOUNTS NAME{" "}
                   </th>
-                  <th className="py-2 font-normal   text-[#8392AB] ">
+                  <th className="py-2 font-normal text-[#8392AB] ">
                     NO OF FAQS
                   </th>
-                  <th className="py-2 font-normal   text-[#8392AB]">ENABLED</th>
+                  <th className="py-2 font-normal text-[#8392AB]">ENABLED</th>
 
                   <th className="py-2 font-normal text-[#8392AB]">
                     LAST UPDATED
                   </th>
-                  <th className="py-2 font-normal  text-[#8392AB]">ACTIONS</th>
+                  <th className="py-2 font-normal text-[#8392AB]">ACTIONS</th>
                 </tr>
               </thead>
               <tbody>
@@ -130,7 +137,7 @@ const FAQs = () => {
                   <td className="py-4 px-4 bg-slate-50 text-sm flex justify-center mt-[8%]  text-[#8392AB]">
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input type="checkbox" value="" className="sr-only peer" />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer  peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600"></div>
+                      <div onClick={handleUpdateLocation} className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer  peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600"></div>
                     </label>
                   </td>
                   <td className="py-4 px-4 bg-slate-50 text-sm text-center  mr-[100%] text-[#8392AB] ">
@@ -192,6 +199,12 @@ const FAQs = () => {
             </table>
           </div>
         </div>
+        {updatelocation && (
+          <LocationUpdate 
+            heading="Location Successfully updated!"
+            onClose={() => setUpdatelocation(false)}
+          />
+        )}
         {isenableModal && (
           <FaqsModal
             heading="Are you Sure You want to Enable all location"

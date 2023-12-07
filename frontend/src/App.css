@@ -80,6 +80,7 @@
   opacity: 1;
 }
 
+
 .delete {
   position: relative;
   display: inline-block;
@@ -121,6 +122,8 @@
   opacity: 1;
 }
 
+
+
 .details {
   position: relative;
   display: inline-block;
@@ -161,6 +164,111 @@
   visibility: visible;
   opacity: 1;
 }
+
+
+
+.update {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.update .updatetext {
+  visibility: hidden;
+  width: fit-content;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  border-radius: 6px;
+  padding: 5px 10px;
+  position: absolute;
+  z-index: 1;
+  bottom: 15%;
+  left: 50%;
+  margin-left: -70px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.update .updatetext::after {
+  content: "";
+  position: absolute;
+  top: 30%;
+  right: -20%;
+  margin-left: -15px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+  transform: rotate(270deg);
+}
+
+.update:hover .updatetext {
+  visibility: visible;
+  opacity: 1;
+}
+
+
+
+.deletefaq {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.deletefaq .deletefaqtext {
+  visibility: hidden;
+  width: fit-content;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  border-radius: 6px;
+  padding: 5px 10px;
+  position: absolute;
+  z-index: 1;
+  bottom: 15%;
+  left: 20%;
+  margin-left: -75px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.deletefaq .deletefaqtext::after {
+  content: "";
+  position: absolute;
+  top: 30%;
+  right: -17%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+  transform: rotate(270deg);
+}
+
+.deletefaq:hover .deletefaqtext {
+  visibility: visible;
+  opacity: 1;
+}
+
+.FaqCard:hover p:first-child {
+  color: blue;
+}
+
+.FaqCard:hover .update {
+  background-color: blue;
+}
+
+.FaqCard:hover .deletefaq {
+  background-color: blue;
+}
+
+/* .FaqCard:hover .hovered-icon {
+  
+} */
+
 
 .SlideModal {
   width: 100px;
