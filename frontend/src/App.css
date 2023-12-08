@@ -265,9 +265,14 @@
   background-color: blue;
 }
 
-/* .FaqCard:hover .hovered-icon {
-  
-} */
+.FaqCard:hover .icoon {
+  color: white;
+}
+
+.tableBox:hover .Text {
+  color: blue;
+}
+
 
 
 .SlideModal {
