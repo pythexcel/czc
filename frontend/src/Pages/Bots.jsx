@@ -132,7 +132,7 @@ function Bots() {
   const handleDetails = async (id) => {
     try {
       const resp = await axiosInstance.get(`bot/${id}`);
-      setBotdetails(resp.details[0]);
+      setBotdetails(resp.details);
       setOpenModal(true);
     } catch (error) {
       console.log(error);

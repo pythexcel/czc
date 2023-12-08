@@ -9,6 +9,7 @@ import { setCreUserFlag } from "../Store/slice/CreUserFlagSlice";
 import { useDispatch } from "react-redux";
 
 function InputModal({ onClose, editData, isedituser }) {
+
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
