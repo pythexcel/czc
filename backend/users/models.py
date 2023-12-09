@@ -9,7 +9,7 @@ class User(AbstractUser):
         ("Admin", "Admin"),
         ("User", "User")
     )
-    id = models.UUIDField(primary_key=True, max_length=60, unique=True, default=uuid4)
+  #  id = models.UUIDField(primary_key=True, max_length=60, unique=True, default=uuid4)
     email = models.EmailField(("email_address"), unique=True, max_length=200)
     remember_me = models.BooleanField(default=False)
     reset_password = models.BooleanField(default=False)
@@ -30,7 +30,7 @@ class OpenAIModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
 
-class HighLevelModel(models.Model):
+class AgencyModel(models.Model):
     agency_name = models.CharField(max_length=100)
     domain = models.URLField(max_length=100)
     agency_api_key = models.CharField(max_length=100)

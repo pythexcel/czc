@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import User
+from django.contrib.auth.hashers import make_password
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -16,3 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
             validated_data['is_staff'] = True
         user = User.objects.create_user(**validated_data)
         return user
+
+    def update(self, instance, validated_data):
+        validated_data['password'] = make_password(validated_data['password'])
+        return super().update(instance, validated_data)

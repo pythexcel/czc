@@ -1,9 +1,10 @@
 from django.db import models
-from users.models import HighLevelModel
+from locations.models import LocationModel
 
 
-class FAQ(models.Model):
-
-    high_level = models.ForeignKey(HighLevelModel, on_delete=models.CASCADE, null=True, related_name="high_level")
+class FAQModel(models.Model):
+    location = models.ForeignKey(LocationModel, on_delete=models.CASCADE, related_name="location")
     question = models.CharField(max_length=500)
     answer = models.CharField(max_length=500)
+    is_enabled = models.BooleanField(default=True)
+    updated_at = models.DateTimeField(auto_now=True)

@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from .serializers import UserSerializer
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import User, OpenAIModel, HighLevelModel
+from .models import User, OpenAIModel, AgencyModel
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -13,8 +13,7 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from utils.hardCodedString import resert_link_string
 from utils.helperfunction import open_ai_is_valid
-from .tasks import get_celery_task
-from locations.models import LocationModel
+from locations.tasks import get_celery_task
 
 
 class SignupAPI(APIView):
@@ -149,7 +148,7 @@ class ManageUserAPI(APIView):
             serializer.is_valid(raise_exception=True)
             user = serializer.save()
             data = {
-                "id": user.reference,
+                "id": user.id,
                 "email": user.email
             }
             return Response(
@@ -181,11 +180,10 @@ class ManageUserAPI(APIView):
 
     def patch(self, request, id):
         try:
-
             user_instance = get_object_or_404(User, id=id, added_by_id=request.user.id)
-            print("fkdkfjsldkf",user_instance)
-            data = UserSerializer(user_instance, data=request.data)
-            print("ddddd",data)
+            serializer = UserSerializer(user_instance, request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
             return Response(
                     {
                         "message": "updated successfully",
@@ -193,7 +191,7 @@ class ManageUserAPI(APIView):
                     },
                     status=status.HTTP_200_OK
                 )
-       
+     
         except Exception as e:
             return Response(
                 {
@@ -270,18 +268,17 @@ class OpenAIAPI(APIView):
             )
 
 
-class HighLevelAgencyAPI(APIView):
+class AgencyAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         data = request.data
-        HighLevelModel.objects.update_or_create(
-            user_id=request.user.id,
+        high_level_instance = AgencyModel.objects.update_or_create(
+            agency_api_key=request.data['agency_api_key'],
             defaults=data
         )
         agency_api_key = request.data['agency_api_key']
-        data = get_celery_task(agency_api_key)
-        LocationModel.objects.bulk_create(data)
+        data = get_celery_task(agency_api_key, high_level_instance[0])
         return Response(
                     {
                         "message": "Selected agency updated successfully!",

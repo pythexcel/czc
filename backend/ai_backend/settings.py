@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     "faq",
     "rest_framework_simplejwt",
     "corsheaders",
-    "locations"
+    "locations",
+    "django_celery_results"
 ]
 
 MIDDLEWARE = [
