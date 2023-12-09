@@ -9,7 +9,7 @@ class User(AbstractUser):
         ("Admin", "Admin"),
         ("User", "User")
     )
-    id = models.UUIDField(primary_key=True, max_length=60, unique=True, default=uuid4)
+  #  id = models.UUIDField(primary_key=True, max_length=60, unique=True, default=uuid4)
     email = models.EmailField(("email_address"), unique=True, max_length=200)
     remember_me = models.BooleanField(default=False)
     reset_password = models.BooleanField(default=False)

@@ -28,7 +28,7 @@ class FAQAPI(APIView):
             status=status.HTTP_200_OK)
 
     def get(self, request, id=None):
-        data = FAQModel.objects.filter(location=id).order_by('updated_at')
+        data = FAQModel.objects.filter(location=id).order_by('-updated_at')
         serializer = FAQSerializer(data, many=True)
         return Response(
             {
