@@ -65,7 +65,7 @@ class CreateBotAPI(APIView):
             serializer = BotModelSerializer(bot_data)
             return Response({"details": serializer.data, "success": True}, status=status.HTTP_200_OK)
         else:
-            bot_data = BotModel.objects.filter(**bot_filter).values()
+            bot_data = BotModel.objects.filter(**bot_filter).values().order_by('-updated_at')
             return Response({"details": bot_data, "success": True}, status=status.HTTP_200_OK)
 
     def patch(self, request, id):

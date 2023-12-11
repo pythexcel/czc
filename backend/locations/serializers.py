@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from locations.models import LocationModel
-from datetime import datetime
 
 
 class LocationModelSerializer(serializers.ModelSerializer):
@@ -21,6 +20,5 @@ class LocationModelSerializer(serializers.ModelSerializer):
         data = {
                "no_of_faqs": obj.location.values().count(),
                "enabled": True,
-               "last_updated": date_string,
-               "fffff": obj.location.values()}
+               "last_updated": date_string}
         return data

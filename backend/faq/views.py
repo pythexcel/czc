@@ -2,9 +2,9 @@ import pandas as pd
 import os
 from rest_framework.views import APIView, status
 from rest_framework.response import Response
-from users.models import AgencyModel
 from .serializers import FAQSerializer 
 from rest_framework.permissions import IsAuthenticated
+from django.db.models import Q
 from .models import FAQModel
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
@@ -15,7 +15,6 @@ class FAQAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        get_object_or_404(LocationModel, id=request.data['location'])
         seralizer = FAQSerializer(
             data=request.data)
         seralizer.is_valid(raise_exception=True)
@@ -29,6 +28,9 @@ class FAQAPI(APIView):
 
     def get(self, request, id=None):
         data = FAQModel.objects.filter(location=id).order_by('-updated_at')
+        query = request.GET.get('query', None)
+        if query:
+            data = FAQModel.objects.filter(Q(question__icontains=query) | Q(answer__icontains=query))
         serializer = FAQSerializer(data, many=True)
         return Response(
             {
@@ -61,8 +63,7 @@ class FAQAPI(APIView):
             )
 
     def delete(self, request, id=None):
-        instance = get_object_or_404(FAQModel, id=id)
-        instance.delete()
+        get_object_or_404(FAQModel, id=id).delete()
         return Response(
             {
                 "details": "deleted successfully",

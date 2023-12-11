@@ -273,16 +273,21 @@ class AgencyAPI(APIView):
 
     def post(self, request):
         data = request.data
-        high_level_instance = AgencyModel.objects.update_or_create(
+
+        high_level_instance, created = AgencyModel.objects.update_or_create(
             agency_api_key=request.data['agency_api_key'],
+            user_id=request.user.id,
             defaults=data
         )
-        agency_api_key = request.data['agency_api_key']
-        data = get_celery_task(agency_api_key, high_level_instance[0])
-        return Response(
-                    {
-                        "message": "Selected agency updated successfully!",
-                        "success": True
-                    },
-                    status=status.HTTP_200_OK
-                )
+        try:
+            agency_api_key = request.data['agency_api_key']
+            get_celery_task.delay(agency_api_key, high_level_instance.id)
+            return Response(
+                        {
+                            "message": "Selected agency updated successfully!",
+                            "success": True
+                        },
+                        status=status.HTTP_200_OK
+                    )
+        except Exception as e:
+            return Response("your error is " + str(e))
