@@ -1,9 +1,9 @@
 from rest_framework import serializers
-from .models import FAQ
+from .models import FAQModel
 
 
 class FAQSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = FAQ
+        model = FAQModel
         fields = "__all__" 

@@ -1,6 +1,7 @@
 from django.db import models
 from users.models import User
-import uuid 
+import uuid
+
 
 class BotModel(models.Model):
     AI_TYPE_CHOICES = (("Booking", "Booking"), ("Non Booking", "Non Booking"))
@@ -15,6 +16,7 @@ class BotModel(models.Model):
     TIME_ZONE_CHOICES = (("Contact", "Contact"), ("Location", "Location"))
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    updated_at = models.DateTimeField(auto_now=True)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) 
     ai_type = models.CharField(max_length=100, choices=AI_TYPE_CHOICES)
     bot_name = models.CharField(max_length=100,)

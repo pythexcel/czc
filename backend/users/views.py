@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from .serializers import UserSerializer
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import User, OpenAIModel, HighLevelModel
+from .models import User, OpenAIModel, AgencyModel
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -13,6 +13,7 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from utils.hardCodedString import resert_link_string
 from utils.helperfunction import open_ai_is_valid
+from locations.tasks import get_celery_task
 
 
 class SignupAPI(APIView):
@@ -147,7 +148,7 @@ class ManageUserAPI(APIView):
             serializer.is_valid(raise_exception=True)
             user = serializer.save()
             data = {
-                "id": user.reference,
+                "id": user.id,
                 "email": user.email
             }
             return Response(
@@ -168,7 +169,7 @@ class ManageUserAPI(APIView):
             )
 
     def get(self, request):
-        user = User.objects.filter(added_by_id=request.user.id).values("reference", "email", "id")
+        user = User.objects.filter(added_by_id=request.user.id).values("email", "id")
         return Response(
                 {
                     "details": user,
@@ -179,9 +180,10 @@ class ManageUserAPI(APIView):
 
     def patch(self, request, id):
         try:
-            user_instance = User.objects.get(id=id, added_by_id=request.user.id)
-            user_instance.set_password(request.data['password'])
-            user_instance.save()
+            user_instance = get_object_or_404(User, id=id, added_by_id=request.user.id)
+            serializer = UserSerializer(user_instance, request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
             return Response(
                     {
                         "message": "updated successfully",
@@ -189,14 +191,7 @@ class ManageUserAPI(APIView):
                     },
                     status=status.HTTP_200_OK
                 )
-        except User.DoesNotExist:
-            return Response(
-                {
-                    "message": "invalid user id",
-                    "success": False
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+
         except Exception as e:
             return Response(
                 {
@@ -273,31 +268,24 @@ class OpenAIAPI(APIView):
             )
 
 
-class HighLevelAgencyAPI(APIView):
+class AgencyAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        try:
-            data = request.data
-            high_level_instance = HighLevelModel.objects.update_or_create(
-                user_id=request.user.id,
-                defaults=data
-            )
-            return Response(
+        data = request.data
+
+        high_level_instance, created = AgencyModel.objects.update_or_create(
+            agency_api_key=request.data['agency_api_key'],
+            user_id=request.user.id,
+            defaults=data
+        )
+        agency_api_key = request.data['agency_api_key']
+        get_celery_task.delay(agency_api_key, high_level_instance.id)
+        return Response(
                     {
-                        "details": {
-                            "id": high_level_instance[0].id
-                            },
-                        "message": "successfully created",
+                        "message": "Selected agency updated successfully!",
                         "success": True
                     },
                     status=status.HTTP_200_OK
                 )
-        except Exception as e:
-            return Response(
-                {
-                    "message": str(e) + " field is required",
-                    "success": False
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+
