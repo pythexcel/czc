@@ -191,7 +191,7 @@ class ManageUserAPI(APIView):
                     },
                     status=status.HTTP_200_OK
                 )
-     
+
         except Exception as e:
             return Response(
                 {
@@ -279,15 +279,13 @@ class AgencyAPI(APIView):
             user_id=request.user.id,
             defaults=data
         )
-        try:
-            agency_api_key = request.data['agency_api_key']
-            get_celery_task.delay(agency_api_key, high_level_instance.id)
-            return Response(
-                        {
-                            "message": "Selected agency updated successfully!",
-                            "success": True
-                        },
-                        status=status.HTTP_200_OK
-                    )
-        except Exception as e:
-            return Response("your error is " + str(e))
+        agency_api_key = request.data['agency_api_key']
+        get_celery_task.delay(agency_api_key, high_level_instance.id)
+        return Response(
+                    {
+                        "message": "Selected agency updated successfully!",
+                        "success": True
+                    },
+                    status=status.HTTP_200_OK
+                )
+
