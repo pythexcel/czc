@@ -265,15 +265,9 @@
   background-color: blue;
 }
 
-.FaqCard:hover .icoon {
-  color: white;
-}
-
-.tableBox:hover .Text {
-  color: blue;
-}
-
-
+/* .FaqCard:hover .hovered-icon {
+  
+} */
 
 .SlideModal {
   width: 100px;
@@ -353,4 +347,16 @@
 @keyframes fadeout {
   from {right: 30px; opacity: 1;}
   to {right: 0; opacity: 0;}
+}
+
+/* Override current date style */
+.flatpickr-day.today {
+  background-color:#5e72e4;
+  color: white;
+}
+
+/* Override hover state style */
+.flatpickr-day:hover {
+  background-color: #d2d8f7;
+  color: black;
 }

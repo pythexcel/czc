@@ -15,7 +15,7 @@ function ForgetPassword() {
   const handleForgetPassword = async (values) => {
     try {
       setIsLoadingPassword(true);
-      const response = await axiosInstance.post("api/forget-password/", {
+      const response = await axiosInstance.post("users/forget-password/", {
         username: values.email,
       });
       setIsLoadingPassword(false);

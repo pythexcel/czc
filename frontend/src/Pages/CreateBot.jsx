@@ -46,8 +46,8 @@ function CreateBot() {
   const [opentag, setOpenTag] = useState([]);
   const [openCustom, setOpenCustom] = useState([]);
   const [openTrigger, setOpenTrigger] = useState([]);
-
-  console.log(opentag, openCustom, openTrigger, "this is the trigger data as well");
+  const [prompt, setPrompt] = useState("Custom Field Name")
+  const [message, setMassage] = useState("Custom Field Name")
 
 
   const childData = useSelector((state) => state.tag.childData);
@@ -159,14 +159,14 @@ function CreateBot() {
   const CreateAIBot = async (values) => {
     setIsLoading(true);
     try {
-      const createBot = await axiosInstance.post("bot", {
+      const createBot = await axiosInstance.post("bot/", {
         bot_type: {
           ai_type: values.AiType,
           bot_name: values.Botname,
           bot_description: values.BotDescription,
-          prompt_type: values.PromptType,
+          prompt_type: values.PromptType ? values.PromptType : "Custom Field" ,
           prompt: values.Prompt,
-          intro_message_type: values.IntroMessageType,
+          intro_message_type: values.IntroMessageType ? values.IntroMessageType : "Custom Field",
           intro_message: values.IntroMessage,
           converstation_limit: values.Conversation,
           time_zone_reference: values.TimeZoneReference,
@@ -204,12 +204,35 @@ function CreateBot() {
       messageDelay: "",
     },
     onSubmit: async (values, { resetForm }) => {
-
       await CreateAIBot(values);
-
       resetForm();
     },
   });
+
+  useEffect(() => {
+    if (formik.values.PromptType === "Text") {
+      setPrompt("Prompt Text");
+    } else if (formik.values.PromptType === "Custom Field") {
+      setPrompt("Custom Field Name");
+    } else if (formik.values.PromptType === "Custom Value") {
+      setPrompt("Custom Value Name")
+    } else {
+      setPrompt("Custom Field Name");
+    }
+  }, [formik.values.PromptType]);
+
+  useEffect(() => {
+    if (formik.values.IntroMessageType === "Text") {
+      setMassage("Text")
+    } else if (formik.values.IntroMessageType === "Custom Field") {
+      setMassage("Custom Field Name")
+    } else if (formik.values.IntroMessageType === "Custom Value") {
+      setMassage("Custom Value Name")
+    } else {
+      setMassage("Custom Field Name");
+    }
+  }, [formik.values.IntroMessageType])
+
 
   const getBotForUpdate = async (uniqueId) => {
     try {
@@ -315,18 +338,19 @@ function CreateBot() {
                 onBlur={formik.handleBlur}
                 value={formik.values.PromptType}
               >
-                <option default value={""} className="hidden">
-                  Select
+                <option selected value="Custom Field" className="hidden">
+                  Custom Field
                 </option>
                 {Intromessage.map((option, i) => (
                   <option key={i}>{option}</option>
                 ))}
               </DropDown>
               <ChevronDownIcon />
-            </div>
+            </div>  
           </div>
+          
           <div className="w-[50%]">
-            <Title>Prompt</Title>
+            <Title>Enter {prompt}</Title>
             <InputField
               type="text"
               id="Prompt"
@@ -349,8 +373,8 @@ function CreateBot() {
                 onBlur={formik.handleBlur}
                 value={formik.values.IntroMessageType}
               >
-                <option default value={""} className="hidden">
-                  Select
+                <option selected value="Custom Field" className="hidden">
+                  Custom Field
                 </option>
                 {Intromessage.map((option, i) => (
                   <option key={i}>{option}</option>
@@ -360,7 +384,7 @@ function CreateBot() {
             </div>
           </div>
           <div className="w-[50%]">
-            <Title>Intro Message</Title>
+            <Title>Intro Message {message}</Title>
             <InputField
               type="text"
               id="IntroMessage"
