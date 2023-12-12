@@ -12,36 +12,45 @@ import Widget from '../Common-Component/Widget';
 import FileSaver from 'file-saver';
 import Icons from "../Common-Component/Icons";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import SearchIcons from "../Common-Component/SearchIcons";
+import SearchBar from "../Common-Component/SearchBar";
+import { HiSearch } from "react-icons/hi";
+import fileDownload from "js-file-download";
 
-const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer }) => {
+const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, widgetsids, getreferesh }) => {
+
+  const [ids, setIds] = useState("");
   const [Alldata, setAllData] = useState([])
+  const [search, setSearch] = useState(false);
+  const [showMore, setShowMore] = useState(false);
+  const [searchtype, setSearchType] = useState("");
   const [isaddfaqs, setIsAddFaqs] = useState(false);
   const [isscrapurl, setIsScrapUrl] = useState(false);
   const [isimportfaqs, setIsImportFaqs] = useState(false);
-  const [showMore, setShowMore] = useState(false);
-  const [ids, setIds] = useState("");
+
 
   const itemsPerPage = 10;
 
   const [currentPage, setCurrentPage] = useState(1);
 
-  const totalPages = Math.ceil(Alldata.length / itemsPerPage);
+  const totalPages = Alldata === undefined ? 1 : Math.ceil(Alldata.length / itemsPerPage);
+
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
   };
 
-  const displayedItems = Alldata.slice(
+  const displayedItems = Alldata?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-  
+
   const isPrevButtonDisabled = currentPage === 1;
   const isNextButtonDisabled = currentPage === totalPages || totalPages === 0;
 
   const getQuery = async () => {
     try {
-      const resp = await axiosInstance.get("frequently-asked-ques/");
+      const resp = await axiosInstance.get(`frequently-asked-ques/${widgetsids}`);
       setAllData(resp.details)
     } catch (error) {
       console.log(error, "this is werror as well ")
@@ -73,7 +82,7 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer }) => {
 
   const handleDelete = async (id) => {
     try {
-      const result = await axiosInstance.delete(`frequently-asked-ques/${id}`);
+      const result = await axiosInstance.delete(`users/frequently-asked-ques/${id}`);
       getQuery();
       console.log(result)
     } catch (error) {
@@ -81,7 +90,7 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer }) => {
     }
   }
 
-  const styleIcon = "h-[23px] w-[23px] text-gray-500 icoon";
+  const styleIcon = "h-[23px] w-[23px] text-gray-500";
 
   const convertToCSV = (data) => {
     const header = Object.keys(data[0]).join(',');
@@ -91,13 +100,11 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer }) => {
 
   const handleExport = async () => {
     try {
-      const resp = await axiosInstance.get("download/faq/");
+      const resp = await axiosInstance.get(`frequently-asked-ques/download/${widgetsids}`);
       const responseData = resp.data;
 
-      const csvData = convertToCSV(responseData);
-
-      const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8' });
-      FileSaver.saveAs(blob, 'exported_data.csv');
+      // const csvData = convertToCSV(responseData);
+      fileDownload(responseData, 'filename.csv');
       console.log(resp)
     } catch (error) {
       console.log(error, "error")
@@ -139,7 +146,7 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer }) => {
           <span> Import</span>
         </Widget>
 
-        <Widget>
+        <Widget onClick={() => setSearch(prev => !prev)}>
           <FaSearch className={heightIcon} />
           <span> Search</span>
         </Widget>
@@ -152,15 +159,30 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer }) => {
         </Widget>
       </div>
       <div className="px-[130px]">
+        {search && <form className="w-full flex flex-row mt-[2%]">
+          <div className="relative w-full">
+            <input
+              type="search"
+              id="location-search"
+              className="block p-2.5 z-20 text-sm focus:outline-none text-gray-700 bg-white rounded-lg dark:placeholder-gray-400 dark:focus:border-blue-500 w-[100%] shadow-lg "
+              placeholder="Search for city or address"
+              onChange={(e) => setSearchType(e.target.value)}
+              required
+            />
+            <button type="submit" className="absolute top-0 end-0 h-full p-2.5 text-sm font-medium text-white bg-blue-700 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 ml-[500px]">
+              <HiSearch className='text-white w-[20px] h-[20px]' />
+            </button>
+          </div>
+        </form>}
         <div>
-          {!Alldata.length ? (
+          {!Alldata?.length ? (
             <div className="bg-white px-6 py-8 mt-6 rounded-lg text-center items-center hover:text-[#0F45F5]">
               <p className="font-semibold text-xl text-[#999999] mx-auto">
                 No FAQs Found
               </p>
             </div>
           ) : (
-            displayedItems.map((item, index) => (
+            displayedItems?.map((item, index) => (
               <div key={index} className="FaqCard bg-white p-6 mt-6 rounded-lg flex flex-row justify-between shadow-md">
                 <div className="mr-5">
                   <p className="font-semibold text-[#999999]">
@@ -214,7 +236,7 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer }) => {
           </button>
         </div>
       </div>
-      {isaddfaqs && <AddFaqs ids={ids} onClose={onClose} />}
+      {isaddfaqs && <AddFaqs ids={ids} widgetsids={widgetsids} getreferesh={getreferesh} onClose={onClose} />}
       {isscrapurl && <ScrapURL onClose={onClose} />}
       {isimportfaqs && <ImportFAQs onClose={onClose} />}
     </div>

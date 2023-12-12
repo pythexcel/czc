@@ -34,13 +34,14 @@ function Bots() {
   const [idforclone, setIdforclone] = useState("");
   const [botdetails, setBotdetails] = useState([]);
   const [bot, setBot] = useState([]);
+
   const [searchTerm, setSearchTerm] = useState("");
 
   const getAllBots = async () => {
     dispatch(setFlag(false));
     try {
-      const response = await axiosInstance.get("bot");
-      setBot(response.details);
+      const response = await axiosInstance.get("bot/");
+      setBot(response?.details);
     } catch (error) {
       console.error("Error during get all data", error);
     }
@@ -71,7 +72,7 @@ function Bots() {
   const handleSuccess = async () => {
     setIsLoading(true);
     try {
-      const Cloneresponce = await axiosInstance.post(`bot/clone/`, {
+      const Cloneresponce = await axiosInstance.post(`bot/clone`, {
         bot_name: clonedBotName,
         id: idforclone,
       });
@@ -92,7 +93,7 @@ function Bots() {
   const handleDeleted = () => {
     setDeleteBot(false);
     setDeletedSuccess(false);
-  };
+   };
 
   const handleCloseFailed = () => {
     setToastFailed(false);
@@ -120,7 +121,7 @@ function Bots() {
 
   const handleDeleteBot = async () => {
     try {
-      await axiosInstance.delete(`bot/${cnfDeleteBot}`);
+      await axiosInstance.delete(`bot/${cnfDeleteBot}/`);
       setDeleteBot(true);
       setDeletedSuccess(true);
       getAllBots()
@@ -131,7 +132,7 @@ function Bots() {
 
   const handleDetails = async (id) => {
     try {
-      const resp = await axiosInstance.get(`bot/${id}`);
+      const resp = await axiosInstance.get(`bot/${id}/`);
       setBotdetails(resp.details);
       setOpenModal(true);
     } catch (error) {
@@ -202,7 +203,7 @@ function Bots() {
 
           <div className="my-4 flex flex-wrap gap-4">
             <BotCard />
-            {bot.map((item, index) => (
+            {bot?.map((item, index) => (
               <BookingCard
                 key={index}
                 handleCopy={(id) => handleCopy(id)}

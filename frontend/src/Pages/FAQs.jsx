@@ -3,7 +3,7 @@ import { HiOutlineChevronDown, HiSearch } from "react-icons/hi";
 import { FaFileExport, FaFileImport } from "react-icons/fa";
 import { AiFillEye } from "react-icons/ai";
 import { MdDelete } from "react-icons/md";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FaqsModal from "../Modal/FaqsModal";
 import WidgetDrawer from "../Component/WidgetDrawer";
 import TextPage from './TextPage';
@@ -11,10 +11,9 @@ import { useSelector } from "react-redux";
 import { selectFaqs } from "../Store/slice/FaqsSlice";
 import LocationUpdate from "../Modal/LocationUpdate";
 import { RiArrowRightSLine } from "react-icons/ri";
+import axiosInstance from "../utils/axios";
 
 const FAQs = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
   const [isenableModal, setIsEnableModal] = useState(false);
   const [isdisableModal, setIsDisableModal] = useState(false);
   const [iswidgetdrawer, setIsWidgetDrawer] = useState(false);
@@ -22,6 +21,13 @@ const FAQs = () => {
 
   const [selectAll, setSelectAll] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [data, setData] = useState([])
+  const [isChecked, setIsChecked] = useState(false);
+  const [widgetsids, setWidgetsids] = useState("");
+
+  const [isOpen, setIsOpen] = useState(false)
+
+  console.log(data, "/////")
 
   const buttonsData = [
     { text: "Enable All Locations", onClick: () => setIsEnableModal(true) },
@@ -31,43 +37,15 @@ const FAQs = () => {
     { text: "Import FAQS", onClick: () => { } },
   ];
 
-  const [data, setData] = useState([
-    { id: 1, name: "180 Transformations", faqs: 1, lastUpdate: "23/01/2024" },
-    { id: 2, name: "ZappayChat", faqs: 0, lastUpdate: "21/02/2024" },
-    { id: 3, name: "Amrita", faqs: 2, lastUpdate: "20/01/2024" },
-    { id: 4, name: "Anamika", faqs: 2, lastUpdate: "20/01/2024" },
-    { id: 5, name: "Amrita", faqs: 0, lastUpdate: "20/04/2024" },
-    { id: 6, name: "shivanya", faqs: 2, lastUpdate: "20/01/2024" },
-    { id: 7, name: "XYZ Corp", faqs: 3, lastUpdate: "15/03/2024" },
-    { id: 8, name: "Tech Solutions", faqs: 1, lastUpdate: "18/02/2024" },
-    { id: 9, name: "Innovate Hub", faqs: 4, lastUpdate: "10/04/2024" },
-    { id: 10, name: "Data Dynamics", faqs: 0, lastUpdate: "25/01/2024" },
-    { id: 11, name: "Eco Ventures", faqs: 2, lastUpdate: "12/03/2024" },
-    { id: 12, name: "Connectify", faqs: 1, lastUpdate: "05/02/2024" },
-    { id: 13, name: "SynthCorp", faqs: 3, lastUpdate: "29/03/2024" },
-    { id: 14, name: "Quantum Innovations", faqs: 0, lastUpdate: "14/02/2024" },
-    { id: 15, name: "Pinnacle Systems", faqs: 2, lastUpdate: "08/04/2024" },
-    { id: 16, name: "Digital Nexus", faqs: 1, lastUpdate: "20/03/2024" },
-    { id: 17, name: "Future Connect", faqs: 4, lastUpdate: "22/02/2024" },
-    { id: 18, name: "DataStreams Ltd", faqs: 0, lastUpdate: "17/01/2024" },
-    { id: 19, name: "InnoTech Solutions", faqs: 2, lastUpdate: "30/03/2024" },
-    { id: 20, name: "InfoDynamics", faqs: 1, lastUpdate: "03/04/2024" },
-    { id: 21, name: "Eagle Eye Tech", faqs: 3, lastUpdate: "11/02/2024" },
-    { id: 22, name: "Alpha Innovations", faqs: 0, lastUpdate: "19/01/2024" },
-    { id: 23, name: "Omega Systems", faqs: 2, lastUpdate: "28/03/2024" },
-    { id: 24, name: "Tech Fusion", faqs: 1, lastUpdate: "07/04/2024" },
-    { id: 25, name: "Synergetic Solutions", faqs: 4, lastUpdate: "16/02/2024" }
-  ])
-
   const itemPerPage = 10;
 
-  const totalPages = Math.ceil(data.length / itemPerPage);
+  const totalPages = Math.ceil(data?.length / itemPerPage);
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage)
   }
 
-  const displayedItems = data.slice(
+  const displayedItems = data?.slice(
     (currentPage - 1) * itemPerPage,
     currentPage * itemPerPage
   );
@@ -75,9 +53,10 @@ const FAQs = () => {
   const isPrevButtonDisabled = currentPage === 1;
   const isNextButtonDisabled = currentPage === totalPages || totalPages === 0;
 
-  const faqsPermission = useSelector(selectFaqs);
+  // const faqsPermission = useSelector(selectFaqs);
 
   const handleUpdateLocation = () => {
+    setIsChecked(prev => !prev)
     setTimeout(() => {
       setUpdatelocation(true);
     }, 700);
@@ -86,6 +65,20 @@ const FAQs = () => {
   const toggleIsOpen = () => {
     setIsOpen((prevIsOpen) => !prevIsOpen);
   };
+
+  const getfaqs = async () => {
+    try {
+      const resp = await axiosInstance.get("locations/get/")
+      setData(resp.data)
+    } catch (error) {
+      console.log(error, "this is eror")
+    }
+  }
+
+  const handleWidgets = (id) => {
+    setIsWidgetDrawer(true);
+    setWidgetsids(id)
+  }
 
   const heading = "py-2 font-normal text-[#8392AB] mx-3"
 
@@ -104,21 +97,29 @@ const FAQs = () => {
   const iccons = "text-[#0F45F5] Text"
 
   const handleHeadCheck = () => {
-    const updatedData = data.map(item => ({ ...item, isChecked: !selectAll }));
+    const updatedData = data?.map(item => ({ ...item, isChecked: !selectAll }));
     setData(updatedData);
     setSelectAll(!selectAll);
   }
 
   const handleCheckedData = (id) => {
-    const updatedData = data.map(item =>
+    const updatedData = data?.map(item =>
       item.id === id ? { ...item, isChecked: !item.isChecked } : item
     );
     setData(updatedData);
     setSelectAll(updatedData.every(item => item.isChecked));
   }
 
+  const getreferesh = () => {
+    getfaqs();
+  }
+
+  useEffect(() => {
+    getfaqs();
+  }, [])
+
   return (
-    <div>{!faqsPermission ? <TextPage /> :
+    <div>{(data === undefined || (Array.isArray(data) && data.length === 0)) ? <TextPage /> :
       <div className="relative">
         <div className="p-6">
           <div className="flex justify-between flex-wrap">
@@ -190,7 +191,7 @@ const FAQs = () => {
                 </tr>
               </thead>
               <tbody>
-                {displayedItems.map((item, index) => (
+                {displayedItems?.map((item, index) => (
                   <tr key={index} className="tableBox border-b border-solid border-slate-300 hover:bg-[#F3F5FE] bg-slate-50">
                     <td className="py-2 px-4 text-xl text-[#8392AB]">
                       <input
@@ -201,19 +202,26 @@ const FAQs = () => {
                       />
                     </td>
                     <td className="Text py-2 text-md text-start text-[#8392AB]">
-                      {item.name}
+                      {item.location_name}
                     </td>
                     <td className="Text py-2 px-4 text-md text-center text-[#8392AB]">
-                      {item.faqs}
+                      {item.faq.no_of_faqs}
                     </td>
                     <td className="py-2 px-4 text-sm flex justify-center mt-[8%]  text-[#8392AB]">
                       <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" value="" className="sr-only peer" />
-                        <div onClick={handleUpdateLocation} className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer  peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600"></div>
+                        <input
+                          type="checkbox"
+                          id="allow_overwrite"
+                          name="allow_overwrite"
+                          value={item.faq.enabled}
+                          checked={item.faq.enabled}
+                          onClick={handleUpdateLocation}
+                          className="relative w-[2.70rem] h-6 bg-gray-100 checked:bg-none checked:bg-blue-600 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 border border-transparent ring-1 ring-transparent focus:shadow-lg ring-offset-white focus:outline-none appearance-none dark:bg-gray-200 dark:checked:bg-blue-600 focus:ring-offset-white before:inline-block before:w-5 before:h-5 before:bg-white checked:before:bg-blue-200 before:translate-x-0 checked:before:translate-x-full before:shadow before:rounded-full before:transform before:ring-0 before:transition before:ease-in-out before:duration-200 dark:before:white dark:checked:before:bg-blue-200" />
+
                       </label>
                     </td>
                     <td className="Text py-2 px-4 text-md text-center  mr-[100%] text-[#8392AB] ">
-                      {item.lastUpdate}
+                      {item.faq.last_updated}
                     </td>
                     <td className="py-2 px-4 text-sm text-right">
                       <div className=" flex justify-center">
@@ -227,7 +235,7 @@ const FAQs = () => {
 
                         <div
                           className="cursor-pointer flex flex-row shadow-lg px-2 bg-opacity-17 bg-[#f8fafc] rounded-lg items-center w-[130px] space-x-2 ml-[2%] border border-slate-300"
-                          onClick={() => setIsWidgetDrawer(true)}
+                          onClick={() => handleWidgets(item.id)}
                         >
                           <AiFillEye className={sty} />
                           <span className="text-[#8392AB] font-semibold Text">Widget</span>
@@ -276,7 +284,7 @@ const FAQs = () => {
             </button>
           </div>
         </div>
-        {updatelocation && ( 
+        {updatelocation && (
           <LocationUpdate
             heading="Location Successfully updated!"
             onClose={() => setUpdatelocation(false)}
@@ -296,6 +304,7 @@ const FAQs = () => {
         )}
         {iswidgetdrawer && (
           <WidgetDrawer
+            getreferesh={getreferesh}
             iswidgetdrawer={iswidgetdrawer}
             setIsWidgetDrawer={setIsWidgetDrawer}
           />

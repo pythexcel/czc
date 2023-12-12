@@ -7,27 +7,27 @@ import CustomButton from "../Common-Component/CustomButton";
 import ModalShadow from "../Common-Component/ModalShadow";
 import axiosInstance from "../utils/axios";
 import { useDispatch } from "react-redux";
-import { setFaqs } from "../Store/slice/FaqsSlice";
+import { setConnect } from "../Store/slice/ConnectedFlagSlice";
 
 
-function IntegrationModal({ onClose, handlesuccess }) {
+function IntegrationModal({ onClose, handlesuccess, highlevel }) {
+
     const dispatch = useDispatch();
-    const [name, setName] = useState("")
-    const [domain, setDomain] = useState("")
-    const [api, setApi] = useState("")
-    const [isLoading, setIsLoading] = useState(false);
+    const [name, setName] = useState(highlevel.agency_name || "");
+    const [domain, setDomain] = useState(highlevel.domain || "");
+    const [api, setApi] = useState(highlevel.agency_api_key || "");
 
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleUpdate = async () => {
         setIsLoading(true)
         try {
-            const resp = await axiosInstance.post("api/high-level/", {
+            const resp = await axiosInstance.post("users/agency-integration/", {
                 agency_name: name,
                 domain: domain,
                 agency_api_key: api
             })
-            console.log(resp,"this is respocne");
-            dispatch(setFaqs('Allow'));
+            dispatch(setConnect(true));
             handlesuccess();
             onClose();
         } catch (error) {
@@ -48,18 +48,17 @@ function IntegrationModal({ onClose, handlesuccess }) {
                     </button>
                 </div>
                 <div className="p-6 space-y-6 bg-white">
-
                     <div>
                         <ModalPara>Agency Name</ModalPara>
-                        <InputField onChange={(event)=>setName(event.target.value)} type="text" placeholder="CoachGrowth" />
+                        <InputField value={name} onChange={(event) => setName(event.target.value)} type="text" placeholder="Agency Name" />
                     </div>
                     <div>
                         <ModalPara>Agency Domain</ModalPara>
-                        <InputField onChange={(event)=>setDomain(event.target.value)} type="text" placeholder="app.coachgrowth.io" />
+                        <InputField value={domain} onChange={(event) => setDomain(event.target.value)} type="text" placeholder="Agency Domain" />
                     </div>
                     <div>
                         <ModalPara>HighLevel Agency API Key</ModalPara>
-                        <InputField onChange={(event)=>setApi(event.target.value)} type="text" placeholder="eyJh********************eY" />
+                        <InputField value={api} onChange={(event) => setApi(event.target.value)} type="text" placeholder="eyJh********************eY" />
                     </div>
                 </div>
                 <hr />

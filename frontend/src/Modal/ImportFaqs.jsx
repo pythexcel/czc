@@ -49,7 +49,7 @@ function ImportFAQs({ onClose }) {
     formData.append('delete_exiting_faq',toggleValue)
 
     try {
-      const resp = await axiosInstance.post(`import/faq`, formData)
+      const resp = await axiosInstance.post(`frequently-asked-ques/import/`, formData)
       console.log(selectedFileName, "dskjbxdkjbv")
       console.log(resp,"i am responce of import ===>")
     } catch (error) {

@@ -19,7 +19,7 @@ function Login() {
   const handleSignIn = async (values) => {
     try {
       setIsLoading(true);
-      const response = await axiosInstance.post("api/signin/", {
+      const response = await axiosInstance.post("users/signin/", {
         username: values.email,
         password: values.password,
       });

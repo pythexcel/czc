@@ -12,7 +12,7 @@ function UpdateModal({ onClose }) {
     const handleCreateOpenAI = async () => {
         onClose()
         try {
-            const resp = await axiosInstance.post("api/manage-open-ai/", {
+            const resp = await axiosInstance.post("users/manage-open-ai/", {
                 open_ai_key: openAIKey
             })
             console.log(resp, "openAI");
