@@ -137,6 +137,6 @@ class CloneBotAPI(APIView):
                                 status=status.HTTP_200_OK)
             return Response({"success": False, "message": message},
                             status=status.HTTP_400_BAD_REQUEST)
-        except Exception:
+        except Exception as e:
             return Response({"success": False, "message": str(e)+" field is required"},
                             status=status.HTTP_400_BAD_REQUEST)
