@@ -22,7 +22,7 @@ const MngUsers = () => {
   const getAllDetails = async () => {
     try {
       dispatch(setCreUserFlag(false));
-      const res = await axiosInstance.get("api/manage-user/");
+      const res = await axiosInstance.get("users/manage-user/");
       setUserData(res.details);
     } catch (error) {
       console.log(error, "i am error");
@@ -31,7 +31,7 @@ const MngUsers = () => {
 
   const deleteUser = async ({ id }) => {
     try {
-      const res = await axiosInstance.delete(`api/manage-user/${id}`);
+      const res = await axiosInstance.delete(`users/manage-user/${id}`);
       getAllDetails();
       console.log("User deleted successfully", res);
     } catch (error) {
@@ -59,9 +59,9 @@ const MngUsers = () => {
     setIsEditUser(false);
   };
 
-  const removeHyphens = (inputString) => {
-    return inputString.replace(/-/g, "");
-  };
+  // const removeHyphens = (inputString) => {
+  //   return inputString.replace(/-/g, "");
+  // };
 
   return (
     <div>
@@ -101,7 +101,6 @@ const MngUsers = () => {
             <tbody>
               {userdata.map((item, index) => (
                 <tr key={index}>
-                  <td className="px-4 py-2">{removeHyphens(item.reference)}</td>
                   <td className="px-4 py-2">{item.email}</td>
                   <td className=" text-center">Location</td>
                   <td className="px-4 py-2 text-lg text-gray-900 flex space-x-2">

@@ -11,7 +11,7 @@ function ScrapURL({ onClose }) {
 
   const manageuser = async () => {
     try {
-      const resp = await axiosInstance.post("api/create-user", {
+      const resp = await axiosInstance.post("users/create-user", {
         email: email,
         password: password,
       });
@@ -61,7 +61,7 @@ function ScrapURL({ onClose }) {
               onChange={handlepassword}
               className="w-full border border-gray-300 rounded-lg p-2"
             >
-              <option value="" disabled selected>
+              <option value="" disabled selected className="hidden">
                 Select Type
               </option>
               <option value="option1">Add</option>

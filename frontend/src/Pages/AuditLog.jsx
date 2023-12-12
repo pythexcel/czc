@@ -3,7 +3,7 @@ import { HiSearch } from "react-icons/hi";
 import { useState } from "react";
 import { useEffect, useRef } from "react";
 import flatpickr from "flatpickr";
-import "flatpickr/dist/flatpickr.min.css";
+import 'flatpickr/dist/flatpickr.min.css';
 import { AiOutlineCalendar } from "react-icons/ai";
 import CustomDropdown from "../Common-Component/CustomDropdown";
 import { locationOptions } from "../utils";
@@ -34,13 +34,30 @@ const AuditLog = () => {
     setIsOpen((prevIsOpen) => !prevIsOpen);
   };
 
+  const thead = "py-2 font-normal text-[#8392AB]"
+
+  const title = [
+    "CONTACT ID",
+    "QUESTION",
+    "ANSWER",
+    "STATUS",
+    "TIMESTAMP",
+    "ACTIONS"
+  ]
+
   return (
     <div className="p-6">
       <div className="w-full flex justify-between flex-grow">
         <p className="font-bold text-[#344767] text-2xl w-[30%] ">Audit Logs</p>
+<<<<<<< Updated upstream
         <div className="flex justify-around">
           <form className="w-[5%] ">
             <div className="relative mr-4">
+=======
+        <div className="flex justify-around items-center">
+          <form className="w-[20%]">
+            <div className="relative mr-2">
+>>>>>>> Stashed changes
               <div className="absolute inset-y-0 left-0 flex items-center px-3 pointer-events-none bg-blue-600 rounded-l-md">
                 <HiSearch className="text-white w-[20px] h-[20px]" />
               </div>
@@ -56,8 +73,14 @@ const AuditLog = () => {
             <input
               ref={inputRef}
               type="text"
+<<<<<<< Updated upstream
               placeholder="Select Date Range "
               className="border rounded-md px-9 py-2 focus:outline-none focus:border-blue-500 "
+=======
+              ref={dateRangePickerRef}
+              placeholder="Select date range"
+              className="flatpickr-input p-2 border rounded-lg w-[250px]"
+>>>>>>> Stashed changes
             />
             <span className="absolute right-2 top-1/2 transform -translate-y-1/2">
               <AiOutlineCalendar className="h-5 w-5 text-black" />
@@ -85,18 +108,15 @@ const AuditLog = () => {
           </div>
         </div>
       </div>
-      <div className="w-full mt-6 bg-slate-50 shadow-lg  bg-opacity-17 rounded-lg">
-        <table className="w-full border-collapse rounded-lg">
+      <div className="w-full mt-6 bg-slate-50 shadow-lg bg-opacity-17">
+        <table className="w-full border-collapse">
           <thead>
-            <tr className="bg-[#F3F5FE]">
-              <th className="py-2 font-normal text-[#8392AB]">CONTACT ID</th>
-              <th className="py-2 font-normal px-2 text-[#8392AB]">QUESTION</th>
-              <th className="py-2 font-normal px-2 text-[#8392AB]">ANSWER</th>
-              <th className="py-2 font-normal px-2 text-[#8392AB]">STATUS</th>
-              <th className="py-2 font-normal px-2 text-[#8392AB]">
-                TIMESTAMP
-              </th>
-              <th className="py-2 font-medium px-2 text-[#8392B3]">ACTIONS</th>
+            <tr className="bg-[#F3F5FE] w-full">
+              {title.map((item, index) => (
+                <th key={index} className={thead}>
+                  {item}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>

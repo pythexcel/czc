@@ -5,7 +5,9 @@ import ModalShadow from "../Common-Component/ModalShadow";
 import axiosInstance from "../utils/axios";
 import { useEffect, useState } from "react";
 
-function AddFaqs({ onClose, ids }) {
+function AddFaqs({ onClose, ids, widgetsids, getreferesh }) {
+
+
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [update, setUpdate] = useState(false);
@@ -15,9 +17,11 @@ function AddFaqs({ onClose, ids }) {
     setLoading(true)
     try {
       const resp = await axiosInstance.post("frequently-asked-ques/", {
+        location: widgetsids, 
         question: question,
         answer: answer,
       });
+      getreferesh();
       onClose();
       console.log(resp);
     } catch (error) {
@@ -40,14 +44,14 @@ function AddFaqs({ onClose, ids }) {
     }
   }
 
-  const getUpdateData = async () => {
+  const getUpdateData = async (ids) => {
+    alert(ids)
     setUpdate(true)
     try {
       const resp = await axiosInstance.get(`frequently-asked-ques/${ids}`)
       const forUpdate = resp.details
       setAnswer(forUpdate.answer)
       setQuestion(forUpdate.question)
-      // console.log(forUpdate)
     } catch (error) {
       console.log(error)
     }
@@ -55,7 +59,7 @@ function AddFaqs({ onClose, ids }) {
 
   useEffect(() => {
     if (typeof ids === 'number') {
-      getUpdateData();
+      getUpdateData(ids);
     }
   }, [ids])
 

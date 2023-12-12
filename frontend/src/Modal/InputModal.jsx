@@ -15,13 +15,13 @@ function InputModal({ onClose, editData, isedituser }) {
 
   const manageuser = async () => {
     try {
-      const resp = await axiosInstance.post("api/manage-user/", {
+      const resp = await axiosInstance.post("users/manage-user/", {
         email: email,
         password: password,
       });
       dispatch(setCreUserFlag(true));
       onClose();
-      console.log(resp, "i ama done boss");
+      // console.log(resp, "i ama done boss");
     } catch (error) {
       console.log(error, "i am error");
     }
@@ -30,7 +30,7 @@ function InputModal({ onClose, editData, isedituser }) {
   const Edituser = async ({ id }) => {
 
     try {
-      const res = await axiosInstance.patch(`api/manage-user/${id}`, {
+      const res = await axiosInstance.patch(`users/manage-user/${id}`, {
         password: password,
       });
      onClose()

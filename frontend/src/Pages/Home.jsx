@@ -10,8 +10,11 @@ import { FiRepeat } from "react-icons/fi";
 import { FaUsers } from "react-icons/fa";
 import Footer from './Footer';
 import axiosInstance from "../utils/axios";
+import { setConnect } from "../Store/slice/ConnectedFlagSlice";
+import { useDispatch } from "react-redux";
 
 function Home() {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const { pathname } = useLocation();
     const [openSideDrawer, setOpenSideDrawer] = useState(false);
@@ -20,8 +23,9 @@ function Home() {
 
     const HandleLogout = async () => {
         try {
-          const response = await axiosInstance.post("api/logout/", {});
+          const response = await axiosInstance.post("users/logout/", {});
           localStorage.clear();
+          dispatch(setConnect(false));
           console.log("logout successful:", response);
           navigate("/");
         } catch (error) {

@@ -60,7 +60,7 @@ function UpdateBot() {
 
     const getBotForUpdate = async (uniqueId) => {
         try {
-            const resp = await axiosInstance.get(`bot/${uniqueId}`);
+            const resp = await axiosInstance.get(`bot/${uniqueId}/`);
             const data = resp.details;
             setBotids(data.id)
             formik.setValues({
@@ -102,7 +102,7 @@ function UpdateBot() {
             return
         } else {
             try {
-                await axiosInstance.delete(`bot/${Botids}`, {
+                await axiosInstance.delete(`bot/${Botids}/`, {
                     data: {
                         "tag_type_ids": id
                     }
@@ -134,7 +134,7 @@ function UpdateBot() {
             return
         } else {
             try {
-                await axiosInstance.delete(`bot/${Botids}`, {
+                await axiosInstance.delete(`bot/${Botids}/`, {
                     data: {
                         "custom_field_type_ids": id
                     }
@@ -156,7 +156,7 @@ function UpdateBot() {
             return
         } else {
             try {
-                await axiosInstance.delete(`bot/${Botids}`, {
+                await axiosInstance.delete(`bot/${Botids}/`, {
                     data: {
                         "header_type_ids": id
                     }
@@ -190,7 +190,7 @@ function UpdateBot() {
             return
         } else {
             try {
-                await axiosInstance.delete(`bot/${Botids}`, {
+                await axiosInstance.delete(`bot/${Botids}/`, {
                     data: {
                         "trigger_webhook_type_ids": id
                     }
@@ -301,7 +301,7 @@ function UpdateBot() {
     const handleSubmitForUpdate = async (values) => {
         setIsLoading(true);
         try {
-            const getBot = await axiosInstance.patch(`bot/${uniqueId}`, {
+            const getBot = await axiosInstance.patch(`bot/${uniqueId}/`, {
                 ai_type: values.AiType,
                 bot_name: values.Botname,
                 bot_description: values.BotDescription,
