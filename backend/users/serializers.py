@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import User, AgencyModel
 from django.contrib.auth.hashers import make_password
 
 
@@ -21,3 +21,9 @@ class UserSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         validated_data['password'] = make_password(validated_data['password'])
         return super().update(instance, validated_data)
+
+
+class AgencyModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AgencyModel
+        fields = "__all__"

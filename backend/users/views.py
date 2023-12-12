@@ -1,6 +1,6 @@
 from rest_framework.views import APIView, status
 from rest_framework.response import Response
-from .serializers import UserSerializer
+from .serializers import UserSerializer, AgencyModelSerializer
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User, OpenAIModel, AgencyModel
@@ -273,14 +273,13 @@ class AgencyAPI(APIView):
 
     def post(self, request):
         data = request.data
-
         high_level_instance, created = AgencyModel.objects.update_or_create(
-            agency_api_key=request.data['agency_api_key'],
             user_id=request.user.id,
             defaults=data
         )
         agency_api_key = request.data['agency_api_key']
-        get_celery_task.delay(agency_api_key, high_level_instance.id)
+        get_celery_task(agency_api_key, high_level_instance.id)
+     #   get_celery_task.delay(agency_api_key, high_level_instance.id)
         return Response(
                     {
                         "message": "Selected agency updated successfully!",
@@ -289,3 +288,13 @@ class AgencyAPI(APIView):
                     status=status.HTTP_200_OK
                 )
 
+    def get(self, request):
+        agency_instance = get_object_or_404(AgencyModel, user_id=request.user.id)
+        serializer = AgencyModelSerializer(agency_instance)
+        return Response(
+            {
+                "message": serializer.data,
+                "success": True
+            },
+            status=status.HTTP_200_OK
+        )
