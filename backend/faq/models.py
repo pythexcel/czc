@@ -3,8 +3,7 @@ from locations.models import LocationModel
 
 
 class FAQModel(models.Model):
-    location = models.ForeignKey(LocationModel, on_delete=models.CASCADE, related_name="location")
+    location = models.ForeignKey(LocationModel, on_delete=models.CASCADE, related_name="location_reference")
     question = models.CharField(max_length=500)
     answer = models.CharField(max_length=500)
-    is_enabled = models.BooleanField(default=True)
     updated_at = models.DateTimeField(auto_now=True)
