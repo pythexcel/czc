@@ -35,6 +35,7 @@ function Bots() {
   const [botdetails, setBotdetails] = useState([]);
   const [bot, setBot] = useState([]);
 
+
   const [searchTerm, setSearchTerm] = useState("");
 
   const getAllBots = async () => {
@@ -65,7 +66,7 @@ function Bots() {
     setIdforclone(cloneforId);
   };
 
-  const handleCloseCloneBot = () => {   
+  const handleCloseCloneBot = () => {
     setClone(false);
   };
 
@@ -93,7 +94,7 @@ function Bots() {
   const handleDeleted = () => {
     setDeleteBot(false);
     setDeletedSuccess(false);
-   };
+  };
 
   const handleCloseFailed = () => {
     setToastFailed(false);

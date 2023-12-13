@@ -90,7 +90,7 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, widgetsids, getrefere
     }
   }
 
-  const styleIcon = "h-[23px] w-[23px] text-gray-500";
+  const styleIcon = "h-[23px] w-[23px] text-gray-500 icoon";
 
   const convertToCSV = (data) => {
     const header = Object.keys(data[0]).join(',');

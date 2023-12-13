@@ -3,7 +3,7 @@ import { HiSearch } from "react-icons/hi";
 import { useState } from "react";
 import { useEffect, useRef } from "react";
 import flatpickr from "flatpickr";
-import 'flatpickr/dist/flatpickr.min.css';
+import "flatpickr/dist/flatpickr.min.css";
 import { AiOutlineCalendar } from "react-icons/ai";
 import CustomDropdown from "../Common-Component/CustomDropdown";
 import { locationOptions } from "../utils";
@@ -12,22 +12,22 @@ const AuditLog = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
 
-  const inputRef = useRef(null);
+  const dateRangePickerRef = useRef(null);
 
   useEffect(() => {
-    const datePicker = flatpickr(inputRef.current, {
-      dateFormat: "d-m-Y",
-      allowInput: true,
+    const dateRangePicker = flatpickr(dateRangePickerRef.current, {
+      mode: "range",
+      dateFormat: "Y-m-d",
     });
 
     return () => {
-      datePicker.destroy();
+      dateRangePicker.destroy();
     };
   }, []);
 
   const handleSelect = (item) => {
     setSelectedOption(item)
-    setIsOpen(p=>!p);
+    setIsOpen(p => !p);
   };
 
   const toggleIsOpen = () => {
@@ -49,9 +49,9 @@ const AuditLog = () => {
     <div className="p-6">
       <div className="w-full flex justify-between flex-grow">
         <p className="font-bold text-[#344767] text-2xl w-[30%] ">Audit Logs</p>
-        <div className="flex justify-around">
-          <form className="w-[5%] ">
-            <div className="relative mr-4">
+        <div className="flex justify-around items-center">
+          <form className="w-[20%]">
+            <div className="relative mr-2">
               <div className="absolute inset-y-0 left-0 flex items-center px-3 pointer-events-none bg-blue-600 rounded-l-md">
                 <HiSearch className="text-white w-[20px] h-[20px]" />
               </div>
@@ -65,10 +65,10 @@ const AuditLog = () => {
           </form>
           <div className="relative ml-9 ">
             <input
-              ref={inputRef}
               type="text"
-              placeholder="Select Date Range "
-              className="border rounded-md px-9 py-2 focus:outline-none focus:border-blue-500 "
+              ref={dateRangePickerRef}
+              placeholder="Select date range"
+              className="flatpickr-input p-2 border rounded-lg w-[250px]"
             />
             <span className="absolute right-2 top-1/2 transform -translate-y-1/2">
               <AiOutlineCalendar className="h-5 w-5 text-black" />

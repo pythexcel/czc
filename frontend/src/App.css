@@ -265,9 +265,13 @@
   background-color: blue;
 }
 
-/* .FaqCard:hover .hovered-icon {
-  
-} */
+.FaqCard:hover .icoon {
+  color: white;
+}
+
+.tableBox:hover .Text{
+  color: blue;
+}
 
 .SlideModal {
   width: 100px;
@@ -360,3 +364,9 @@
   background-color: #d2d8f7;
   color: black;
 }
+
+
+
+
+
+

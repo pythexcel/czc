@@ -50,6 +50,7 @@ function AddFaqs({ onClose, ids, widgetsids, getreferesh }) {
     try {
       const resp = await axiosInstance.get(`frequently-asked-ques/${ids}`)
       const forUpdate = resp.details
+      console.log(forUpdate,"this is for Update data 00000000")
       setAnswer(forUpdate.answer)
       setQuestion(forUpdate.question)
     } catch (error) {
