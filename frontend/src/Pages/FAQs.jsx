@@ -25,9 +25,7 @@ const FAQs = () => {
   const [isChecked, setIsChecked] = useState(false);
   const [widgetsids, setWidgetsids] = useState("");
 
-  const [isOpen, setIsOpen] = useState(false)
-
-  console.log(data, "/////")
+  const [isOpen, setIsOpen] = useState(false);
 
   const buttonsData = [
     { text: "Enable All Locations", onClick: () => setIsEnableModal(true) },
@@ -53,8 +51,6 @@ const FAQs = () => {
   const isPrevButtonDisabled = currentPage === 1;
   const isNextButtonDisabled = currentPage === totalPages || totalPages === 0;
 
-  // const faqsPermission = useSelector(selectFaqs);
-
   const handleUpdateLocation = () => {
     setIsChecked(prev => !prev)
     setTimeout(() => {
@@ -75,6 +71,18 @@ const FAQs = () => {
     }
   }
 
+  const handleCustomFieldData = (event, index) => {
+    const { checked, value, name } = event.target;
+    const newWebHookData = [...data];
+    if (name === 'enabled') {
+      newWebHookData[index].faq[name] = checked;
+    } else {
+      newWebHookData[index].faq[name] = value;
+    }
+    handleUpdateLocation();
+    setData(newWebHookData);
+  };
+  
   const handleWidgets = (id) => {
     setIsWidgetDrawer(true);
     setWidgetsids(id)
@@ -94,7 +102,7 @@ const FAQs = () => {
 
   const sty = "text-[#8392AB] w-4 h-4 Text"
 
-  const iccons = "text-[#0F45F5] Text"
+  const iccons = "text-[#0F45F5]"
 
   const handleHeadCheck = () => {
     const updatedData = data?.map(item => ({ ...item, isChecked: !selectAll }));
@@ -164,9 +172,8 @@ const FAQs = () => {
             ))}
           </div>
 
-
-          <div className="w-full mt-6 bg-slate-50 shadow-lg bg-opacity-17 rounded-lg overflow-x-scroll">
-            <table className="w-full border-collapse rounded-lg border border-slate-200 ">
+          <div className="w-full mt-6   bg-slate-50 shadow-lg bg-opacity-17 rounded-lg overflow-x-scroll">
+            <table className="w-full border-collapse rounded-lg">
               <thead>
                 <tr className="bg-[#F3F5FE] border-b border-solid border-slate-300 rounded-lg">
                   <th className="text-xl px-4 text-[#8392AB] text-start py-[12px]">
@@ -210,14 +217,14 @@ const FAQs = () => {
                     <td className="py-2 px-4 text-sm flex justify-center mt-[8%]  text-[#8392AB]">
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input
+                          key={index}
                           type="checkbox"
-                          id="allow_overwrite"
-                          name="allow_overwrite"
+                          id={`enabled-${index}`}
+                          name="enabled"
                           value={item.faq.enabled}
                           checked={item.faq.enabled}
-                          onClick={handleUpdateLocation}
-                          className="relative w-[2.70rem] h-6 bg-gray-100 checked:bg-none checked:bg-blue-600 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 border border-transparent ring-1 ring-transparent focus:shadow-lg ring-offset-white focus:outline-none appearance-none dark:bg-gray-200 dark:checked:bg-blue-600 focus:ring-offset-white before:inline-block before:w-5 before:h-5 before:bg-white checked:before:bg-blue-200 before:translate-x-0 checked:before:translate-x-full before:shadow before:rounded-full before:transform before:ring-0 before:transition before:ease-in-out before:duration-200 dark:before:white dark:checked:before:bg-blue-200" />
-
+                          onChange={(event) => handleCustomFieldData(event, index)}
+                          className="relative w-[2.70rem] h-6 bg-gray-100 checked:bg-none checked:bg-[#02E002] border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 border border-transparent ring-1 ring-transparent focus:shadow-lg ring-offset-white focus:outline-none appearance-none dark:bg-gray-200 dark:checked:bg-[#02E002] focus:ring-offset-white before:inline-block before:w-5 before:h-5 before:bg-white checked:before:bg-slate-50 before:translate-x-0 checked:before:translate-x-full before:shadow before:rounded-full before:transform before:ring-0 before:transition before:ease-in-out before:duration-200 dark:before:white dark:checked:before:bg-slate-50" />
                       </label>
                     </td>
                     <td className="Text py-2 px-4 text-md text-center  mr-[100%] text-[#8392AB] ">
@@ -249,7 +256,7 @@ const FAQs = () => {
                         <div className="flex flex-row">
                           <select onClick={toggleIsOpen} className="rounded-lg  appearance-none border border-[#0F45F5] focus:outline-none focus:ring-2 text-base mx-2 shadow-md w-[150px] py-2 px-3 text-[#0F45F5] font-semibold hover:bg-[#0F45F5] hover:text-slate-50">
                             {sel.map((item, index) => (
-                              <option key={index}>{item}</option>
+                              <option className="bg-slate-50 text-gray-400 hover:bg-[#F3F5FE] hover:text-[#0F8FE9]" key={index}>{item}</option>
                             ))}
                           </select>
                           <span
@@ -304,6 +311,7 @@ const FAQs = () => {
         )}
         {iswidgetdrawer && (
           <WidgetDrawer
+            widgetsids={widgetsids}
             getreferesh={getreferesh}
             iswidgetdrawer={iswidgetdrawer}
             setIsWidgetDrawer={setIsWidgetDrawer}
