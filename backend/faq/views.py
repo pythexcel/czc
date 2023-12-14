@@ -33,7 +33,7 @@ class FAQAPI(APIView):
         else:
             query = request.GET.get('query', None)
             if query:
-                faq_instace = FAQModel.objects.filter((Q(question__icontains=query) | Q(answer__icontains=query)), location_id=id).order_by('-updated_at')
+                faq_instace = FAQModel.objects.filter((Q(question__icontains=query) | Q(answer__icontains=query)), location_id=location_id).order_by('-updated_at')
             else:
                 faq_instace = FAQModel.objects.filter(location_id=location_id).order_by('-updated_at')
         serializer = FAQSerializer(faq_instace, many=True)

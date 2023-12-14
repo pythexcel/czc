@@ -1,9 +1,10 @@
 from django.db import models
 from users.models import User
 import uuid
+from django_random_id_model import RandomIDModel
 
 
-class BotModel(models.Model):
+class BotModel(RandomIDModel):
     AI_TYPE_CHOICES = (("Booking", "Booking"), ("Non Booking", "Non Booking"))
     PROMPT_TYPE_CHOICES = (
         ("Text", "Text"),

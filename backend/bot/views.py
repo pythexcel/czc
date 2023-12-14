@@ -140,3 +140,12 @@ class CloneBotAPI(APIView):
         except Exception as e:
             return Response({"success": False, "message": str(e)+" field is required"},
                             status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetBotName(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        bot_name = BotModel.objects.filter(user_id=request.user.id).values("bot_name","id")
+        return Response({"details": bot_name, "success": True},
+                                status=status.HTTP_200_OK)
