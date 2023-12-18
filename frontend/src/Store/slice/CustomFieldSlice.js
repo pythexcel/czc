@@ -17,8 +17,15 @@ const customFieldSlice = createSlice({
                 allowCustomOverWright: allowCustomOverWright !== undefined ? allowCustomOverWright : false,
             };
         },
+        deleteCustomField: (state, action) => {
+            const newCustomField = state.customfieldData.filter((item, i) => i !== action.payload)
+            state.customfieldData = newCustomField
+        },
+        resetCustomField: (state) => {
+            state.customfieldData = []
+        }
     },
 });
 
-export const { setCustomFieldSlice } = customFieldSlice.actions;
+export const { setCustomFieldSlice, deleteCustomField, resetCustomField } = customFieldSlice.actions;
 export default customFieldSlice.reducer;

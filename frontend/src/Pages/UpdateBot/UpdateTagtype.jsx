@@ -3,7 +3,7 @@ import Title from '../../Component/Title';
 import InputField from '../../Component/TextInput';
 
 
-function UpdateTagtype({ addtag, setAddTag, onDeleteClick, index, data }) {
+function UpdateTagtype({ addtag, setAddTag, onDeleteClick, index, data, errors }) {
 
     const handleUpdateTagtype = (event) => {
         const { value, name } = event.target;
@@ -24,6 +24,7 @@ function UpdateTagtype({ addtag, setAddTag, onDeleteClick, index, data }) {
                     value={data.tag_name}
                     onChange={handleUpdateTagtype}
                 />
+                {errors.length && errors[index]?.tag_name ? <span className="text-red-500">{errors[index].tag_name}</span> : null}
             </div>
             <div className="items-end flex w-full space-x-4">
                 <div className="w-[80%]">

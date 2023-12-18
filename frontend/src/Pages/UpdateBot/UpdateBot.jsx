@@ -6,7 +6,7 @@ import InputField from "../../Component/TextInput";
 import Title from "../../Component/Title";
 import { useFormik } from "formik";
 import { useDispatch } from "react-redux";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../utils/axios";
 import TextArea from "../../Common-Component/TextArea";
 import Updatebutton from "../../Common-Component/Updatebutton";
@@ -16,6 +16,8 @@ import { handleReset } from "../../Store/slice/TriggerWebhookSlice";
 import CustomSelector from "../../Common-Component/CustomSelector";
 import ChevronDownIcon from "../../Component/ChevronDownIcon";
 import UpdateTagtype from "./UpdateTagtype";
+import { resetCustomField } from "../../Store/slice/CustomFieldSlice";
+import { resetTagState } from "../../Store/slice/TagTypeSlice";
 
 const Intromessage = ["Text", "Custom Field", "Custom Value"];
 
@@ -49,6 +51,13 @@ function UpdateBot() {
     const [updatetriggerwebhook, setUpdatetriggerwebhook] = useState([]);
 
     const [customfield, setCustomfield] = useState([]);
+    const [prompt, setPrompt] = useState("Custom Field Name")
+    const [message, setMassage] = useState("Custom Field Name")
+
+    const [allerror, setAllError] = useState([]);
+    const [tagNameErrors, setTagNameErrors] = useState([])
+
+    console.log(tagNameErrors,">>>>>>>>>>>>>>>>>>>>>>>>>>")
 
     const HandleAddTage = () => {
         const newTag = {
@@ -128,7 +137,7 @@ function UpdateBot() {
         if (id === undefined) {
             setCustomfield((prev) => {
                 const updatedTags = [...prev];
-                updatedTags.splice(index, 1); 
+                updatedTags.splice(index, 1);
                 return updatedTags;
             });
             return
@@ -184,7 +193,7 @@ function UpdateBot() {
         if (id === undefined) {
             setUpdatetriggerwebhook((prev) => {
                 const updatedTags = [...prev];
-                updatedTags.splice(index, 1); 
+                updatedTags.splice(index, 1);
                 return updatedTags;
             });
             return
@@ -238,6 +247,7 @@ function UpdateBot() {
                         addtag={addtag}
                         setAddTag={setAddTag}
                         onDeleteClick={handleUpdateDeleteTage}
+                        errors={tagNameErrors}
                     />
                 ))}
 
@@ -247,6 +257,7 @@ function UpdateBot() {
                         key={index}
                         data={item}
                         index={index}
+                        error={tagNameErrors}
                         customfield={customfield}
                         setCustomfield={setCustomfield}
                         onDeleteClick={handleDeleteCustomeField}
@@ -262,6 +273,7 @@ function UpdateBot() {
                         handleDeleteHeader={handleDeleteHeader}
                         index={index}
                         key={index}
+                        error={tagNameErrors}
                         data={item}
                     />
                 ))}
@@ -282,7 +294,6 @@ function UpdateBot() {
         allow_overwrite: item?.allow_overwrite,
     }));
 
-
     const tiggerwebhook = updatetriggerwebhook.map((item) => ({
         id: item.id,
         goal_name: item.goal_name,
@@ -297,17 +308,18 @@ function UpdateBot() {
         }))
     }));
 
-
     const handleSubmitForUpdate = async (values) => {
         setIsLoading(true);
+        setAllError([])
+        setTagNameErrors([])
         try {
-            const getBot = await axiosInstance.patch(`bot/${uniqueId}/`, {
+             await axiosInstance.patch(`bot/${uniqueId}/`, {
                 ai_type: values.AiType,
                 bot_name: values.Botname,
                 bot_description: values.BotDescription,
-                prompt_type: values.PromptType,
+                prompt_type: values.PromptType ? values.PromptType : "Custom Field",
                 prompt: values.Prompt,
-                intro_message_type: values.IntroMessageType,
+                intro_message_type: values.IntroMessageType ? values.IntroMessageType : "Custom Field",
                 intro_message: values.IntroMessage,
                 converstation_limit: values.Conversation,
                 time_zone_reference: values.TimeZoneReference,
@@ -321,9 +333,18 @@ function UpdateBot() {
                 trigger_webhook_type: tiggerwebhook,
             });
             dispatch(setFlag(true));
+            dispatch(resetCustomField())
+            dispatch(resetTagState())
+            dispatch(handleReset())
             navigate("/dashboard/bots");
-            console.log(getBot.response.data, "udpate data as well");
         } catch (error) {
+            setIsLoading(false);
+            if (error?.response?.data) {
+                setAllError(error.response.data);
+                if (error.response.data?.non_field_errors) {
+                    setTagNameErrors(error.response.data?.non_field_errors)
+                }
+            }
             console.log(error, "i am error");
         }
     };
@@ -345,21 +366,47 @@ function UpdateBot() {
             GPTmodel: "",
             messageDelay: "",
         },
-        onSubmit: async (values, { resetForm }) => {
-            console.log(JSON.stringify(values, null, 2));
-            await handleSubmitForUpdate(values);
-            resetForm();
+        onSubmit: async (values) => {
+            handleSubmitForUpdate(values);
         },
     });
+
+    useEffect(() => {
+        if (formik.values.PromptType === "Text") {
+          setPrompt("Prompt Text");
+        } else if (formik.values.PromptType === "Custom Field") {
+          setPrompt("Custom Field Name");
+        } else if (formik.values.PromptType === "Custom Value") {
+          setPrompt("Custom Value Name")
+        } else {
+          setPrompt("Custom Field Name");
+        }
+      }, [formik.values.PromptType]);
+    
+      useEffect(() => {
+        if (formik.values.IntroMessageType === "Text") {
+          setMassage("Text")
+        } else if (formik.values.IntroMessageType === "Custom Field") {
+          setMassage("Custom Field Name")
+        } else if (formik.values.IntroMessageType === "Custom Value") {
+          setMassage("Custom Value Name")
+        } else {
+          setMassage("Custom Field Name");
+        }
+      }, [formik.values.IntroMessageType])
 
     useEffect(() => {
         if (uniqueId) {
             getBotForUpdate(uniqueId);
         }
-        return () => {
-            dispatch(handleReset())
-        }
     }, [uniqueId]);
+
+    const handleCancel = () => {
+        dispatch(resetCustomField())
+        dispatch(resetTagState())
+        dispatch(handleReset())
+        navigate("/dashboard/bots")
+      }
 
     return (
         <div className="w-[100%] bg-white border border-gray-400 rounded-lg px-8 py-6 shadow-lg">
@@ -385,6 +432,9 @@ function UpdateBot() {
                             </DropDown>
                             <ChevronDownIcon />
                         </div>
+                        {allerror.ai_type &&
+                            <p className="text-red-500">{allerror.ai_type}</p>
+                        }
                     </div>
                     <div className="w-[50%]">
                         <Title>Bot Name</Title>
@@ -397,6 +447,9 @@ function UpdateBot() {
                             onBlur={formik.handleBlur}
                             value={formik.values.Botname}
                         />
+                        {allerror.bot_name &&
+                            <p className="text-red-500">{allerror.bot_name}</p>
+                        }
                     </div>
                 </div>
                 <div className="w-full my-4">
@@ -422,8 +475,8 @@ function UpdateBot() {
                                 onBlur={formik.handleBlur}
                                 value={formik.values.PromptType}
                             >
-                                <option default value={""} className="hidden">
-                                    Select
+                                <option selected value="Custom Field" className="hidden">
+                                    Custom Field
                                 </option>
                                 {Intromessage.map((option, i) => (
                                     <option key={i}>{option}</option>
@@ -433,7 +486,7 @@ function UpdateBot() {
                         </div>
                     </div>
                     <div className="w-[50%]">
-                        <Title>Prompt</Title>
+                        <Title>Enter {prompt}</Title>
                         <InputField
                             type="text"
                             id="Prompt"
@@ -443,6 +496,9 @@ function UpdateBot() {
                             onBlur={formik.handleBlur}
                             value={formik.values.Prompt}
                         />
+                        {allerror.prompt &&
+                            <p className="text-red-500">{allerror.prompt}</p>
+                        }
                     </div>
                 </div>
                 <div className="flex gap-6 my-4">
@@ -456,8 +512,8 @@ function UpdateBot() {
                                 onBlur={formik.handleBlur}
                                 value={formik.values.IntroMessageType}
                             >
-                                <option default value={""} className="hidden">
-                                    Select
+                                <option selected value="Custom Field" className="hidden">
+                                    Custom Field
                                 </option>
                                 {Intromessage.map((option, i) => (
                                     <option key={i}>{option}</option>
@@ -467,7 +523,7 @@ function UpdateBot() {
                         </div>
                     </div>
                     <div className="w-[50%]">
-                        <Title>Intro Message</Title>
+                        <Title>Intro Message {message}</Title>
                         <InputField
                             type="text"
                             id="IntroMessage"
@@ -477,6 +533,9 @@ function UpdateBot() {
                             onBlur={formik.handleBlur}
                             value={formik.values.IntroMessage}
                         />
+                        {allerror.intro_message &&
+                            <p className="text-red-500">{allerror.intro_message}</p>
+                        }
                     </div>
                 </div>
                 <div className="flex gap-6 my-4">
@@ -491,6 +550,9 @@ function UpdateBot() {
                             onBlur={formik.handleBlur}
                             value={formik.values.OpenAikey}
                         />
+                        {allerror.open_ai_api_key &&
+                            <p className="text-red-500">{allerror.open_ai_api_key}</p>
+                        }
                     </div>
                     <div className="w-[50%]">
                         <Title>Conversation Limit</Title>
@@ -504,6 +566,9 @@ function UpdateBot() {
                             value={formik.values.Conversation}
                             min={0}
                         />
+                        {allerror.converstation_limit &&
+                            <p className="text-red-500">{allerror.converstation_limit}</p>
+                        }
                     </div>
                 </div>
                 <div className="flex gap-6 my-4">
@@ -527,6 +592,9 @@ function UpdateBot() {
                                 </DropDown>
                                 <ChevronDownIcon />
                             </div>
+                            {allerror.time_zone_reference &&
+                                <p className="text-red-500">{allerror.time_zone_reference}</p>
+                            }
                         </div>
                         <div className="w-1/3">
                             <Title>Time zone Format</Title>
@@ -547,6 +615,9 @@ function UpdateBot() {
                                 </DropDown>
                                 <ChevronDownIcon />
                             </div>
+                            {allerror.time_zone_format &&
+                                <p className="text-red-500">{allerror.time_zone_format}</p>
+                            }
                         </div>
                         <div className="w-1/3">
                             <Title>Time Format</Title>
@@ -567,6 +638,9 @@ function UpdateBot() {
                                 </DropDown>
                                 <ChevronDownIcon />
                             </div>
+                            {allerror.time_format &&
+                                <p className="text-red-500">{allerror.time_format}</p>
+                            }
                         </div>
                     </div>
                     <div className="w-[50%]">
@@ -587,6 +661,9 @@ function UpdateBot() {
                             </DropDown>
                             <ChevronDownIcon />
                         </div>
+                        {allerror.gpt_model &&
+                            <p className="text-red-500">{allerror.gpt_model}</p>
+                        }
                     </div>
                 </div>
                 <div className="flex gap-6 my-4">
@@ -602,6 +679,9 @@ function UpdateBot() {
                             value={formik.values.messageDelay}
                             min={0}
                         />
+                        {allerror.message_delay &&
+                            <p className="text-red-500">{allerror.message_delay}</p>
+                        }
                     </div>
                     <div className="w-[50%]">
                         <div className="relative gap-3">
@@ -639,14 +719,13 @@ function UpdateBot() {
                 </div>
                 {foreignElements}
                 <div className="flex gap-2 my-6">
-                    <Link to="/dashboard/bots">
                         <button
+                            onClick={handleCancel}
                             type="button"
                             className="border border-blue-600 rounded-md text-blue-600 px-12 font-semibold py-2 text-md hover:bg-blue-600 hover:text-white"
                         >
                             Cancel
                         </button>
-                    </Link>
                     <Updatebutton
                         isLoading={isLoading}
                         type="submit"

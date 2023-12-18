@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 // import { useState } from "react";
 
 
-const UpdateHeaders = ({ data, onDelete, index, webHookIndex, updatetriggerwebhook, setUpdatetriggerwebhook }) => {
+const UpdateHeaders = ({ data, onDelete, index, webHookIndex, updatetriggerwebhook, setUpdatetriggerwebhook, header_type }) => {
     const { headers, value_of_header } = data;
 
     const [name, setName] = useState("");
@@ -40,6 +40,7 @@ const UpdateHeaders = ({ data, onDelete, index, webHookIndex, updatetriggerwebho
                     value={name}
                     onChange={handleUpdateHeaders}
                 />
+                {header_type.length && header_type[index]?.headers ? <span className="text-red-500">{header_type[index].headers}</span> : null}   
             </div>
             <div className="w-[40%]">
                 <Title>Value Of header</Title>

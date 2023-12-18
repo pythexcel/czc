@@ -19,14 +19,14 @@ axiosInstance.interceptors.request.use(
 
 axiosInstance.interceptors.response.use(
   (res) => {
-    return res.data;
+    return res.data
   },
   (err) => {
     if (err.response.status === 401) {
       localStorage.clear();
       window.location.href = "/";
     } else {
-      return err;
+      return Promise.reject(err);
     }
   }
 );

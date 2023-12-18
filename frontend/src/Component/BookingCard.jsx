@@ -16,6 +16,8 @@ function BookingCard({
   handleDetails,
   userData,
 }) {
+
+
   const [showCopyButton, setShowCopyButton] = useState(false);
   const [isshowmodal, setIsShowModal] = useState(false);
 
@@ -23,8 +25,8 @@ function BookingCard({
     setIsShowModal(false);
   };
 
-  const handleParaClick = () => {
-    const paraText = "https://chat.botwebhook.com/message?b=8681698042045389";
+  const handleParaClick = (id) => {
+    const paraText = `https://chat.botwebhook.com/message?b=${id}`;
     setIsShowModal(true);
     navigator.clipboard
       .writeText(paraText)
@@ -47,11 +49,11 @@ function BookingCard({
           onMouseEnter={() => setShowCopyButton(true)}
           onMouseLeave={() => setShowCopyButton(false)}
         >
-          https://chat.botwebhook .com/message?b=8681698042045389
+          https://chat.botwebhook .com/message?b={id}
           {showCopyButton && (
             <button
               className=" top-0 right-[80%] ml-[40%] bg-blue-600 text-white px-2 py-1 border border-green-600 rounded"
-              onClick={handleParaClick}
+              onClick={()=>handleParaClick(id)}
             >
               Copy
             </button>

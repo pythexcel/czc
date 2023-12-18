@@ -5,8 +5,7 @@ import ModalShadow from "../Common-Component/ModalShadow";
 import axiosInstance from "../utils/axios";
 import { useEffect, useState } from "react";
 
-function AddFaqs({ onClose, ids, widgetsids, getreferesh }) {
-
+function AddFaqs({ onClose, ids, widgetsids, setIddd }) {
 
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
@@ -21,7 +20,7 @@ function AddFaqs({ onClose, ids, widgetsids, getreferesh }) {
         question: question,
         answer: answer,
       });
-      getreferesh();
+      setIddd(widgetsids)
       onClose();
       console.log(resp);
     } catch (error) {
@@ -32,11 +31,12 @@ function AddFaqs({ onClose, ids, widgetsids, getreferesh }) {
   const handleUdpate = async () => {
     setLoading(true)
     try {
-      const result = await axiosInstance.patch(`frequently-asked-ques/${ids}`, {
+      const result = await axiosInstance.patch(`frequently-asked-ques/${widgetsids}/${ids}/`, {
         question: question,
         answer: answer
       })
       setUpdate(false)
+      setIddd(widgetsids)
       onClose();
       console.log(result);
     } catch (error) {
@@ -45,12 +45,11 @@ function AddFaqs({ onClose, ids, widgetsids, getreferesh }) {
   }
 
   const getUpdateData = async (ids) => {
-    alert(ids)
     setUpdate(true)
     try {
-      const resp = await axiosInstance.get(`frequently-asked-ques/${ids}`)
-      const forUpdate = resp.details
-      console.log(forUpdate,"this is for Update data 00000000")
+      const resp = await axiosInstance.get(`frequently-asked-ques/${widgetsids}/${ids}/`)
+      const forUpdate = resp.details[0]
+      console.log(forUpdate)
       setAnswer(forUpdate.answer)
       setQuestion(forUpdate.question)
     } catch (error) {

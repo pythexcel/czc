@@ -7,7 +7,7 @@ import UpdateHeaders from '../../Pages/UpdateBot/UpdateHeaders';
 import TextArea from "../../Common-Component/TextArea";
 
 
-function TriggerWebhook({ data, onDeleteWebhook, index, updatetriggerwebhook, setUpdatetriggerwebhook, handleDeleteHeader }) {
+function TriggerWebhook({ data, onDeleteWebhook, index, updatetriggerwebhook, setUpdatetriggerwebhook, handleDeleteHeader, error }) {
 
 
     const handleAddHeaders = () => {
@@ -50,6 +50,7 @@ function TriggerWebhook({ data, onDeleteWebhook, index, updatetriggerwebhook, se
                         value={data.goal_name}
                         onChange={handleChangeTriggerWebhook}
                     />
+                    {error.length && error[index]?.goal_name ? <span className="text-red-500">{error[index].goal_name}</span> : null}
                 </div>
                 <div className="w-[40%]">
                     <Title>Triggers</Title>
@@ -81,6 +82,7 @@ function TriggerWebhook({ data, onDeleteWebhook, index, updatetriggerwebhook, se
                     onChange={handleChangeTriggerWebhook}
                     placeholder="https://app.zappychat/example/webhook"
                 />
+                {error.length && error[index]?.webhook_url ? <span className="text-red-500">{error[index].webhook_url}</span> : null}
             </div>
             <div className="w-[75%] my-4">
                 <Title>Webhook Description</Title>
@@ -102,6 +104,7 @@ function TriggerWebhook({ data, onDeleteWebhook, index, updatetriggerwebhook, se
                     key={headerIndex}
                     index={headerIndex}
                     webHookIndex={index}
+                    header_type={error[index]?.header_type}
                     onDelete={handleDeleteHeader}
                     updatetriggerwebhook={updatetriggerwebhook}
                     setUpdatetriggerwebhook={setUpdatetriggerwebhook}

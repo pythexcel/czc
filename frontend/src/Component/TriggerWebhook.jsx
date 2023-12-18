@@ -8,7 +8,9 @@ import { useDispatch } from "react-redux";
 import { addHeadersSlice, deleteHeaders, setTriggerWebhookSlice } from '../Store/slice/TriggerWebhookSlice';
 
 
-function TriggerWebhook({ data, onDeleteWebhook, index }) {
+function TriggerWebhook({ data, onDeleteWebhook, index, error }) {
+    console.log(error,"trigger, webhook_url")
+
     const dispatch = useDispatch();
 
     const handleGoalName = (e) => {
@@ -70,6 +72,7 @@ function TriggerWebhook({ data, onDeleteWebhook, index }) {
                         value={data?.Triggergoalname}
                         onChange={handleGoalName}
                     />
+                    {error.length && error[index]?.goal_name ? <span className="text-red-500">{error[index].goal_name}</span> : null}
                 </div>
                 <div className="w-[40%]">
                     <Title>Triggers</Title>
@@ -92,10 +95,13 @@ function TriggerWebhook({ data, onDeleteWebhook, index }) {
                 <Title>Webhook Url</Title>
                 <InputField
                     type="text"
+                    id="webhook_url"
+                    name="webhook_url"
                     placeholder="https://app.zappychat/example/webhook"
                     value={data.TriggerwebhookUrl}
                     onChange={handleWebhookUrl}
                 />
+                {error.length && error[index]?.webhook_url ? <span className="text-red-500">{error[index].webhook_url}</span> : null}   
             </div>
             <div className="w-[75%] my-4">
                 <Title>Webhook Description</Title>
@@ -112,10 +118,11 @@ function TriggerWebhook({ data, onDeleteWebhook, index }) {
 
             {data?.headers.map((item, headerIndex) => (
                 <InputHeaders
+                    data={item} 
                     key={headerIndex}
-                    webHookIndex={index}
                     index={headerIndex}
-                    data={item}
+                    header_type={error[index]?.header_type}
+                    webHookIndex={index}
                     onDelete={handleDelete}
                 />
             ))}

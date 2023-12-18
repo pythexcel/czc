@@ -6,7 +6,9 @@ import ModalShadow from "../Common-Component/ModalShadow"
 
 function DetailsModal({ onClose, botdetails }) {
 
-    const { ai_type,
+    const {
+        id,
+        ai_type,
         bot_description,
         bot_name,
         gpt_model,
@@ -14,6 +16,8 @@ function DetailsModal({ onClose, botdetails }) {
         prompt,
         converstation_limit,
         prompt_type } = botdetails;
+
+        console.log(botdetails,"ooooooooooooooooooo---------------============>")
 
         const maskString = (str) => {
             const visibleChars = 2; 
@@ -44,7 +48,7 @@ function DetailsModal({ onClose, botdetails }) {
                     </div>
                     <div>
                         <Label>Bot Webhook</Label>
-                        <NormalText>https://chat.botwebhook.com/message?b=4651699011051154</NormalText>
+                        <NormalText>https://chat.botwebhook.com/message?b={id}</NormalText>
                     </div>
                     <div>
                         <Label>OpenAi Key</Label>
@@ -58,7 +62,7 @@ function DetailsModal({ onClose, botdetails }) {
                             </div>
                             <div>
                                 <Label>Bot Reference</Label>
-                                <NormalText>Under Processing</NormalText>
+                                <NormalText>{id}</NormalText>
                             </div>
                             <div>
                                 <Label>Bot Conversation Limit</Label>

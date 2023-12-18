@@ -14,6 +14,8 @@ import { RiArrowRightSLine } from "react-icons/ri";
 import axiosInstance from "../utils/axios";
 
 const FAQs = () => {
+  const faqsPermission = useSelector(selectFaqs);
+
   const [isenableModal, setIsEnableModal] = useState(false);
   const [isdisableModal, setIsDisableModal] = useState(false);
   const [iswidgetdrawer, setIsWidgetDrawer] = useState(false);
@@ -62,9 +64,9 @@ const FAQs = () => {
     setIsOpen((prevIsOpen) => !prevIsOpen);
   };
 
-  const getfaqs = async () => {
+  const getfaqs = async (faqsPermission) => {
     try {
-      const resp = await axiosInstance.get("locations/get/")
+      const resp = await axiosInstance.get(`locations/get/${faqsPermission}`)
       setData(resp.data)
     } catch (error) {
       console.log(error, "this is eror")
@@ -74,10 +76,10 @@ const FAQs = () => {
   const handleCustomFieldData = (event, index) => {
     const { checked, value, name } = event.target;
     const newWebHookData = [...data];
-    if (name === 'enabled') {
-      newWebHookData[index].faq[name] = checked;
+    if (name === 'is_enabled') {
+      newWebHookData[index][name] = checked;
     } else {
-      newWebHookData[index].faq[name] = value;
+      newWebHookData[index][name] = value;
     }
     handleUpdateLocation();
     setData(newWebHookData);
@@ -118,13 +120,9 @@ const FAQs = () => {
     setSelectAll(updatedData.every(item => item.isChecked));
   }
 
-  const getreferesh = () => {
-    getfaqs();
-  }
-
   useEffect(() => {
-    getfaqs();
-  }, [])
+    getfaqs(faqsPermission);
+  }, [faqsPermission])
 
   return (
     <div>{(data === undefined || (Array.isArray(data) && data.length === 0)) ? <TextPage /> :
@@ -219,10 +217,10 @@ const FAQs = () => {
                         <input
                           key={index}
                           type="checkbox"
-                          id={`enabled-${index}`}
-                          name="enabled"
-                          value={item.faq.enabled}
-                          checked={item.faq.enabled}
+                          id={`is_enabled-${index}`}
+                          name="is_enabled"
+                          value={item.is_enabled}
+                          checked={item.is_enabled}
                           onChange={(event) => handleCustomFieldData(event, index)}
                           className="relative w-[2.70rem] h-6 bg-gray-100 checked:bg-none checked:bg-[#02E002] border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 border border-transparent ring-1 ring-transparent focus:shadow-lg ring-offset-white focus:outline-none appearance-none dark:bg-gray-200 dark:checked:bg-[#02E002] focus:ring-offset-white before:inline-block before:w-5 before:h-5 before:bg-white checked:before:bg-slate-50 before:translate-x-0 checked:before:translate-x-full before:shadow before:rounded-full before:transform before:ring-0 before:transition before:ease-in-out before:duration-200 dark:before:white dark:checked:before:bg-slate-50" />
                       </label>
@@ -312,7 +310,7 @@ const FAQs = () => {
         {iswidgetdrawer && (
           <WidgetDrawer
             widgetsids={widgetsids}
-            getreferesh={getreferesh}
+            getfaqs={getfaqs}
             iswidgetdrawer={iswidgetdrawer}
             setIsWidgetDrawer={setIsWidgetDrawer}
           />
