@@ -48,8 +48,6 @@ class ValidateAllSerializer(serializers.Serializer):
         request = self.context["request"]
         bot_type_data = self.validated_data['bot_type']
         bot_type_data.pop('user')
-        generated_id = ''.join([str(random.randint(0, 9)) for _ in range(16)])
-        bot_type_data["id"] = generated_id
         bot_type_data["user"] = request.user
         bot_instance = BotModel.objects.create(**bot_type_data)
         return bot_instance

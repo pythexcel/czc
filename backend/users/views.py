@@ -281,7 +281,7 @@ class AgencyAPI(APIView):
         agency_api_key = request.data['agency_api_key'] 
         get_celery_task.delay(agency_api_key, high_level_instance.id)
         return Response(
-                    {
+                    {   "id": high_level_instance,
                         "message": "Selected agency updated successfully!",
                         "success": True
                     },

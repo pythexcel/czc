@@ -1,6 +1,7 @@
 from django.db import models
 from users.models import User
 import uuid
+import random
 
 
 class BotModel(models.Model):
@@ -32,6 +33,11 @@ class BotModel(models.Model):
     time_zone_format = models.CharField(max_length=15, choices=TIME_ZONE_FORMAT_CHOICES)
     time_format = models.CharField(max_length=10, choices=TIME_FORMAT_CHOICES)
     message_delay = models.IntegerField()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.id:
+            self.id = ''.join([str(random.randint(0, 9)) for _ in range(16)])
 
 
 class TagType(models.Model):
