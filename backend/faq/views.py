@@ -29,7 +29,7 @@ class FAQAPI(APIView):
     def get(self, request, location_id=None, faq_id=None):
         if faq_id:
             faq_instace = FAQModel.objects.filter(id=faq_id).order_by('-updated_at')
-            
+
         else:
             query = request.GET.get('query', None)
             if query:

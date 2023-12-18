@@ -1,10 +1,9 @@
 from django.db import models
 from users.models import User
 import uuid
-from django_random_id_model import RandomIDModel
 
 
-class BotModel(RandomIDModel):
+class BotModel(models.Model):
     AI_TYPE_CHOICES = (("Booking", "Booking"), ("Non Booking", "Non Booking"))
     PROMPT_TYPE_CHOICES = (
         ("Text", "Text"),
@@ -18,7 +17,7 @@ class BotModel(RandomIDModel):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     updated_at = models.DateTimeField(auto_now=True)
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) 
+   # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) 
     ai_type = models.CharField(max_length=100, choices=AI_TYPE_CHOICES)
     bot_name = models.CharField(max_length=100,)
     bot_description = models.CharField(max_length=500, blank=True, null=True)
@@ -36,7 +35,7 @@ class BotModel(RandomIDModel):
 
 
 class TagType(models.Model):
-   # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     bot = models.ForeignKey(BotModel, on_delete=models.CASCADE,
                                null=True,
                                related_name="bot_tagtype")
@@ -47,7 +46,7 @@ class TagType(models.Model):
 
 
 class CustomFieldType(models.Model):
-  #  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     FIELD_TYPE_CHOICES = (      
                                 ("Text", "Text"),
                                 ("Number", "Number"),
@@ -72,7 +71,7 @@ class CustomFieldType(models.Model):
 
 
 class TriggerWebhook(models.Model):
-   # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     TRIGGER_TYPE_CHOICES = (
         ("Once Only", "Once Only"),
         ("Multiple Times", "Multiple Times"),
@@ -99,7 +98,7 @@ class TriggerWebhook(models.Model):
 
 
 class Header(models.Model):
-    #id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     triggerwebhook = models.ForeignKey(TriggerWebhook,
                                           on_delete=models.CASCADE,
                                           null=True,
