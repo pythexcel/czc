@@ -9,15 +9,13 @@ import ScrapURL from "../Modal/ScrapUrl";
 import ImportFAQs from "../Modal/ImportFaqs";
 import axiosInstance from "../utils/axios";
 import Widget from '../Common-Component/Widget';
-import FileSaver from 'file-saver';
 import Icons from "../Common-Component/Icons";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import SearchIcons from "../Common-Component/SearchIcons";
-import SearchBar from "../Common-Component/SearchBar";
 import { HiSearch } from "react-icons/hi";
-import fileDownload from "js-file-download";
+import IsDelete from "../Modal/IsDelete";
+import Deleted from '../Modal/Deleted';
 
-const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, widgetsids, getreferesh }) => {
+const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, widgetsids, setWidgetsids, getfaqs }) => {
 
   const [ids, setIds] = useState("");
   const [Alldata, setAllData] = useState([])
@@ -28,6 +26,10 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, widgetsids, getrefere
   const [isscrapurl, setIsScrapUrl] = useState(false);
   const [isimportfaqs, setIsImportFaqs] = useState(false);
 
+  const [isDel, setIsDel] = useState(false);
+  const [CnfDel, setCnfDel] = useState(false);
+
+  const [iddd, setIddd] = useState("");
 
   const itemsPerPage = 10;
 
@@ -48,23 +50,22 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, widgetsids, getrefere
   const isPrevButtonDisabled = currentPage === 1;
   const isNextButtonDisabled = currentPage === totalPages || totalPages === 0;
 
-  const getQuery = async () => {
+  const getQuery = async (widgetsids, iddd) => {
     try {
-      const resp = await axiosInstance.get(`frequently-asked-ques/${widgetsids}`);
+      const resp = await axiosInstance.get(`frequently-asked-ques/${widgetsids || iddd}/`);
       setAllData(resp.details)
     } catch (error) {
-      console.log(error, "this is werror as well ")
+      console.log(error, "this is werror")
     }
   }
 
   useEffect(() => {
-    getQuery();
-  }, [])
+    getQuery(widgetsids, iddd);
+  }, [widgetsids, iddd])
 
   const onClose = () => {
     setIds("")
     setIsAddFaqs(false);
-    getQuery();
     setIsScrapUrl(false);
     setIsImportFaqs(false);
   };
@@ -82,8 +83,8 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, widgetsids, getrefere
 
   const handleDelete = async (id) => {
     try {
-      const result = await axiosInstance.delete(`users/frequently-asked-ques/${id}`);
-      getQuery();
+      const result = await axiosInstance.delete(`frequently-asked-ques/${widgetsids}/${id}/`);
+      getQuery(widgetsids);
       console.log(result)
     } catch (error) {
       console.log(error, "delete faqs")
@@ -92,20 +93,13 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, widgetsids, getrefere
 
   const styleIcon = "h-[23px] w-[23px] text-gray-500 icoon";
 
-  const convertToCSV = (data) => {
-    const header = Object.keys(data[0]).join(',');
-    const body = data.map(obj => Object.values(obj).join(',')).join('\n');
-    return `${header}\n${body}`;
-  }
-
   const handleExport = async () => {
     try {
       const resp = await axiosInstance.get(`frequently-asked-ques/download/${widgetsids}`);
       const responseData = resp.data;
 
-      // const csvData = convertToCSV(responseData);
-      fileDownload(responseData, 'filename.csv');
-      console.log(resp)
+      // fileDownload(responseData, 'filename.csv');
+      // console.log(resp)
     } catch (error) {
       console.log(error, "error")
     }
@@ -134,10 +128,10 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, widgetsids, getrefere
           </span>
         </div>
 
-        <Widget onClick={handleExport}>
-          <FaFileExport className={heightIcon} />
-          <span> Export</span>
-        </Widget>
+          <Widget>
+            <FaFileExport className={heightIcon} />
+            <span> Export</span>
+          </Widget>
 
         <Widget
           onClick={() => setIsImportFaqs(true)}
@@ -236,9 +230,11 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, widgetsids, getrefere
           </button>
         </div>
       </div>
-      {isaddfaqs && <AddFaqs ids={ids} widgetsids={widgetsids} getreferesh={getreferesh} onClose={onClose} />}
+      {isaddfaqs && <AddFaqs ids={ids} widgetsids={widgetsids} setIddd={setIddd} onClose={onClose} />}
       {isscrapurl && <ScrapURL onClose={onClose} />}
       {isimportfaqs && <ImportFAQs onClose={onClose} />}
+      {isDel && <IsDelete />}
+      {CnfDel && <Deleted />}
     </div>
   );
 };

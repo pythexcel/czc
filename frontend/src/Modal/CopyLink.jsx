@@ -5,7 +5,7 @@ function CopyLink({ onClose }) {
     return (
         <ModalShadow onClose={onClose}>
             <div className="relative bg-white rounded-2xl justify-center text-center items-center shadow-lg dark:white mx-auto mt-[40%] w-[530px] z-50 p-8">
-                <img src={successGif} className='w-[200px] h-[150px] text-orange-300 mx-auto mb-3' />
+                <img src={successGif} className='w-[150px] h-[145px] text-orange-300 mx-auto mb-3' />
                 <h1 className='text-gray-600 text-2xl font-semibold my-4 font-Arial'>Copied</h1>
                 <p className='text-gray-800 text-lg my-5 font-normal'>Your link has been Copied.</p>
                 <div className="flex justify-center space-x-2 rounded-b-lg dark:border-gray-600 bg-white mt-3">

@@ -7,11 +7,10 @@ import { useState } from "react";
 
 
 function TagType(props) {
-    const { onDeleteClick, index, data } = props;
-    console.log(data, "this is data for update :- ///////////////////////");
-    const dispatch = useDispatch();
+    const { onDeleteClick, index, data, errors } = props;
+    console.log(data, "this is data :- ///////////////////////");
 
-    console.log(data, "this is data i am showing here as well")
+    const dispatch = useDispatch();
 
     const [tagname, setTagname] = useState(data?.tag_name || "");
     const [descritption, setDescription] = useState(data?.goal_description || "");
@@ -42,6 +41,7 @@ function TagType(props) {
                     value={tagname}
                     onChange={handleTagNameChange}
                 />
+                {errors.length && errors[index]?.tag_name ? <span className="text-red-500">{errors[index].tag_name}</span> : null}
             </div>
             <div className="items-end flex w-full space-x-4">
                 <div className="w-[80%]">

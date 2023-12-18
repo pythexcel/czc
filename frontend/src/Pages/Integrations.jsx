@@ -8,11 +8,14 @@ import ToastSuccess from '../Modal/ToastSuccess';
 import ToastFailed from '../Modal/ToastFailed';
 import ErrorPage from '../Modal/ErrorPage';
 import axiosInstance from '../utils/axios';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectConnet } from '../Store/slice/ConnectedFlagSlice';
+import { setFaqs } from '../Store/slice/FaqsSlice';
 
 
 function Integrations() {
+    const dispatch = useDispatch();
+
     const access = useSelector(selectConnet)
 
     const [openModal, setOpenModal] = useState(false);
@@ -51,6 +54,9 @@ function Integrations() {
         try {
             const resp = await axiosInstance.get("users/agency-integration/")
             setHighlevel(resp.message);
+            if(resp.message){
+                dispatch(setFaqs(resp.message.id));
+            }
             setOpenModal(true);
         } catch (error) {
             console.log(error, "error of high level")

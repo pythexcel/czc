@@ -13,10 +13,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../utils/axios";
 import TextArea from "../Common-Component/TextArea";
-import Updatebutton from "../Common-Component/Updatebutton";
-import { setFlag } from "../Store/slice/flagSlice";
 import { addEmptyWebhookObject, deleteWebhook, handleReset, setTriggerWebhookSlice } from "../Store/slice/TriggerWebhookSlice";
 import CustomSelector from "../Common-Component/CustomSelector";
+import { deleteTagType, resetTagState } from '../Store/slice/TagTypeSlice';
+import { deleteCustomField, resetCustomField } from '../Store/slice/CustomFieldSlice';
+import updateChildData from '../Store/slice/TagTypeSlice';
 
 const Intromessage = ["Text", "Custom Field", "Custom Value"];
 
@@ -36,19 +37,14 @@ function CreateBot() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const uniqueId = queryParams.get("id");
-
   const [isLoading, setIsLoading] = useState(false);
-  const [update, setUpdate] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [opentag, setOpenTag] = useState([]);
-  const [openCustom, setOpenCustom] = useState([]);
-  const [openTrigger, setOpenTrigger] = useState([]);
   const [prompt, setPrompt] = useState("Custom Field Name")
   const [message, setMassage] = useState("Custom Field Name")
 
+  const [allerror, setAllError] = useState([]);
+
+  console.log(allerror, "this is responce of API")
 
   const childData = useSelector((state) => state.tag.childData);
 
@@ -58,6 +54,7 @@ function CreateBot() {
 
   const [addtag, setAddTag] = useState([]);
   const [customfield, setCustomfield] = useState([]);
+  const [tagNameErrors, setTagNameErrors] = useState([])
 
   const HandleAddTage = () => {
     setAddTag([...addtag, addtag.length]);
@@ -65,6 +62,7 @@ function CreateBot() {
 
   const handleDeleteTage = (index) => {
     setAddTag((p) => p.filter((addtagIndex) => addtagIndex !== index));
+    dispatch(deleteTagType(index));
   };
 
   const handleAddCustomField = () => {
@@ -75,6 +73,7 @@ function CreateBot() {
     setCustomfield((p) =>
       p.filter((addCustomIndex) => addCustomIndex !== index)
     );
+    dispatch(deleteCustomField(index))
   };
 
   const handleAddTriggerWebhook = () => {
@@ -108,6 +107,7 @@ function CreateBot() {
             onDeleteClick={handleDeleteTage}
             index={index}
             key={index}
+            errors={tagNameErrors}
           />
         ))}
 
@@ -117,6 +117,7 @@ function CreateBot() {
             onDeleteClick={handleDeleteCustomeField}
             index={index}
             key={index}
+            error={tagNameErrors}
           />
         ))}
 
@@ -127,6 +128,7 @@ function CreateBot() {
             index={index}
             key={index}
             data={item}
+            error={tagNameErrors}
           />
         ))}
     </div>
@@ -158,13 +160,15 @@ function CreateBot() {
 
   const CreateAIBot = async (values) => {
     setIsLoading(true);
+    setAllError([])
+    setTagNameErrors([])
     try {
-      const createBot = await axiosInstance.post("bot/", {
+      await axiosInstance.post("bot/", {
         bot_type: {
           ai_type: values.AiType,
           bot_name: values.Botname,
           bot_description: values.BotDescription,
-          prompt_type: values.PromptType ? values.PromptType : "Custom Field" ,
+          prompt_type: values.PromptType ? values.PromptType : "Custom Field",
           prompt: values.Prompt,
           intro_message_type: values.IntroMessageType ? values.IntroMessageType : "Custom Field",
           intro_message: values.IntroMessage,
@@ -180,9 +184,20 @@ function CreateBot() {
         custom_field_type: customfields,
         trigger_webhook_type: tiggerwebhook,
       });
+      dispatch(resetCustomField())
+      dispatch(resetTagState())
+      dispatch(handleReset())
       navigate("/dashboard/bots");
     } catch (error) {
-      console.log("i am error");
+      setIsLoading(false)
+      if (error?.response?.data) {
+        setAllError(error.response.data);
+        if (error.response.data?.non_field_errors) {
+          setTagNameErrors(error.response.data?.non_field_errors)
+        }
+      }
+
+      console.log(error.response.data.non_field_errors, "I am error");
     }
   };
 
@@ -203,9 +218,8 @@ function CreateBot() {
       GPTmodel: "",
       messageDelay: "",
     },
-    onSubmit: async (values, { resetForm }) => {
-      await CreateAIBot(values);
-      resetForm();
+    onSubmit: async (values) => {
+      CreateAIBot(values);
     },
   });
 
@@ -233,49 +247,12 @@ function CreateBot() {
     }
   }, [formik.values.IntroMessageType])
 
-
-  const getBotForUpdate = async (uniqueId) => {
-    try {
-      const resp = await axiosInstance.get(`bot/${uniqueId}`);
-      const data = resp.details;
-      formik.setValues({
-        AiType: data.ai_type,
-        Botname: data.bot_name,
-        BotDescription: data.bot_description,
-        PromptType: data.prompt_type,
-        Prompt: data.prompt,
-        IntroMessageType: data.intro_message_type,
-        IntroMessage: data.intro_message,
-        OpenAikey: data.open_ai_api_key,
-        Conversation: data.converstation_limit,
-        TimeZoneReference: data.time_zone_reference,
-        TimeZoneFormat: data.time_zone_format,
-        TimeFormat: data.time_format,
-        GPTmodel: data.gpt_model,
-        messageDelay: data.message_delay,
-      });
-      console.log(resp.details.goal.tag_type, "i am tag type")
-      setOpenTag(resp.details.goal.tag_type)
-
-      console.log(resp.details.goal.custom_field_type, "i am custom field")
-      setOpenCustom(resp.details.goal.custom_field_type)
-
-      console.log(resp.details.goal.trigger_webhook_field, "i am triggerwebhook data")
-      setOpenTrigger(resp.details.goal.trigger_webhook_field)
-      setUpdate(true);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    if (uniqueId) {
-      getBotForUpdate(uniqueId);
-    }
-    return () => {
-      dispatch(handleReset())
-    }
-  }, [uniqueId]);
+  const handleCancel = () => {
+    dispatch(resetCustomField())
+    dispatch(resetTagState())
+    dispatch(handleReset())
+    navigate("/dashboard/bots")
+  }
 
   return (
     <div className="w-[100%] bg-white border border-gray-400 rounded-lg px-8 py-6 shadow-lg">
@@ -301,6 +278,9 @@ function CreateBot() {
               </DropDown>
               <ChevronDownIcon />
             </div>
+            {allerror.ai_type &&
+              <p className="text-red-500">{allerror.ai_type}</p>
+            }
           </div>
           <div className="w-[50%]">
             <Title>Bot Name</Title>
@@ -313,6 +293,9 @@ function CreateBot() {
               onBlur={formik.handleBlur}
               value={formik.values.Botname}
             />
+            {allerror.bot_name &&
+              <p className="text-red-500">{allerror.bot_name}</p>
+            }
           </div>
         </div>
         <div className="w-full my-4">
@@ -346,9 +329,9 @@ function CreateBot() {
                 ))}
               </DropDown>
               <ChevronDownIcon />
-            </div>  
+            </div>
           </div>
-          
+
           <div className="w-[50%]">
             <Title>Enter {prompt}</Title>
             <InputField
@@ -360,6 +343,9 @@ function CreateBot() {
               onBlur={formik.handleBlur}
               value={formik.values.Prompt}
             />
+            {allerror.prompt &&
+              <p className="text-red-500">{allerror.prompt}</p>
+            }
           </div>
         </div>
         <div className="flex gap-6 my-4">
@@ -394,6 +380,9 @@ function CreateBot() {
               onBlur={formik.handleBlur}
               value={formik.values.IntroMessage}
             />
+            {allerror.intro_message &&
+              <p className="text-red-500">{allerror.intro_message}</p>
+            }
           </div>
         </div>
         <div className="flex gap-6 my-4">
@@ -408,6 +397,9 @@ function CreateBot() {
               onBlur={formik.handleBlur}
               value={formik.values.OpenAikey}
             />
+            {allerror.open_ai_api_key &&
+              <p className="text-red-500">{allerror.open_ai_api_key}</p>
+            }
           </div>
           <div className="w-[50%]">
             <Title>Conversation Limit</Title>
@@ -421,6 +413,9 @@ function CreateBot() {
               value={formik.values.Conversation}
               min={0}
             />
+            {allerror.converstation_limit &&
+              <p className="text-red-500">{allerror.converstation_limit}</p>
+            }
           </div>
         </div>
         <div className="flex gap-6 my-4">
@@ -444,6 +439,9 @@ function CreateBot() {
                 </DropDown>
                 <ChevronDownIcon />
               </div>
+              {allerror.time_zone_reference &&
+                <p className="text-red-500">{allerror.time_zone_reference}</p>
+              }
             </div>
             <div className="w-1/3">
               <Title>Time zone Format</Title>
@@ -464,6 +462,9 @@ function CreateBot() {
                 </DropDown>
                 <ChevronDownIcon />
               </div>
+              {allerror.time_zone_format &&
+                <p className="text-red-500">{allerror.time_zone_format}</p>
+              }
             </div>
             <div className="w-1/3">
               <Title>Time Format</Title>
@@ -484,6 +485,9 @@ function CreateBot() {
                 </DropDown>
                 <ChevronDownIcon />
               </div>
+              {allerror.time_format &&
+                <p className="text-red-500">{allerror.time_format}</p>
+              }
             </div>
           </div>
           <div className="w-[50%]">
@@ -504,6 +508,9 @@ function CreateBot() {
               </DropDown>
               <ChevronDownIcon />
             </div>
+            {allerror.gpt_model &&
+              <p className="text-red-500">{allerror.gpt_model}</p>
+            }
           </div>
         </div>
         <div className="flex gap-6 my-4">
@@ -519,6 +526,9 @@ function CreateBot() {
               value={formik.values.messageDelay}
               min={0}
             />
+            {allerror.message_delay &&
+              <p className="text-red-500">{allerror.message_delay}</p>
+            }
           </div>
           <div className="w-[50%]">
             <div className="relative gap-3">
@@ -556,21 +566,14 @@ function CreateBot() {
         </div>
         {foreignElements}
         <div className="flex gap-2 my-6">
-          <Link to="/dashboard/bots">
-            <button
-              type="button"
-              className="border border-blue-600 rounded-md text-blue-600 px-12 font-semibold py-2 text-md hover:bg-blue-600 hover:text-white"
-            >
-              Cancel
-            </button>
-          </Link>
-          {update ? (
-            <Updatebutton
-              type="submit"
-            />
-          ) : (
-            <LoadingButton type="submit" isLoading={isLoading} />
-          )}
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="border border-blue-600 rounded-md text-blue-600 px-12 font-semibold py-2 text-md hover:bg-blue-600 hover:text-white"
+          >
+            Cancel
+          </button>
+          <LoadingButton type="submit" isLoading={isLoading} />
         </div>
       </form>
     </div>

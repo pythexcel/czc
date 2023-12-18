@@ -9,7 +9,7 @@ import { useDispatch } from "react-redux";
 import { useState } from "react";
 import TextArea from "../Common-Component/TextArea";
 
-function CustomField({ onDeleteClick, index }) {
+function CustomField({ onDeleteClick, index, error }) {
     const dispatch = useDispatch();
     const [allowCustomOverWright, setAllowCustomOverWright] = useState(false);
 
@@ -57,14 +57,20 @@ function CustomField({ onDeleteClick, index }) {
                 <Title>Field Name</Title>
                 <InputField
                     type="text"
+                    id="field_name"
+                    name="field_name"
                     placeholder="Name"
                     onChange={handleCustomFieldtagname}
                 />
+                {error.length && error[index]?.field_name ? <span className="text-red-500">{error[index].field_name}</span> : null}
             </div>
             <div className="w-[15%]">
                 <Title>Field Type</Title>
                 <div className="relative">
-                    <DropDown onChange={selectedFieldType}>
+                    <DropDown
+                        id="field_type"
+                        name="field_type"
+                        onChange={selectedFieldType}>
                         <option default value={""} className="hidden">Select</option>
                         {options.map((item, i) => (
                             <option key={i} value={item}>{item}</option>
@@ -72,6 +78,7 @@ function CustomField({ onDeleteClick, index }) {
                     </DropDown>
                     <span className="absolute right-0 top-0 h-full w-10 text-center text-black pointer-events-none flex items-center justify-center"><HiOutlineChevronDown />
                     </span>
+                    {error.length && error[index]?.field_type ? <span className="text-red-500">{error[index].field_name}</span> : null}
                 </div>
             </div>
             <div className="w-[40%]">

@@ -5,7 +5,9 @@ import Title from "../../Component/Title";
 import DropDown from "../../Component/DropDown";
 import TextArea from "../../Common-Component/TextArea";
 
-function CustomField({ onDeleteClick, index, data, customfield, setCustomfield }) {
+function CustomField({ onDeleteClick, index, data, customfield, setCustomfield, error }) {
+
+    console.log(error,"///////dds")
 
     const handleCustomFieldData = (event) => {
         const { checked, value, name } = event.target;
@@ -44,6 +46,7 @@ function CustomField({ onDeleteClick, index, data, customfield, setCustomfield }
                     value={data.field_name}
                     onChange={handleCustomFieldData}
                 />
+                {error.length && error[index]?.field_name ? <span className="text-red-500">{error[index].field_name}</span> : null}
             </div>
             <div className="w-[15%]">
                 <Title>Field Type</Title>
@@ -61,6 +64,7 @@ function CustomField({ onDeleteClick, index, data, customfield, setCustomfield }
                     </DropDown>
                     <span className="absolute right-0 top-0 h-full w-10 text-center text-black pointer-events-none flex items-center justify-center"><HiOutlineChevronDown />
                     </span>
+                    {error.length && error[index]?.field_type ? <span className="text-red-500">{error[index].field_name}</span> : null}
                 </div>
             </div>
             <div className="w-[40%]">

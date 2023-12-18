@@ -6,10 +6,11 @@ import { handleHeaderChange } from "../Store/slice/TriggerWebhookSlice";
 // import { useState } from "react";
 
 
-const InputHeaders = ({ data, onDelete, index, webHookIndex }) => {
-    
-    const dispatch = useDispatch();
+const InputHeaders = ({ data, onDelete, index, webHookIndex, header_type }) => {
 
+    console.log(header_type,"[[[[[[[[[[[[[, headers")
+
+    const dispatch = useDispatch();
 
     const handleheaderChange = (event) => {
         const { name, value } = event.target
@@ -34,6 +35,7 @@ const InputHeaders = ({ data, onDelete, index, webHookIndex }) => {
                     placeholder="Name"
                     onChange={handleheaderChange}
                 />
+                {header_type?.length && header_type[index]?.headers ? <span className="text-red-500">{header_type[index]?.headers}</span> : null}   
             </div>
             <div className="w-[40%]">
                 <Title>Value Of header</Title>
