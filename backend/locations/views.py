@@ -32,8 +32,6 @@ class LocationAPI(APIView):
             serializer.is_valid(raise_exception=True)
             serializer.save()
         else:
-            # location_instance = LocationModel.objects.filter(agency_id=agency_id)
-            # serializer = LocationModelSerializer(location_instance, data=data, partial=True, many=True)
             LocationModel.objects.filter(agency_id=agency_id).update(**data)
         if 'is_enabled' in data:
             return Response(
