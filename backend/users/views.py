@@ -268,6 +268,16 @@ class OpenAIAPI(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+    def get(self, request):
+        data = OpenAIModel.objects.filter(user_id=request.user.id).values()
+        return Response(
+            {  
+                "details": data,
+                "success": True
+             },
+            status=status.HTTP_200_OK
+        )
+
 
 class AgencyAPI(APIView):
     permission_classes = [IsAuthenticated]
