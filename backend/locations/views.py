@@ -33,13 +33,17 @@ class LocationAPI(APIView):
             serializer.save()
         else:
             LocationModel.objects.filter(agency_id=agency_id).update(**data)
+            return Response(
+                {"success": True, "message": "All Locations Successfully updated!"},
+                status=status.HTTP_200_OK,
+            )
         if 'is_enabled' in data:
             return Response(
-                {"success": True, "data": "Location Successfully updated!"},
+                {"success": True, "message": "Location Successfully updated!"},
                 status=status.HTTP_200_OK,
             )
         if 'bot_name' in data:
             return Response(
-                {"success": True, "data": "Successfully updated bot for the location!"},
+                {"success": True, "message": "Successfully updated bot for the location!"},
                 status=status.HTTP_200_OK,
             )
