@@ -5,12 +5,14 @@ import ModalShadow from "../Common-Component/ModalShadow";
 import axiosInstance from "../utils/axios";
 import { useEffect, useState } from "react";
 
-function AddFaqs({ onClose, ids, widgetsids, setIddd }) {
+function AddFaqs({ onClose, ids, getQuery, setResSuccess, setResFailed }) {
 
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [update, setUpdate] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const widgetsids = localStorage.getItem('userId');
 
   const handleAddQuestion = async () => {
     setLoading(true)
@@ -20,10 +22,13 @@ function AddFaqs({ onClose, ids, widgetsids, setIddd }) {
         question: question,
         answer: answer,
       });
-      setIddd(widgetsids)
+      setResSuccess(true)
+      getQuery(widgetsids);
       onClose();
       console.log(resp);
     } catch (error) {
+      setResFailed(true)
+      setLoading(false)
       console.log(error);
     }
   };
@@ -36,10 +41,11 @@ function AddFaqs({ onClose, ids, widgetsids, setIddd }) {
         answer: answer
       })
       setUpdate(false)
-      setIddd(widgetsids)
+      getQuery(widgetsids);
       onClose();
       console.log(result);
     } catch (error) {
+      setLoading(false)
       console.log(error)
     }
   }
@@ -108,12 +114,12 @@ function AddFaqs({ onClose, ids, widgetsids, setIddd }) {
           {update == true ? <button
             onClick={handleUdpate}
             type="button"
-            className="focus:ring-4 focus:outline-none rounded-lg text-sm font-medium px-5 py-2.5 text-white bg-blue-600"
+            className="focus:ring-4 focus:outline-none rounded-lg text-sm font-medium px-5 py-2.5 text-white bg-[#0445F5]"
           >{loading ? "Updating..." : "Update"}
           </button> : <button
             onClick={handleAddQuestion}
             type="button"
-            className="focus:ring-4 focus:outline-none rounded-lg text-sm font-medium px-5 py-2.5 text-white bg-blue-600"
+            className="focus:ring-4 focus:outline-none rounded-lg text-sm font-medium px-5 py-2.5 text-white bg-[#0445F5]"
           >{loading ? "Adding..." :
             "Add" }
           </button>}

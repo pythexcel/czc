@@ -12,7 +12,6 @@ function ImportFAQs({ onClose }) {
   const [check, setCheck] = useState("No")
   const [selectedFileName, setSelectedFileName] = useState("");
   const [data, setData] = useState([]);
-  console.log(data, ">>>>>>>>>>>>>>>>")
 
   const handleRadioChange = (event) => {
     setCsvHeaders(event.target.value);
@@ -151,7 +150,7 @@ function ImportFAQs({ onClose }) {
                 </CustomButton>
                 <button
                   type="button"
-                  className="focus:ring-4 focus:outline-none rounded-lg text-sm font-medium px-5 py-2.5 text-white bg-blue-600"
+                  className="focus:ring-4 focus:outline-none rounded-lg text-sm font-medium px-5 py-2.5 text-white bg-[#0445F5]"
                   onClick={handleSubmit}
                 >
                   Import

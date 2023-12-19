@@ -20,10 +20,6 @@ const CustomDropdown = ({
         setFilterData(filterOpt);
     }
 
-    // if(handleSelect){
-    //     setFilterData([]);
-    // }
-
     const handleFire = () => {
         toggleIsOpen()
     }

@@ -1,7 +1,7 @@
 import { RxCross2 } from 'react-icons/rx';
 import ToastContainer from '../Common-Component/ToastContainer';
 
-function ToastSuccess({ onClose, title, message }) {
+function ToastSuccess({onClose, title, message }) {
   return (
     <ToastContainer>
       <div className="bg-gradient-to-r from-[#2DCEC7] to-[#2DCE9C] rounded-lg w-[350px] p-4">

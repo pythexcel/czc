@@ -6,8 +6,8 @@ import ModalShadow from "../Common-Component/ModalShadow";
 import axiosInstance from "../utils/axios";
 import { useState } from "react";
 
-function UpdateModal({ onClose }) {
-    const [openAIKey, setOpenAIKey] = useState("")
+function UpdateModal({ onClose, openAIkey }) {
+    const [openAIKey, setOpenAIKey] = useState( openAIkey || "")
 
     const handleCreateOpenAI = async () => {
         onClose()
@@ -36,7 +36,7 @@ function UpdateModal({ onClose }) {
                 <div className="pt-6 px-8 pb-4 space-y-6 bg-white">
                     <div>
                         <ModalPara>OpenAI API Key</ModalPara>
-                        <InputField type='text' onChange={(e) => setOpenAIKey(e.target.value)} placeholder='sk-l*********************************************Ms' />
+                        <InputField value={openAIkey} type='text' onChange={(e) => setOpenAIKey(e.target.value)} placeholder='sk-l*********************************************Ms' />
                     </div>
                 </div>
                 <div className="flex justify-start px-6 pb-12 space-x-2 rounded-b-lg dark:border-gray-600 bg-white">

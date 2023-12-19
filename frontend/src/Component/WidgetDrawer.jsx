@@ -12,16 +12,19 @@ import Widget from '../Common-Component/Widget';
 import Icons from "../Common-Component/Icons";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { HiSearch } from "react-icons/hi";
-import IsDelete from "../Modal/IsDelete";
-import Deleted from '../Modal/Deleted';
+import { useSelector } from "react-redux";
+import { selectFaqs } from "../Store/slice/FaqsSlice";
+import SDelete from "../Modal/SDelete";
+import DeleteFaq from "../Modal/DeleteFaq";
+import ToastSuccess from '../Modal/ToastSuccess';
+import ToastFailed from '../Modal/ToastFailed'
 
-const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, widgetsids, setWidgetsids, getfaqs }) => {
+const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, setWidgetsids, getfaqs }) => {
 
   const [ids, setIds] = useState("");
   const [Alldata, setAllData] = useState([])
   const [search, setSearch] = useState(false);
   const [showMore, setShowMore] = useState(false);
-  const [searchtype, setSearchType] = useState("");
   const [isaddfaqs, setIsAddFaqs] = useState(false);
   const [isscrapurl, setIsScrapUrl] = useState(false);
   const [isimportfaqs, setIsImportFaqs] = useState(false);
@@ -29,14 +32,16 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, widgetsids, setWidget
   const [isDel, setIsDel] = useState(false);
   const [CnfDel, setCnfDel] = useState(false);
 
-  const [iddd, setIddd] = useState("");
-
   const itemsPerPage = 10;
+
+  const faqsPermission = useSelector(selectFaqs);
+
+  const [resSuccess, setResSuccess] = useState(false);
+  const [resFailed, setResFailed] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
 
   const totalPages = Alldata === undefined ? 1 : Math.ceil(Alldata.length / itemsPerPage);
-
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
@@ -47,24 +52,46 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, widgetsids, setWidget
     currentPage * itemsPerPage
   );
 
+  const [filterData, setFilterData] = useState([]);
+
+  const handleSearchFaqs = (event) => {
+    const dd = event.target.value;
+    const filterfaq = displayedItems.filter((item) =>
+      item.question.toLowerCase().includes(dd.toLowerCase())
+    );
+    setFilterData(filterfaq)
+  }
+
   const isPrevButtonDisabled = currentPage === 1;
   const isNextButtonDisabled = currentPage === totalPages || totalPages === 0;
 
-  const getQuery = async (widgetsids, iddd) => {
+  const getQuery = async (widgetsids) => {
     try {
-      const resp = await axiosInstance.get(`frequently-asked-ques/${widgetsids || iddd}/`);
+      const resp = await axiosInstance.get(`frequently-asked-ques/${widgetsids}/`);
+      getfaqs(faqsPermission)
       setAllData(resp.details)
     } catch (error) {
       console.log(error, "this is werror")
     }
   }
 
+  const widgetsids = localStorage.getItem('userId');
+
   useEffect(() => {
-    getQuery(widgetsids, iddd);
-  }, [widgetsids, iddd])
+    if (widgetsids) {
+      getQuery(widgetsids);
+    }
+  }, [widgetsids])
+
+  const handleHideToast = () => {
+    setResSuccess(false)
+    setResFailed(false)
+  }
 
   const onClose = () => {
     setIds("")
+    setCnfDel(false);
+    setIsDel(false);
     setIsAddFaqs(false);
     setIsScrapUrl(false);
     setIsImportFaqs(false);
@@ -76,16 +103,25 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, widgetsids, setWidget
 
   const heightIcon = "h-[20px] w-[20px]";
 
-  const handleUdpate = (id) => {
+  const handleUpdate = (id) => {
     setIds(id);
     setIsAddFaqs(true)
   }
 
+  const [idfordel, setIdfordel] = useState("")
+
   const handleDelete = async (id) => {
+    setIdfordel(id);
+    setIsDel(true)
+  }
+
+  const handleDeletefaq = async () => {
+    setIsDel(false)
     try {
-      const result = await axiosInstance.delete(`frequently-asked-ques/${widgetsids}/${id}/`);
+      await axiosInstance.delete(`frequently-asked-ques/${widgetsids}/${idfordel}/`);
       getQuery(widgetsids);
-      console.log(result)
+      setIsDel(false)
+      setCnfDel(true)
     } catch (error) {
       console.log(error, "delete faqs")
     }
@@ -97,6 +133,7 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, widgetsids, setWidget
     try {
       const resp = await axiosInstance.get(`frequently-asked-ques/download/${widgetsids}`);
       const responseData = resp.data;
+      console.log(responseData,"asdfasdfasdfasdf")
 
       // fileDownload(responseData, 'filename.csv');
       // console.log(resp)
@@ -105,11 +142,40 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, widgetsids, setWidget
     }
   }
 
+
+
+  const Allmodals = (
+    <div>
+      {resSuccess &&
+        <ToastSuccess title="success" message="Faqs have been created successfully" onClose={handleHideToast} />
+      }
+      {resFailed &&
+        <ToastFailed title="Falied" message="Something went wrong" onClose={handleHideToast} />}
+      {isaddfaqs && (
+        <AddFaqs
+          ids={ids}
+          onClose={onClose}
+          getQuery={getQuery}
+          setResFailed={setResFailed}
+          setResSuccess={setResSuccess}
+          widgetsids={widgetsids}
+        />
+      )}
+
+      {isscrapurl && <ScrapURL onClose={onClose} />}
+      {isimportfaqs && <ImportFAQs onClose={onClose} />}
+      {isDel && <SDelete onClose={onClose} handleDeletefaq={handleDeletefaq} />}
+      {CnfDel && <DeleteFaq onClose={onClose} />}
+    </div>
+  );
+
+
   return (
     <div
-      className={`fixed top-0 right-0 z-40 h-screen transition-all duration-900 shadow-lg ease-in-out ${iswidgetdrawer ? "translate-x-0" : "translate-x-full"
+      className={`fixed top-0 right-0 h-screen transition-all duration-900 shadow-lg ease-in-out ${iswidgetdrawer ? "translate-x-0" : "translate-x-full"
         } w-[50%] bg-[#F2F7FA] overflow-y-scroll`}
     >
+
       <div
         className="cursor-pointer flex justify-end mt-4 mr-4"
         onClick={() => setIsWidgetDrawer(false)}
@@ -128,10 +194,12 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, widgetsids, setWidget
           </span>
         </div>
 
-          <Widget>
-            <FaFileExport className={heightIcon} />
-            <span> Export</span>
-          </Widget>
+        <Widget
+          onClick={handleExport}
+        >
+          <FaFileExport className={heightIcon} />
+          <span> Export</span>
+        </Widget>
 
         <Widget
           onClick={() => setIsImportFaqs(true)}
@@ -160,7 +228,7 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, widgetsids, setWidget
               id="location-search"
               className="block p-2.5 z-20 text-sm focus:outline-none text-gray-700 bg-white rounded-lg dark:placeholder-gray-400 dark:focus:border-blue-500 w-[100%] shadow-lg "
               placeholder="Search for city or address"
-              onChange={(e) => setSearchType(e.target.value)}
+              onChange={handleSearchFaqs}
               required
             />
             <button type="submit" className="absolute top-0 end-0 h-full p-2.5 text-sm font-medium text-white bg-blue-700 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 ml-[500px]">
@@ -176,48 +244,95 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, widgetsids, setWidget
               </p>
             </div>
           ) : (
-            displayedItems?.map((item, index) => (
-              <div key={index} className="FaqCard bg-white p-6 mt-6 rounded-lg flex flex-row justify-between shadow-md">
-                <div className="mr-5">
-                  <p className="font-semibold text-[#999999]">
-                    Q : {item.question}
-                  </p>
-                  <p className="text-[#999999] break-words">
-                    A :{
-                      showMore === true ? (
-                        <span>
-                          {item.answer}
-                        </span>
-                      ) : (
-                        <span>{item.answer.length > 174 ? `${item.answer.slice(0, 173)}...` : item.answer}</span>
-                      )
-                    }<br />
-                    {item.answer.length > 174 && (
-                      <span style={{ cursor: 'pointer', color: 'blue' }} onClick={toggleShowMore}>
-                        {showMore ? ' Show less' : ' Show more'}
-                      </span>
-                    )}
-                  </p>
-                </div>
-                <div className="flex flex-col space-y-2">
-                  <Icons
-                    handleClick={() => handleUdpate(item.id)}
-                    icon={<FaPencilAlt className={styleIcon} />}
-                    text="EDIT"
-                    textClassName="updatetext"
-                    containerClassName="update"
-                  />
+            <>
+              {filterData?.length > 0 ? (
+                filterData.map((item, index) => (
+                  <div key={index} className="FaqCard bg-white p-6 mt-6 rounded-lg flex flex-row justify-between shadow-md">
+                    <div className="mr-5">
+                      <p className="font-semibold text-[#999999]">
+                        Q : {item.question}
+                      </p>
+                      <p className="text-[#999999] break-words">
+                        A :{
+                          showMore === true ? (
+                            <span>
+                              {item.answer}
+                            </span>
+                          ) : (
+                            <span>{item.answer.length > 174 ? `${item.answer.slice(0, 173)}...` : item.answer}</span>
+                          )
+                        }<br />
+                        {item.answer.length > 174 && (
+                          <span style={{ cursor: 'pointer', color: 'blue' }} onClick={toggleShowMore}>
+                            {showMore ? ' Show less' : ' Show more'}
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                    <div className="flex flex-col space-y-2">
+                      <Icons
+                        handleClick={() => handleUpdate(item.id)}
+                        icon={<FaPencilAlt className={styleIcon} />}
+                        text="EDIT"
+                        textClassName="updatetext"
+                        containerClassName="update"
+                      />
 
-                  <Icons
-                    handleClick={() => handleDelete(item.id)}
-                    icon={<RiDeleteBin6Line className={styleIcon} />}
-                    text="DELETE"
-                    textClassName="deletefaqtext"
-                    containerClassName="deletefaq"
-                  />
-                </div>
-              </div>
-            ))
+                      <Icons
+                        handleClick={() => handleDelete(item.id)}
+                        icon={<RiDeleteBin6Line className={styleIcon} />}
+                        text="DELETE"
+                        textClassName="deletefaqtext"
+                        containerClassName="deletefaq"
+                      />
+                    </div>
+                  </div>
+                ))
+              ) : (
+                displayedItems?.map((item, index) => (
+                  <div key={index} className="FaqCard bg-white p-6 mt-6 rounded-lg flex flex-row justify-between shadow-md">
+                    <div className="mr-5">
+                      <p className="font-semibold text-[#999999]">
+                        Q : {item.question}
+                      </p>
+                      <p className="text-[#999999] break-words">
+                        A :{
+                          showMore === true ? (
+                            <span>
+                              {item.answer}
+                            </span>
+                          ) : (
+                            <span>{item.answer.length > 174 ? `${item.answer.slice(0, 173)}...` : item.answer}</span>
+                          )
+                        }<br />
+                        {item.answer.length > 174 && (
+                          <span style={{ cursor: 'pointer', color: 'blue' }} onClick={toggleShowMore}>
+                            {showMore ? ' Show less' : ' Show more'}
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                    <div className="flex flex-col space-y-2">
+                      <Icons
+                        handleClick={() => handleUpdate(item.id)}
+                        icon={<FaPencilAlt className={styleIcon} />}
+                        text="EDIT"
+                        textClassName="updatetext"
+                        containerClassName="update"
+                      />
+
+                      <Icons
+                        handleClick={() => handleDelete(item.id)}
+                        icon={<RiDeleteBin6Line className={styleIcon} />}
+                        text="DELETE"
+                        textClassName="deletefaqtext"
+                        containerClassName="deletefaq"
+                      />
+                    </div>
+                  </div>
+                ))
+              )}
+            </>
           )}
         </div>
         <div className="flex mt-4 space-x-2">
@@ -230,11 +345,7 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, widgetsids, setWidget
           </button>
         </div>
       </div>
-      {isaddfaqs && <AddFaqs ids={ids} widgetsids={widgetsids} setIddd={setIddd} onClose={onClose} />}
-      {isscrapurl && <ScrapURL onClose={onClose} />}
-      {isimportfaqs && <ImportFAQs onClose={onClose} />}
-      {isDel && <IsDelete />}
-      {CnfDel && <Deleted />}
+      {Allmodals}
     </div>
   );
 };
