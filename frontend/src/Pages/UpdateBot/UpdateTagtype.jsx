@@ -5,6 +5,8 @@ import InputField from '../../Component/TextInput';
 
 function UpdateTagtype({ addtag, setAddTag, onDeleteClick, index, data, errors }) {
 
+    // console.log(errors,"lkijuhygjuhjgjklbhgvc")
+
     const handleUpdateTagtype = (event) => {
         const { value, name } = event.target;
         const newWebHookData = [...addtag]
@@ -24,7 +26,7 @@ function UpdateTagtype({ addtag, setAddTag, onDeleteClick, index, data, errors }
                     value={data.tag_name}
                     onChange={handleUpdateTagtype}
                 />
-                {errors.length && errors[index]?.tag_name ? <span className="text-red-500">{errors[index].tag_name}</span> : null}
+                 <span className="text-red-500">{errors[index]?.tag_name}</span> 
             </div>
             <div className="items-end flex w-full space-x-4">
                 <div className="w-[80%]">

@@ -10,14 +10,14 @@ import Title from "../Component/Title";
 import TriggerWebhook from "../Component/TriggerWebhook";
 import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axios";
 import TextArea from "../Common-Component/TextArea";
-import { addEmptyWebhookObject, deleteWebhook, handleReset, setTriggerWebhookSlice } from "../Store/slice/TriggerWebhookSlice";
+import { addEmptyWebhookObject, deleteWebhook, handleReset } from "../Store/slice/TriggerWebhookSlice";
 import CustomSelector from "../Common-Component/CustomSelector";
 import { deleteTagType, resetTagState } from '../Store/slice/TagTypeSlice';
 import { deleteCustomField, resetCustomField } from '../Store/slice/CustomFieldSlice';
-import updateChildData from '../Store/slice/TagTypeSlice';
+import ToastFailed from '../Modal/ToastFailed';
 
 const Intromessage = ["Text", "Custom Field", "Custom Value"];
 
@@ -43,6 +43,8 @@ function CreateBot() {
   const [message, setMassage] = useState("Custom Field Name")
 
   const [allerror, setAllError] = useState([]);
+
+  const [respErr, setRespErr] = useState(false)
 
   console.log(allerror, "this is responce of API")
 
@@ -101,6 +103,7 @@ function CreateBot() {
 
   const foreignElements = (
     <div>
+    {respErr && <ToastFailed />}
       {Array.isArray(addtag) &&
         addtag.map((index) => (
           <TagType
@@ -189,6 +192,7 @@ function CreateBot() {
       dispatch(handleReset())
       navigate("/dashboard/bots");
     } catch (error) {
+      setRespErr(true)
       setIsLoading(false)
       if (error?.response?.data) {
         setAllError(error.response.data);

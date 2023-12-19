@@ -57,7 +57,7 @@ function UpdateBot() {
     const [allerror, setAllError] = useState([]);
     const [tagNameErrors, setTagNameErrors] = useState([])
 
-    console.log(tagNameErrors,">>>>>>>>>>>>>>>>>>>>>>>>>>")
+    console.log(allerror,">>>>>>>>>>>>>>>>>>>>>>>>>>")
 
     const HandleAddTage = () => {
         const newTag = {
@@ -247,7 +247,7 @@ function UpdateBot() {
                         addtag={addtag}
                         setAddTag={setAddTag}
                         onDeleteClick={handleUpdateDeleteTage}
-                        errors={tagNameErrors}
+                        errors={allerror}
                     />
                 ))}
 
@@ -257,7 +257,7 @@ function UpdateBot() {
                         key={index}
                         data={item}
                         index={index}
-                        error={tagNameErrors}
+                        error={allerror}
                         customfield={customfield}
                         setCustomfield={setCustomfield}
                         onDeleteClick={handleDeleteCustomeField}

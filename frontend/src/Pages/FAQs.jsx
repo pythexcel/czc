@@ -25,13 +25,36 @@ const FAQs = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [data, setData] = useState([])
   const [isChecked, setIsChecked] = useState(false);
-  const [widgetsids, setWidgetsids] = useState("");
 
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleEnableAll = async() => {
+    try {
+      await axiosInstance.patch(`locations/get/${faqsPermission}/`)
+      setIsEnableModal(true)
+    }catch (error) {
+      console.log(error,"faqs")
+    }
+  }
+
+  const disableALL = async() => {
+    try {
+        await axiosInstance.patch(`locations/get/${faqsPermission}/`,{
+          is_enabled: false
+        })
+        setIsDisableModal(true)
+    } catch (error){
+      console.log(error,"")
+    }
+  }
+
   const buttonsData = [
-    { text: "Enable All Locations", onClick: () => setIsEnableModal(true) },
-    { text: "Disable All Locations", onClick: () => setIsDisableModal(true) },
+    { 
+      text: "Enable All Locations", 
+      onClick: () => handleEnableAll() 
+    },    
+    { text: "Disable All Locations",
+     onClick: () => disableALL() },
     { text: "Enable Locations", onClick: () => { } },
     { text: "Disable Location", onClick: () => { } },
     { text: "Import FAQS", onClick: () => { } },
@@ -66,28 +89,32 @@ const FAQs = () => {
 
   const getfaqs = async (faqsPermission) => {
     try {
-      const resp = await axiosInstance.get(`locations/get/${faqsPermission}`)
+      const resp = await axiosInstance.get(`locations/get/${faqsPermission}/`)
       setData(resp.data)
     } catch (error) {
       console.log(error, "this is eror")
     }
   }
 
-  const handleCustomFieldData = (event, index) => {
+
+  const handleCustomFieldData = async(event, index) => {
     const { checked, value, name } = event.target;
-    const newWebHookData = [...data];
-    if (name === 'is_enabled') {
-      newWebHookData[index][name] = checked;
-    } else {
-      newWebHookData[index][name] = value;
-    }
-    handleUpdateLocation();
-    setData(newWebHookData);
+    const sliderId = event.target.id;
+    console.log(sliderId,value, faqsPermission,"ppppppppppppppppppppppppp" )
+      try{
+          await axiosInstance.patch(`locations/get/${faqsPermission}/${sliderId}/`,{
+            is_enabled: value
+          });
+          getfaqs(faqsPermission)
+      } catch (error) {
+        console.log(error,"clisder")
+      }
   };
   
   const handleWidgets = (id) => {
     setIsWidgetDrawer(true);
-    setWidgetsids(id)
+    localStorage.removeItem('userId');
+    localStorage.setItem('userId', id);
   }
 
   const heading = "py-2 font-normal text-[#8392AB] mx-3"
@@ -101,6 +128,15 @@ const FAQs = () => {
     "Main Appointment Setting",
     "Test"
   ]
+
+  const handleClearFaqs = async(id) => {
+    try{
+      await axiosInstance.delete(`frequently-asked-ques/${id}/`);
+      getfaqs(faqsPermission)
+    } catch(error) {
+      console.log(error,"location")
+    }
+  }
 
   const sty = "text-[#8392AB] w-4 h-4 Text"
 
@@ -134,7 +170,7 @@ const FAQs = () => {
                 Manage FAQs by Sub-Accounts
               </h6>
             </div>
-            <form className="w-[10%]">
+            <form className="w-[20%]">
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 flex items-center px-3 pointer-events-none bg-blue-600 rounded-l-md">
                   <HiSearch className="text-white w-[20px] h-[20px]" />
@@ -217,7 +253,7 @@ const FAQs = () => {
                         <input
                           key={index}
                           type="checkbox"
-                          id={`is_enabled-${index}`}
+                          id={item.id}
                           name="is_enabled"
                           value={item.is_enabled}
                           checked={item.is_enabled}
@@ -246,7 +282,7 @@ const FAQs = () => {
                           <span className="text-[#8392AB] font-semibold Text">Widget</span>
                         </div>
 
-                        <div className="cursor-pointer flex flex-row shadow-lg px-2 bg-opacity-17 bg-[#f8fafc] rounded-lg items-center w-[130px] space-x-2 ml-[2%] border border-slate-300">
+                        <div onClick={()=>handleClearFaqs(item.id)} className="flex flex-row shadow-lg px-2 bg-opacity-17 bg-[#f8fafc] rounded-lg items-center w-[130px] space-x-2 ml-[2%] border border-slate-300 cursor-pointer">
                           <MdDelete className={sty} />
                           <span className="text-[#8392AB] font-semibold Text">Clear FAQs</span>
                         </div>
@@ -309,7 +345,6 @@ const FAQs = () => {
         )}
         {iswidgetdrawer && (
           <WidgetDrawer
-            widgetsids={widgetsids}
             getfaqs={getfaqs}
             iswidgetdrawer={iswidgetdrawer}
             setIsWidgetDrawer={setIsWidgetDrawer}

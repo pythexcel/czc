@@ -34,9 +34,7 @@ function Bots() {
   const [idforclone, setIdforclone] = useState("");
   const [botdetails, setBotdetails] = useState([]);
   const [bot, setBot] = useState([]);
-
-
-  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredData, setFilterData] = useState([])
 
   const getAllBots = async () => {
     dispatch(setFlag(false));
@@ -180,8 +178,11 @@ function Bots() {
     </div>
   );
 
-  const handleSearchInputChange = (value) => {
-    setSearchTerm(value);
+  const handlesearchBot = (event) => {
+    const sear = event.target.value;
+    const filteredBot = bot.filter((item) => item.bot_name.toLowerCase().includes(sear.toLowerCase())
+    );
+    setFilterData(filteredBot)
   };
 
   return (
@@ -196,24 +197,36 @@ function Bots() {
                 type="search"
                 name="search"
                 placeholder="Type and Press Enter"
-                value={searchTerm}
-                onChange={(e) => handleSearchInputChange(e.target.value)}
+                onChange={handlesearchBot}
               />
             </div>
           </form>
 
           <div className="my-4 flex flex-wrap gap-4">
             <BotCard />
-            {bot?.map((item, index) => (
-              <BookingCard
-                key={index}
-                handleCopy={(id) => handleCopy(id)}
-                handleEdit={(id) => handleEdit(id)}
-                handleDelete={(id) => handleDelete(id)}
-                handleDetails={(id) => handleDetails(id)}
-                userData={item}
-              />
-            ))}
+            {filteredData?.length > 0 ? (
+              filteredData.map((item, index) => (
+                <BookingCard
+                  key={index}
+                  handleCopy={(id) => handleCopy(id)}
+                  handleEdit={(id) => handleEdit(id)}
+                  handleDelete={(id) => handleDelete(id)}
+                  handleDetails={(id) => handleDetails(id)}
+                  userData={item}
+                />
+              ))
+            ) : (
+              bot?.map((item, index) => (
+                <BookingCard
+                  key={index}
+                  handleCopy={(id) => handleCopy(id)}
+                  handleEdit={(id) => handleEdit(id)}
+                  handleDelete={(id) => handleDelete(id)}
+                  handleDetails={(id) => handleDetails(id)}
+                  userData={item}
+                />
+              ))
+            )}            
           </div>
         </section>
         {Alltoast}
