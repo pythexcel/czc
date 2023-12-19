@@ -69,60 +69,49 @@ class CreateBotAPI(APIView):
             return Response({"details": bot_data, "success": True}, status=status.HTTP_200_OK)
 
     def patch(self, request, id):
-        try:
-            bot_instance = get_object_or_404(BotModel, id=id, user_id=request.user.id)
-            if not open_ai_is_valid(request.data['open_ai_api_key']):
-                return Response(
-                    {"success": False, "message": "please enter a valid openAi key"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            serializer = BotModelSerializer(bot_instance, data=request.data, partial=True)
-            if not serializer.is_valid():
-                return Response({"success": False, "message": serializer.errors},
-                            status=status.HTTP_400_BAD_REQUEST)
-            serializer.save()
 
-            return Response({"message": "updated successfully", "success": True}, status=status.HTTP_200_OK)
+        bot_instance = get_object_or_404(BotModel, id=id, user_id=request.user.id)
+        if not open_ai_is_valid(request.data['open_ai_api_key']):
+            return Response(
+                {"success": False, "message": "please enter a valid openAi key"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        serializer = BotModelSerializer(bot_instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
-        except Exception as e:
-            return Response({"success": False, "message": str(e)},
-                            status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "updated successfully", "success": True}, status=status.HTTP_200_OK)
 
     def delete(self, request, id):
-        try:
-            flag=0
-            data = request.data
-            serializer = DeleteBotSerializer(data=data)
-            serializer.is_valid(raise_exception=True)
-            bot_instance = BotModel.objects.get(
-                id=id
-            )
-            if "tag_type_ids" in serializer.validated_data:
-                bot_instance.bot_tagtype.filter(
-                    id=serializer.validated_data["tag_type_ids"]
-                ).delete()
-                flag = 1
-            if "custom_field_type_ids" in serializer.validated_data:
-                bot_instance.bot_custom.filter(
-                    id=serializer.validated_data["custom_field_type_ids"]
-                ).delete()
-                flag = 1
-            if "trigger_webhook_type_ids" in serializer.validated_data:
-                bot_instance.bot_trigger.filter(
-                    id=serializer.validated_data["trigger_webhook_type_ids"]
-                ).delete()
-                flag = 1
-            if "header_type_ids" in serializer.validated_data:
-                Header.objects.filter(
-                    id=serializer.validated_data["header_type_ids"]
-                ).delete()
-                flag = 1
-            if not flag:
-                bot_instance.delete() # delete the entire bot
+        flag=0
+        data = request.data
+        serializer = DeleteBotSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        bot_instance = get_object_or_404(BotModel, id=id)
+        if "tag_type_ids" in serializer.validated_data:
+            bot_instance.bot_tagtype.filter(
+                id=serializer.validated_data["tag_type_ids"]
+            ).delete()
+            flag = 1
+        if "custom_field_type_ids" in serializer.validated_data:
+            bot_instance.bot_custom.filter(
+                id=serializer.validated_data["custom_field_type_ids"]
+            ).delete()
+            flag = 1
+        if "trigger_webhook_type_ids" in serializer.validated_data:
+            bot_instance.bot_trigger.filter(
+                id=serializer.validated_data["trigger_webhook_type_ids"]
+            ).delete()
+            flag = 1
+        if "header_type_ids" in serializer.validated_data:
+            Header.objects.filter(
+                id=serializer.validated_data["header_type_ids"]
+            ).delete()
+            flag = 1
+        if not flag:
+            bot_instance.delete() # delete the entire bot
 
-            return Response({"message": "deleted successfully", "success": True}, status=status.HTTP_200_OK)
-        except BotModel.DoesNotExist:
-            return Response({"success": False, "message": "invalid bot id"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "deleted successfully", "success": True}, status=status.HTTP_200_OK)  
 
 
 class CloneBotAPI(APIView):

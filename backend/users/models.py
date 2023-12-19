@@ -1,7 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from .managers import UserManager
-from uuid import uuid4
+import uuid
+import random
 
 
 class User(AbstractUser):
@@ -9,7 +10,7 @@ class User(AbstractUser):
         ("Admin", "Admin"),
         ("User", "User")
     )
-    id = models.UUIDField(primary_key=True, max_length=60, unique=True, default=uuid4)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) 
     email = models.EmailField(("email_address"), unique=True, max_length=200)
     remember_me = models.BooleanField(default=False)
     reset_password = models.BooleanField(default=False)
@@ -35,3 +36,8 @@ class AgencyModel(models.Model):
     domain = models.URLField(max_length=100)
     agency_api_key = models.CharField(max_length=100)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.id:
+            self.id = ''.join([str(random.randint(0, 9)) for _ in range(14)])

@@ -1,6 +1,7 @@
 from django.db import models
 from users.models import User
 import uuid
+import random
 
 
 class BotModel(models.Model):
@@ -17,7 +18,7 @@ class BotModel(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     updated_at = models.DateTimeField(auto_now=True)
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) 
+   # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) 
     ai_type = models.CharField(max_length=100, choices=AI_TYPE_CHOICES)
     bot_name = models.CharField(max_length=100,)
     bot_description = models.CharField(max_length=500, blank=True, null=True)
@@ -33,9 +34,14 @@ class BotModel(models.Model):
     time_format = models.CharField(max_length=10, choices=TIME_FORMAT_CHOICES)
     message_delay = models.IntegerField()
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.id:
+            self.id = ''.join([str(random.randint(0, 9)) for _ in range(16)])
+
 
 class TagType(models.Model):
-   # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     bot = models.ForeignKey(BotModel, on_delete=models.CASCADE,
                                null=True,
                                related_name="bot_tagtype")
@@ -46,7 +52,7 @@ class TagType(models.Model):
 
 
 class CustomFieldType(models.Model):
-  #  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     FIELD_TYPE_CHOICES = (      
                                 ("Text", "Text"),
                                 ("Number", "Number"),
@@ -71,7 +77,7 @@ class CustomFieldType(models.Model):
 
 
 class TriggerWebhook(models.Model):
-   # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     TRIGGER_TYPE_CHOICES = (
         ("Once Only", "Once Only"),
         ("Multiple Times", "Multiple Times"),
@@ -98,7 +104,7 @@ class TriggerWebhook(models.Model):
 
 
 class Header(models.Model):
-    #id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     triggerwebhook = models.ForeignKey(TriggerWebhook,
                                           on_delete=models.CASCADE,
                                           null=True,
