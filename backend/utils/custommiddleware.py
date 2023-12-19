@@ -11,5 +11,8 @@ class CustomMiddleware:
         if response.status_code == 500:
             data = {"message": "internal server error", "success": False}
             return JsonResponse(data, status=500)
+        if response.status_code == 404:
+            data = {"message": "page not found", "success": False}
+            return JsonResponse(data, status=404)
 
         return response
