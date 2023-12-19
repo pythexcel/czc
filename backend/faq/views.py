@@ -29,11 +29,11 @@ class FAQAPI(APIView):
     def get(self, request, location_id=None, faq_id=None):
         if faq_id:
             faq_instace = FAQModel.objects.filter(id=faq_id).order_by('-updated_at')
-            
+
         else:
             query = request.GET.get('query', None)
             if query:
-                faq_instace = FAQModel.objects.filter((Q(question__icontains=query) | Q(answer__icontains=query)), location_id=id).order_by('-updated_at')
+                faq_instace = FAQModel.objects.filter((Q(question__icontains=query) | Q(answer__icontains=query)), location_id=location_id).order_by('-updated_at')
             else:
                 faq_instace = FAQModel.objects.filter(location_id=location_id).order_by('-updated_at')
         serializer = FAQSerializer(faq_instace, many=True)
@@ -116,7 +116,6 @@ class ImportFAQFile(APIView):
             delete_existing_faq = request.data.get('delete_exiting_faq', None)
             if delete_existing_faq == "yes":
                 FAQModel.objects.filter(agency_id=agency_instance.id).delete()
-
             df = pd.read_csv(filename, skiprows=0)
             faq_list = []
             for row in df.iterrows():
@@ -133,4 +132,5 @@ class ImportFAQFile(APIView):
                     status=status.HTTP_200_OK)
 
         except Exception as e:
+            print("your error is ",str(e))
             return Response(str(e))

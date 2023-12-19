@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import User, AgencyModel
 from django.contrib.auth.hashers import make_password
+import random
 
 
 class UserSerializer(serializers.ModelSerializer):

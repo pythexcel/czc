@@ -268,6 +268,16 @@ class OpenAIAPI(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+    def get(self, request):
+        data = OpenAIModel.objects.filter(user_id=request.user.id).values()
+        return Response(
+            {  
+                "details": data,
+                "success": True
+             },
+            status=status.HTTP_200_OK
+        )
+
 
 class AgencyAPI(APIView):
     permission_classes = [IsAuthenticated]
@@ -281,7 +291,8 @@ class AgencyAPI(APIView):
         agency_api_key = request.data['agency_api_key'] 
         get_celery_task.delay(agency_api_key, high_level_instance.id)
         return Response(
-                    {
+                    {  
+                        "id": high_level_instance.id,
                         "message": "Selected agency updated successfully!",
                         "success": True
                     },
