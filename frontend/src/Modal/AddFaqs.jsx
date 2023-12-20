@@ -4,6 +4,7 @@ import CustomButton from "../Common-Component/CustomButton";
 import ModalShadow from "../Common-Component/ModalShadow";
 import axiosInstance from "../utils/axios";
 import { useEffect, useState } from "react";
+import Spinner from '../Component/Spinner';
 
 function AddFaqs({ onClose, ids, getQuery, setResSuccess, setResFailed }) {
 
@@ -18,11 +19,14 @@ function AddFaqs({ onClose, ids, getQuery, setResSuccess, setResFailed }) {
     setLoading(true)
     try {
       const resp = await axiosInstance.post("frequently-asked-ques/", {
-        location: widgetsids, 
+        location: widgetsids,
         question: question,
         answer: answer,
       });
       setResSuccess(true)
+      setTimeout(() => {
+        setResSuccess(false)
+      }, 4000)
       getQuery(widgetsids);
       onClose();
       console.log(resp);
@@ -115,13 +119,12 @@ function AddFaqs({ onClose, ids, getQuery, setResSuccess, setResFailed }) {
             onClick={handleUdpate}
             type="button"
             className="focus:ring-4 focus:outline-none rounded-lg text-sm font-medium px-5 py-2.5 text-white bg-[#0445F5]"
-          >{loading ? "Updating..." : "Update"}
+          >{loading ? <div className="flex">{`updating...`} <Spinner /></div> : "Update"}
           </button> : <button
             onClick={handleAddQuestion}
             type="button"
             className="focus:ring-4 focus:outline-none rounded-lg text-sm font-medium px-5 py-2.5 text-white bg-[#0445F5]"
-          >{loading ? "Adding..." :
-            "Add" }
+          >{loading ? <div className="flex">{`Adding...`} <Spinner /></div> : "Add"}
           </button>}
         </div>
       </div>

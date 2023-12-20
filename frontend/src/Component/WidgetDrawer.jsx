@@ -17,7 +17,9 @@ import { selectFaqs } from "../Store/slice/FaqsSlice";
 import SDelete from "../Modal/SDelete";
 import DeleteFaq from "../Modal/DeleteFaq";
 import ToastSuccess from '../Modal/ToastSuccess';
-import ToastFailed from '../Modal/ToastFailed'
+import ToastFailed from '../Modal/ToastFailed';
+import { saveAs } from 'file-saver';
+import Papa from 'papaparse';
 
 const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, setWidgetsids, getfaqs }) => {
 
@@ -129,20 +131,41 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, setWidgetsids, getfaq
 
   const styleIcon = "h-[23px] w-[23px] text-gray-500 icoon";
 
+  // const convertToCSV = (resp) => {
+  //   const header = Object.keys(resp[0]).join(',');
+  //   const body = resp.map(obj => Object.values(obj).join(',')).join('\n');
+  //   return `${header}\n${body}`;
+  // }
+  
   const handleExport = async () => {
     try {
       const resp = await axiosInstance.get(`frequently-asked-ques/download/${widgetsids}`);
-      const responseData = resp.data;
-      console.log(responseData,"asdfasdfasdfasdf")
-
-      // fileDownload(responseData, 'filename.csv');
-      // console.log(resp)
+  
+      let data;
+  
+      // Check if resp.data is an array
+      if (Array.isArray(resp.data)) {
+        data = resp.data.map(({ question, answer }) => [question, answer]);
+      } else {
+        // If resp.data is not an array, adjust accordingly
+        data = [Object.keys(resp.data)]; // Header row
+        data.push(Object.values(resp.data)); // Data row
+      }
+  
+      // Create a CSV string
+      const csv = Papa.unparse(data, {
+        header: true, // Optional: specify column headers
+      });
+  
+      // Convert the CSV string to a Blob
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  
+      // Save the Blob as a file
+      saveAs(blob, 'exported_data.csv');
     } catch (error) {
-      console.log(error, "error")
+      console.log(error, 'error');
     }
-  }
-
-
+  };
 
   const Allmodals = (
     <div>
@@ -161,7 +184,6 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, setWidgetsids, getfaq
           widgetsids={widgetsids}
         />
       )}
-
       {isscrapurl && <ScrapURL onClose={onClose} />}
       {isimportfaqs && <ImportFAQs onClose={onClose} />}
       {isDel && <SDelete onClose={onClose} handleDeletefaq={handleDeletefaq} />}

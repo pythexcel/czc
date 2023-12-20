@@ -11,6 +11,7 @@ import MngeSlice from '../slice/MngeSlice';
 import CreUserFlagSlice from '../slice/CreUserFlagSlice';
 import FaqsSlice from '../slice/FaqsSlice';
 import ConnectedFlagSlice from '../slice/ConnectedFlagSlice';
+import AuditlogSlice from '../slice/AuditlogSlice';
 
 const persistConfig = {
   key: 'root',
@@ -25,7 +26,8 @@ const rootReducer = combineReducers({
   FaqsAccess: FaqsSlice,
   flag: flagSlice,
   ManageFlag: MngeSlice,
-  userRefresh: CreUserFlagSlice
+  userRefresh: CreUserFlagSlice,
+  AccessAuditlogs: AuditlogSlice
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
