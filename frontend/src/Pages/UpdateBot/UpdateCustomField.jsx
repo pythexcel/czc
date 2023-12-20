@@ -7,8 +7,6 @@ import TextArea from "../../Common-Component/TextArea";
 
 function CustomField({ onDeleteClick, index, data, customfield, setCustomfield, error }) {
 
-    console.log(error,"///////dds")
-
     const handleCustomFieldData = (event) => {
         const { checked, value, name } = event.target;
         const newWebHookData = [...customfield]
@@ -46,7 +44,7 @@ function CustomField({ onDeleteClick, index, data, customfield, setCustomfield, 
                     value={data.field_name}
                     onChange={handleCustomFieldData}
                 />
-                <span className="text-red-500">{error[index]?.field_name}</span> 
+                <span className="text-red-500">{error?.field_name[index]}</span> 
             </div>
             <div className="w-[15%]">
                 <Title>Field Type</Title>

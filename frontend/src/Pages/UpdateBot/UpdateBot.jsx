@@ -57,8 +57,6 @@ function UpdateBot() {
     const [allerror, setAllError] = useState([]);
     const [tagNameErrors, setTagNameErrors] = useState([])
 
-    console.log(allerror,">>>>>>>>>>>>>>>>>>>>>>>>>>")
-
     const HandleAddTage = () => {
         const newTag = {
             tag_name: "",
@@ -313,7 +311,7 @@ function UpdateBot() {
         setAllError([])
         setTagNameErrors([])
         try {
-             await axiosInstance.patch(`bot/${uniqueId}/`, {
+            await axiosInstance.patch(`bot/${uniqueId}/`, {
                 ai_type: values.AiType,
                 bot_name: values.Botname,
                 bot_description: values.BotDescription,
@@ -373,27 +371,27 @@ function UpdateBot() {
 
     useEffect(() => {
         if (formik.values.PromptType === "Text") {
-          setPrompt("Prompt Text");
+            setPrompt("Prompt Text");
         } else if (formik.values.PromptType === "Custom Field") {
-          setPrompt("Custom Field Name");
+            setPrompt("Custom Field Name");
         } else if (formik.values.PromptType === "Custom Value") {
-          setPrompt("Custom Value Name")
+            setPrompt("Custom Value Name")
         } else {
-          setPrompt("Custom Field Name");
+            setPrompt("Custom Field Name");
         }
-      }, [formik.values.PromptType]);
-    
-      useEffect(() => {
+    }, [formik.values.PromptType]);
+
+    useEffect(() => {
         if (formik.values.IntroMessageType === "Text") {
-          setMassage("Text")
+            setMassage("Text")
         } else if (formik.values.IntroMessageType === "Custom Field") {
-          setMassage("Custom Field Name")
+            setMassage("Custom Field Name")
         } else if (formik.values.IntroMessageType === "Custom Value") {
-          setMassage("Custom Value Name")
+            setMassage("Custom Value Name")
         } else {
-          setMassage("Custom Field Name");
+            setMassage("Custom Field Name");
         }
-      }, [formik.values.IntroMessageType])
+    }, [formik.values.IntroMessageType])
 
     useEffect(() => {
         if (uniqueId) {
@@ -406,7 +404,7 @@ function UpdateBot() {
         dispatch(resetTagState())
         dispatch(handleReset())
         navigate("/dashboard/bots")
-      }
+    }
 
     return (
         <div className="w-[100%] bg-white border border-gray-400 rounded-lg px-8 py-6 shadow-lg">
@@ -719,13 +717,13 @@ function UpdateBot() {
                 </div>
                 {foreignElements}
                 <div className="flex gap-2 my-6">
-                        <button
-                            onClick={handleCancel}
-                            type="button"
-                            className="border border-blue-600 rounded-md text-blue-600 px-12 font-semibold py-2 text-md hover:bg-blue-600 hover:text-white"
-                        >
-                            Cancel
-                        </button>
+                    <button
+                        onClick={handleCancel}
+                        type="button"
+                        className="border border-blue-600 rounded-md text-blue-600 px-12 font-semibold py-2 text-md hover:bg-blue-600 hover:text-white"
+                    >
+                        Cancel
+                    </button>
                     <Updatebutton
                         isLoading={isLoading}
                         type="submit"

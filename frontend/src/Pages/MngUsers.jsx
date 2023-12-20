@@ -16,7 +16,6 @@ const MngUsers = () => {
   const [isuserdelete, setIsUserDelete] = useState(false);
   const [isedituser, setIsEditUser] = useState(false);
   const [editData, setEditData]= useState({})
-  console.log(editData, '==============>>>>>>>>>>>>>>>>>>>>>editttttttttttttt')
   const dispatch = useDispatch();
 
   const getAllDetails = async () => {

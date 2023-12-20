@@ -133,7 +133,7 @@ function Home() {
                     : <SideNav />
                 }
             </div>
-            <div className="w-full h-full content overflow-auto">
+            <div className="w-full h-full content overflow-auto scrollbar-hide no-overflow">
                 <div className="bg-white h-[5%] w-full items-center flex justify-between px-7 shadow-lg">
                     {isSmallScreen ?
                         <div className='flex ml-1 gap-2 h-[60px] cursor-pointer'>
