@@ -18,8 +18,7 @@ import SDelete from "../Modal/SDelete";
 import DeleteFaq from "../Modal/DeleteFaq";
 import ToastSuccess from '../Modal/ToastSuccess';
 import ToastFailed from '../Modal/ToastFailed';
-import { saveAs } from 'file-saver';
-import Papa from 'papaparse';
+import * as Papa from 'papaparse';
 
 const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, setWidgetsids, getfaqs }) => {
 
@@ -131,37 +130,16 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, setWidgetsids, getfaq
 
   const styleIcon = "h-[23px] w-[23px] text-gray-500 icoon";
 
-  // const convertToCSV = (resp) => {
-  //   const header = Object.keys(resp[0]).join(',');
-  //   const body = resp.map(obj => Object.values(obj).join(',')).join('\n');
-  //   return `${header}\n${body}`;
-  // }
-  
+  // // const convertToCSV = (resp) => {
+  // //   const header = Object.keys(resp[0]).join(',');
+  // //   const body = resp.map(obj => Object.values(obj).join(',')).join('\n');
+  // //   return `${header}\n${body}`;
+  // // }
+
   const handleExport = async () => {
     try {
       const resp = await axiosInstance.get(`frequently-asked-ques/download/${widgetsids}`);
-  
-      let data;
-  
-      // Check if resp.data is an array
-      if (Array.isArray(resp.data)) {
-        data = resp.data.map(({ question, answer }) => [question, answer]);
-      } else {
-        // If resp.data is not an array, adjust accordingly
-        data = [Object.keys(resp.data)]; // Header row
-        data.push(Object.values(resp.data)); // Data row
-      }
-  
-      // Create a CSV string
-      const csv = Papa.unparse(data, {
-        header: true, // Optional: specify column headers
-      });
-  
-      // Convert the CSV string to a Blob
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-  
-      // Save the Blob as a file
-      saveAs(blob, 'exported_data.csv');
+      console.log(typeof resp,"this is data..!")
     } catch (error) {
       console.log(error, 'error');
     }
@@ -186,8 +164,20 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, setWidgetsids, getfaq
       )}
       {isscrapurl && <ScrapURL onClose={onClose} />}
       {isimportfaqs && <ImportFAQs onClose={onClose} />}
-      {isDel && <SDelete onClose={onClose} handleDeletefaq={handleDeletefaq} />}
-      {CnfDel && <DeleteFaq onClose={onClose} />}
+      {isDel &&
+        <SDelete
+          onClose={onClose}
+          handleDeletefaq={handleDeletefaq}
+          message="You won‘t be able to revert this!"
+          heading="Are you sure you want to delete this bot?"
+        />
+      }
+      {CnfDel &&
+        <DeleteFaq
+          heading="Deleted!"
+          message="Your faqs has been deleted successfully"
+          onClose={onClose} />
+      }
     </div>
   );
 

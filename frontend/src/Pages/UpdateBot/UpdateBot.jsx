@@ -547,6 +547,7 @@ function UpdateBot() {
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             value={formik.values.OpenAikey}
+                            autocomplete="off"
                         />
                         {allerror.open_ai_api_key &&
                             <p className="text-red-500">{allerror.open_ai_api_key}</p>

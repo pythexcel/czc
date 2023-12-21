@@ -12,6 +12,7 @@ import Footer from './Footer';
 import axiosInstance from "../utils/axios";
 import { setConnect } from "../Store/slice/ConnectedFlagSlice";
 import { useDispatch } from "react-redux";
+import { resetFaqs } from "../Store/slice/FaqsSlice";
 
 function Home() {
     const dispatch = useDispatch();
@@ -22,10 +23,12 @@ function Home() {
     const [title, setTitle] = useState("")
 
     const HandleLogout = async () => {
+        
         try {
           const response = await axiosInstance.post("users/logout/", {});
           localStorage.clear();
           dispatch(setConnect(false));
+          dispatch(resetFaqs());
           console.log("logout successful:", response);
           navigate("/");
         } catch (error) {

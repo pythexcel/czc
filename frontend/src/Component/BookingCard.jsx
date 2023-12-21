@@ -49,7 +49,7 @@ function BookingCard({
           onMouseEnter={() => setShowCopyButton(true)}
           onMouseLeave={() => setShowCopyButton(false)}
         >
-          https://chat.botwebhook .com/message?b={id}
+          https://chat.botwebhook.com/message?b={id}
           {showCopyButton && (
             <button
               className=" top-0 right-[80%] ml-[40%] bg-blue-600 text-white px-2 py-1 border border-green-600 rounded"

@@ -44,7 +44,6 @@ function CustomField({ onDeleteClick, index, data, customfield, setCustomfield, 
                     value={data.field_name}
                     onChange={handleCustomFieldData}
                 />
-                <span className="text-red-500">{error?.field_name[index]}</span> 
             </div>
             <div className="w-[15%]">
                 <Title>Field Type</Title>
