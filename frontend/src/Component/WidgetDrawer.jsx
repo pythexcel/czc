@@ -1,4 +1,4 @@
-import { MdCancel } from "react-icons/md";
+import { MdCancel, MdWidgets } from "react-icons/md";
 import { FaFileExport, FaFileImport, FaPencilAlt, FaSearch } from "react-icons/fa";
 import { MdAddCard } from "react-icons/md";
 import { FaLessThan, FaGreaterThan } from "react-icons/fa6";
@@ -18,7 +18,7 @@ import SDelete from "../Modal/SDelete";
 import DeleteFaq from "../Modal/DeleteFaq";
 import ToastSuccess from '../Modal/ToastSuccess';
 import ToastFailed from '../Modal/ToastFailed';
-import * as Papa from 'papaparse';
+// import * as Papa from 'papaparse';
 
 const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, setWidgetsids, getfaqs }) => {
 
@@ -136,14 +136,14 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, setWidgetsids, getfaq
   // //   return `${header}\n${body}`;
   // // }
 
-  const handleExport = async () => {
-    try {
-      const resp = await axiosInstance.get(`frequently-asked-ques/download/${widgetsids}`);
-      console.log(typeof resp,"this is data..!")
-    } catch (error) {
-      console.log(error, 'error');
-    }
-  };
+  // const handleExport = async () => {
+  //   try {
+  //     const resp = await axiosInstance.get(`frequently-asked-ques/download/${widgetsids}`);
+  //     console.log(typeof resp,"this is data..!")
+  //   } catch (error) {
+  //     console.log(error, 'error');
+  //   }
+  // };
 
   const Allmodals = (
     <div>
@@ -206,12 +206,11 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, setWidgetsids, getfaq
           </span>
         </div>
 
-        <Widget
-          onClick={handleExport}
+        <MdWidgets
         >
           <FaFileExport className={heightIcon} />
           <span> Export</span>
-        </Widget>
+        </MdWidgets>
 
         <Widget
           onClick={() => setIsImportFaqs(true)}
