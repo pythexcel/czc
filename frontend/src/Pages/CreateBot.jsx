@@ -103,7 +103,11 @@ function CreateBot() {
 
   const foreignElements = (
     <div>
-    {respErr && <ToastFailed />}
+    {respErr && 
+      <ToastFailed  
+        title="Error!"
+        message="something went wrong"
+      />}
       {Array.isArray(addtag) &&
         addtag.map((index) => (
           <TagType
@@ -400,6 +404,7 @@ function CreateBot() {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values.OpenAikey}
+              autoComplete="off"
             />
             {allerror.open_ai_api_key &&
               <p className="text-red-500">{allerror.open_ai_api_key}</p>

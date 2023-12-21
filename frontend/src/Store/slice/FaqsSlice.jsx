@@ -7,9 +7,12 @@ const FaqsSlice = createSlice({
         setFaqs: (state, action) => {
             state.permission = action.payload;
         },
+        resetFaqs: (state) => {
+            state.permission = ''; 
+        },
     }, 
 });
 
-export const { setFaqs } = FaqsSlice.actions;
+export const { setFaqs, resetFaqs  } = FaqsSlice.actions;
 export const selectFaqs = (state) => state.FaqsAccess.permission;
 export default FaqsSlice.reducer;
