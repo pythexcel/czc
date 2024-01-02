@@ -6,6 +6,7 @@ from bot.models import (BotModel,
                         Header,
                         TagType,
                         CustomFieldType)
+import random
 
 
 class ValidateAllSerializer(serializers.Serializer):
@@ -110,7 +111,6 @@ class BotModelSerializer(serializers.ModelSerializer):
                 }
         return data
 
-  
     class Meta:
         model = BotModel
         fields = "__all__"
@@ -148,15 +148,17 @@ class BotModelSerializer(serializers.ModelSerializer):
                     webhook_id = trigger_webhook['id']
                     trigger_webhook_instance = get_object_or_404(TriggerWebhook, id=trigger_webhook.pop('id'))
                     serializer = TriggerWebhookSerializer(trigger_webhook_instance, data=trigger_webhook, partial=True)
+                    serializer.is_valid(raise_exception=True)
+                    serializer.save()
                     for header in header_type:
                         header['triggerwebhook'] = webhook_id
                         if 'id' in header:
                             header_instance = get_object_or_404(Header, id=header.pop('id'))
-                            serializer = HeaderSerializer(header_instance, data=header, partial=True)
+                            header_serializer = HeaderSerializer(header_instance, data=header, partial=True)
                         else:
-                            serializer = HeaderSerializer(data=header)
-                        serializer.is_valid(raise_exception=True)
-                        serializer.save()
+                            header_serializer = HeaderSerializer(data=header)
+                        header_serializer.is_valid(raise_exception=True)
+                        header_serializer.save()
                 else:
                     serializer = TriggerWebhookSerializer(data=trigger_webhook, context={"bot_instance": instance})
                 serializer.is_valid(raise_exception=True)

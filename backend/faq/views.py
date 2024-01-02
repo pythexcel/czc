@@ -26,12 +26,18 @@ class FAQAPI(APIView):
             },
             status=status.HTTP_200_OK)
 
-    def get(self, request, id=None):
-        data = FAQModel.objects.filter(location=id).order_by('-updated_at')
-        query = request.GET.get('query', None)
-        if query:
-            data = FAQModel.objects.filter((Q(question__icontains=query) | Q(answer__icontains=query)), location=id)
-        serializer = FAQSerializer(data, many=True)
+    def get(self, request, location_id=None, faq_id=None):
+        if faq_id:
+            faq_instace = FAQModel.objects.filter(id=faq_id).order_by('-updated_at')
+
+        else:
+            query = request.GET.get('query', None)
+            if query:
+                faq_instace = FAQModel.objects.filter((Q(question__icontains=query) | Q(answer__icontains=query)), location_id=location_id).order_by('-updated_at')
+            else:
+                faq_instace = FAQModel.objects.filter(location_id=location_id).order_by('-updated_at')
+        serializer = FAQSerializer(faq_instace, many=True)
+
         return Response(
             {
                 "details": serializer.data,
@@ -39,9 +45,9 @@ class FAQAPI(APIView):
             },
             status=status.HTTP_200_OK)
 
-    def patch(self, request, id=None):
+    def patch(self, request, location_id=None, faq_id=None):
         try:
-            instance = get_object_or_404(FAQModel, id=id)
+            instance = get_object_or_404(FAQModel, id=faq_id, location_id=location_id)
             serializer = FAQSerializer(instance, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -62,8 +68,11 @@ class FAQAPI(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-    def delete(self, request, id=None):
-        get_object_or_404(FAQModel, id=id).delete()
+    def delete(self, request, location_id=None, faq_id=None):
+        if faq_id:
+            get_object_or_404(FAQModel, id=faq_id).delete()
+        else:
+            FAQModel.objects.filter(location_id=location_id).delete()
         return Response(
             {
                 "details": "deleted successfully",
@@ -107,7 +116,6 @@ class ImportFAQFile(APIView):
             delete_existing_faq = request.data.get('delete_exiting_faq', None)
             if delete_existing_faq == "yes":
                 FAQModel.objects.filter(agency_id=agency_instance.id).delete()
-
             df = pd.read_csv(filename, skiprows=0)
             faq_list = []
             for row in df.iterrows():
@@ -124,4 +132,5 @@ class ImportFAQFile(APIView):
                     status=status.HTTP_200_OK)
 
         except Exception as e:
+            print("your error is ",str(e))
             return Response(str(e))
