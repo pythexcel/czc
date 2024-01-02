@@ -13,9 +13,9 @@ from bot.models import (
 from rest_framework.response import Response
 from rest_framework.views import APIView, status
 from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
 from bot.utils import clone_bot_data
 from utils.helperfunction import open_ai_is_valid
-from django.shortcuts import get_object_or_404
 
 
 class CreateBotAPI(APIView):
@@ -35,6 +35,7 @@ class CreateBotAPI(APIView):
             )
         bot_instance = serializer.create()
         validate_data = serializer.validated_data
+        webhook_url = f"http://116.202.210.102:5002/webhook?b={str(bot_instance.id)}"
         if "tag_type" in validate_data:
             tag_serializer = TagTypeListSerializer(data=validate_data['tag_type'],
                   context ={"bot_instance": bot_instance})
@@ -52,21 +53,27 @@ class CreateBotAPI(APIView):
                 trigger_serializer.is_valid(raise_exception=True)
                 trigger_serializer.save()
         return Response(
-                    {"success": True, "message": "bot created successfully"},
+                    {"success": True, "message": "bot created successfully", "webhook": webhook_url},
                     status=status.HTTP_200_OK,
                 )
-
+    
     def get(self, request, id=None):
-        user_id = request.user.id
-        bot_filter = {'user_id': user_id}
-        if id:
-            bot_filter['id'] = id
-            bot_data = get_object_or_404(BotModel, **bot_filter)
-            serializer = BotModelSerializer(bot_data)
-            return Response({"details": serializer.data, "success": True}, status=status.HTTP_200_OK)
-        else:
-            bot_data = BotModel.objects.filter(**bot_filter).values().order_by('-updated_at')
-            return Response({"details": bot_data, "success": True}, status=status.HTTP_200_OK)
+            user_id = request.user.id
+            bot_filter = {'user_id': user_id}
+            if id:
+                bot_filter['id'] = id
+                bot_data = get_object_or_404(BotModel, **bot_filter)
+                serializer = BotModelSerializer(bot_data)
+                return Response({"details": serializer.data, "success": True}, status=status.HTTP_200_OK)
+            else:
+                bot_instances  = BotModel.objects.filter(**bot_filter).values().order_by('-updated_at')
+                bot_data_with_webhooks = []
+                for bot_instance in bot_instances:
+                    webhook_url = f"http://116.202.210.102:5002/webhook?b={bot_instance['id']}"
+                    bot_instance['webhook'] = webhook_url
+                    bot_data_with_webhooks.append(bot_instance)
+            
+            return Response({"details": bot_data_with_webhooks, "success": True}, status=status.HTTP_200_OK)
 
     def patch(self, request, id):
 

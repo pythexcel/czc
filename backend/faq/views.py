@@ -115,7 +115,7 @@ class ImportFAQFile(APIView):
                  status=status.HTTP_400_BAD_REQUEST)
             delete_existing_faq = request.data.get('delete_exiting_faq', None)
             if delete_existing_faq == "yes":
-                FAQModel.objects.filter(agency_id=agency_instance.id).delete()
+                FAQModel.objects.filter(location_id=agency_instance.id).delete()
             df = pd.read_csv(filename, skiprows=0)
             faq_list = []
             for row in df.iterrows():
