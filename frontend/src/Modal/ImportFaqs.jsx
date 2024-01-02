@@ -6,10 +6,11 @@ import ModalShadow from "../Common-Component/ModalShadow";
 import { useRef, useState } from "react";
 import axiosInstance from "../utils/axios";
 
-function ImportFAQs({ onClose }) {
-  const [allow, setAllow] = useState(false)
+function ImportFAQs({ onClose, getQuery }) {
+  const [allow, setAllow] = useState(false);
   const [csvHeaders, setCsvHeaders] = useState("");
-  const [check, setCheck] = useState("No")
+  const [check, setCheck] = useState(false);
+
   const [selectedFileName, setSelectedFileName] = useState("");
   const [data, setData] = useState([]);
 
@@ -29,32 +30,32 @@ function ImportFAQs({ onClose }) {
     setSelectedFileName(selectedFile.name);
   };
 
-  const handlecheck = (event) => {
-    setCheck(event.target.checked);
-    setAllow(true)
+  const handlecheck = () => {
+    setCheck(prev => !prev);
   };
-
-  const toggleValue = check ? "yes" : "no";
 
   const renderModal = (
     <div style={{ zIndex: "1000" }}>
       {allow && (<p>this i s nothing asd well</p>)}
     </div>
   )
+  const widgetsids = localStorage.getItem('userId');
 
   const handleSubmit = async () => {
-    const formData = new FormData()
-    formData.append('file',data)
-    formData.append('delete_exiting_faq',toggleValue)
+    const location_id = localStorage.getItem('userId')
+    const formData = new FormData();
+    formData.append('file', data);
+    formData.append('delete_exiting_faq', check ? "yes" : "")
+    formData.append('location_id', location_id)
 
     try {
-      const resp = await axiosInstance.post(`frequently-asked-ques/import/`, formData)
-      console.log(selectedFileName, "dskjbxdkjbv")
-      console.log(resp,"i am responce of import ===>")
+      await axiosInstance.post(`frequently-asked-ques/import`, formData);
+      onClose();
+      getQuery(widgetsids);
     } catch (error) {
       console.log(error, "i am error")
     }
-  }
+  };
 
   return (
     <div>
@@ -129,7 +130,7 @@ function ImportFAQs({ onClose }) {
 
                   </div>
                   <label className="mt-2 text-[#445573]">
-                    <input type="checkbox" onChange={handlecheck} className="mr-2" />
+                    <input type="checkbox" checked={check} onChange={handlecheck} className="mr-2" />
                     Delete Existing Faqs
                   </label>
                 </>

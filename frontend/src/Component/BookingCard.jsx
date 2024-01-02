@@ -17,7 +17,6 @@ function BookingCard({
   userData,
 }) {
 
-
   const [showCopyButton, setShowCopyButton] = useState(false);
   const [isshowmodal, setIsShowModal] = useState(false);
 
@@ -25,8 +24,8 @@ function BookingCard({
     setIsShowModal(false);
   };
 
-  const handleParaClick = (id) => {
-    const paraText = `https://chat.botwebhook.com/message?b=${id}`;
+  const handleParaClick = (webhook) => {
+    const paraText = webhook;
     setIsShowModal(true);
     navigator.clipboard
       .writeText(paraText)
@@ -38,24 +37,24 @@ function BookingCard({
       });
   };
 
-  const { id, bot_name, ai_type } = userData;
+  const { id, bot_name, ai_type, webhook } = userData;
 
   return (
     <Card>
       <div className="p-4">
         <Botname>{bot_name}</Botname>
         <p
-          className="cursor-pointer font-thin  "
+          className="cursor-pointer font-thin flex-wrap flex"
           onMouseEnter={() => setShowCopyButton(true)}
           onMouseLeave={() => setShowCopyButton(false)}
         >
-          https://chat.botwebhook.com/message?b={id}
+          {webhook}
           {showCopyButton && (
             <button
-              className=" top-0 right-[80%] ml-[40%] bg-blue-600 text-white px-2 py-1 border border-green-600 rounded"
-              onClick={()=>handleParaClick(id)}
+              className="top-0 right-[20%] ml-[80%] -mt-[2%] bg-blue-600 text-white px-2 py-1 border border-green-600 rounded-lg z-20 overflow-hidden w-[80px] h-[40px] flex justify-between items-center font-semibold"
+              onClick={()=>handleParaClick(webhook)}
             >
-              Copy
+             <FaCopy className="w-[15px] h-[15px]"/> <p>Copy</p>
             </button>
           )}
         </p>

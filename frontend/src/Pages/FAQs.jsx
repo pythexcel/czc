@@ -13,10 +13,11 @@ import LocationUpdate from "../Modal/LocationUpdate";
 import { RiArrowRightSLine } from "react-icons/ri";
 import axiosInstance from "../utils/axios";
 import { setAudit } from "../Store/slice/AuditlogSlice";
+import { saveAs } from 'file-saver';
 
 const FAQs = () => {
   const dispatch = useDispatch();
-  const faqsPermission = useSelector(selectFaqs);
+  // const faqsPermission = useSelector(selectFaqs);
 
   const [isenableModal, setIsEnableModal] = useState(false);
   const [isdisableModal, setIsDisableModal] = useState(false);
@@ -25,6 +26,7 @@ const FAQs = () => {
   const [isClearFaqs, setIsClearFaqs] = useState(false);
 
   const [enalbleAllUpdate, setEnableAllUpdate] = useState(false);
+  const [faqsPermission, setFaqsPermission] = useState("")
 
   const [selectAll, setSelectAll] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -45,7 +47,7 @@ const FAQs = () => {
       setData(resp.data)
       setMaindata(resp.data)
     } catch (error) {
-      console.log(error, "this is eror")
+      console.log(error, "this is eror");
     }
   }
 
@@ -93,7 +95,6 @@ const FAQs = () => {
     { text: "Import FAQS", className: "bg-blue-400", disabled: true, onClick: () => { } },
   ];
 
-
   const itemPerPage = 10;
 
   const [serachitem, setSearchItem] = useState("")
@@ -128,8 +129,9 @@ const FAQs = () => {
   const handleUpdateLocation = () => {
     setTimeout(() => {
       setUpdatelocation(true);
-    }, 700);
+    }, 400);
   };
+
   const [opt, setOpt] = useState([])
 
   const handleCallOptions = async () => {
@@ -166,6 +168,16 @@ const FAQs = () => {
     localStorage.setItem('userId', id);
   }
 
+  const handleExport = async (id) => {
+    try {
+      const response = await axiosInstance.get(`frequently-asked-ques/download/${id}`);
+      const blob = new Blob([response], { type: 'text' });
+      saveAs(blob, 'data.csv');
+    } catch (error) {
+      console.log(error, 'error');
+    }
+  };
+
   const isShowTable = () => {
     if (serachitem) {
       return data.length
@@ -178,14 +190,6 @@ const FAQs = () => {
   const heading = "py-2 font-normal text-[#8392AB] mx-3"
 
   const headingS = "py-2 font-normal text-[#8392AB] text-start"
-
-  const sel = [
-    "Training Bot",
-    "Test",
-    "test4",
-    "Main Appointment Setting",
-    "Test"
-  ]
 
   const [clid, setClid] = useState("")
 
@@ -227,9 +231,21 @@ const FAQs = () => {
     setSelectAll(updatedData.every(item => item.isChecked));
   }
 
+  const handlegethighlevel = async () => {
+    try {
+      const resp = await axiosInstance.get("users/agency-integration/")
+      if (resp.message) {
+        setFaqsPermission(resp.message.id);
+        getfaqs(resp.message.id);
+      }
+    } catch (error) {
+      console.log(error, "error of high level")
+    }
+  }
+
   useEffect(() => {
-    getfaqs(faqsPermission);
-  }, [faqsPermission])
+    handlegethighlevel();
+  }, [])
 
   return (
     <div>
@@ -345,7 +361,7 @@ const FAQs = () => {
                           </td>
                           <td className="py-2 px-4 text-sm text-right">
                             <div className=" flex justify-center">
-                              <div className="cursor-pointer text-[#8392AB] p-2 shadow-lg bg-opacity-17 bg-[#f8fafc] rounded-lg flex justify-center items-center border border-slate-300">
+                              <div onClick={() => handleExport(item.id)} className="cursor-pointer text-[#8392AB] p-2 shadow-lg bg-opacity-17 bg-[#f8fafc] rounded-lg flex justify-center items-center border border-slate-300">
                                 <FaFileExport className={sty} />
                               </div>
 
@@ -368,6 +384,7 @@ const FAQs = () => {
 
                               <div className="flex flex-row">
                                 <select onClick={handleCallOptions} className="rounded-lg  appearance-none border border-[#0F45F5] focus:outline-none focus:ring-2 text-base mx-2 shadow-md w-[150px] py-2 px-3 text-[#0F45F5] font-semibold hover:bg-[#0F45F5] hover:text-slate-50">
+                                  <option selected className="bg-slate-50 text-gray-400 hover:bg-[#F3F5FE] hover:text-[#0F8FE9]">Select</option>
                                   {opt.map((item, index) => (
                                     <option className="bg-slate-50 text-gray-400 hover:bg-[#F3F5FE] hover:text-[#0F8FE9]" key={index}>{item}</option>
                                   ))}
@@ -383,7 +400,14 @@ const FAQs = () => {
                           </td>
                         </tr>
                       ))}
-                    </> : <tr className="broder border-red-500 bg-white text-slate-950 w-full py-2">No Faqs found</tr>}
+                    </> : <tr>
+                      <td
+                        className="py-2 px-2 bg-slate-50 text-[#8392B3] text-lg text-center"
+                        colSpan="6"
+                      >
+                        No faqs found...!
+                      </td>
+                    </tr>}
                 </tbody>
               </table>
             </div>

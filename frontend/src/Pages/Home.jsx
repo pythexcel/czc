@@ -23,7 +23,6 @@ function Home() {
     const [title, setTitle] = useState("")
 
     const HandleLogout = async () => {
-        
         try {
           const response = await axiosInstance.post("users/logout/", {});
           localStorage.clear();
