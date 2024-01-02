@@ -46,8 +46,6 @@ function CreateBot() {
 
   const [respErr, setRespErr] = useState(false)
 
-  console.log(allerror, "this is responce of API")
-
   const childData = useSelector((state) => state.tag.childData);
 
   const customfieldata = useSelector((state) => state.custom.customfieldData);
@@ -103,11 +101,12 @@ function CreateBot() {
 
   const foreignElements = (
     <div>
-    {respErr && 
-      <ToastFailed  
-        title="Error!"
-        message="something went wrong"
-      />}
+      {respErr &&
+        <ToastFailed
+          onClose={() => setRespErr(false)}
+          title="Error!"
+          message="something went wrong"
+        />}
       {Array.isArray(addtag) &&
         addtag.map((index) => (
           <TagType
@@ -170,7 +169,7 @@ function CreateBot() {
     setAllError([])
     setTagNameErrors([])
     try {
-      await axiosInstance.post("bot/", {
+      const createBotresp = await axiosInstance.post("bot/", {
         bot_type: {
           ai_type: values.AiType,
           bot_name: values.Botname,
@@ -191,6 +190,7 @@ function CreateBot() {
         custom_field_type: customfields,
         trigger_webhook_type: tiggerwebhook,
       });
+      console.log(createBotresp.webhook)
       dispatch(resetCustomField())
       dispatch(resetTagState())
       dispatch(handleReset())
@@ -204,7 +204,6 @@ function CreateBot() {
           setTagNameErrors(error.response.data?.non_field_errors)
         }
       }
-
       console.log(error.response.data.non_field_errors, "I am error");
     }
   };

@@ -6,7 +6,6 @@ import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 import { AiOutlineCalendar } from "react-icons/ai";
 import CustomDropdown from "../Common-Component/CustomDropdown";
-import { locationOptions } from "../utils";
 import { useSelector } from "react-redux";
 import { selectAuditlog } from "../Store/slice/AuditlogSlice";
 import { Link } from "react-router-dom";
@@ -15,6 +14,7 @@ import TextPage from "./TextPage";
 const AuditLog = () => {
 
   const auditPermission = useSelector(selectAuditlog);
+
 
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -54,10 +54,9 @@ const AuditLog = () => {
     "ACTIONS"
   ]
 
-
   const message = (
     <p>
-      You haven't added any location. Please click on{' '}
+      You haven&lsquo;t added any location. Please click on{' '}
       <Link to="/dashboard/faqs">FAQs</Link> to add your first location.
     </p>
   );
@@ -107,7 +106,6 @@ const AuditLog = () => {
               <div className="relative">
                 <CustomDropdown
                   toggleIsOpen={toggleIsOpen}
-                  locationOptions={locationOptions}
                   handleSelect={(item) => handleSelect(item)}
                   selectedOption={selectedOption}
                   isOpen={isOpen}

@@ -9,6 +9,7 @@ import ScrapURL from "../Modal/ScrapUrl";
 import ImportFAQs from "../Modal/ImportFaqs";
 import axiosInstance from "../utils/axios";
 import Widget from '../Common-Component/Widget';
+import { saveAs } from 'file-saver';
 import Icons from "../Common-Component/Icons";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { HiSearch } from "react-icons/hi";
@@ -129,21 +130,17 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, setWidgetsids, getfaq
   }
 
   const styleIcon = "h-[23px] w-[23px] text-gray-500 icoon";
+  
+  const handleExport = async () => {
+    try {
+      const response = await axiosInstance.get(`frequently-asked-ques/download/${widgetsids}`);
+      const blob = new Blob([response], { type: 'text' });
+      saveAs(blob, 'data.csv');
+    } catch (error) {
+      console.log(error, 'error');
+    }
+  };
 
-  // // const convertToCSV = (resp) => {
-  // //   const header = Object.keys(resp[0]).join(',');
-  // //   const body = resp.map(obj => Object.values(obj).join(',')).join('\n');
-  // //   return `${header}\n${body}`;
-  // // }
-
-  // const handleExport = async () => {
-  //   try {
-  //     const resp = await axiosInstance.get(`frequently-asked-ques/download/${widgetsids}`);
-  //     console.log(typeof resp,"this is data..!")
-  //   } catch (error) {
-  //     console.log(error, 'error');
-  //   }
-  // };
 
   const Allmodals = (
     <div>
@@ -163,7 +160,7 @@ const WidgetDrawer = ({ iswidgetdrawer, setIsWidgetDrawer, setWidgetsids, getfaq
         />
       )}
       {isscrapurl && <ScrapURL onClose={onClose} />}
-      {isimportfaqs && <ImportFAQs onClose={onClose} />}
+      {isimportfaqs && <ImportFAQs getQuery={getQuery} onClose={()=>setIsImportFaqs(false)} />}
       {isDel &&
         <SDelete
           onClose={onClose}

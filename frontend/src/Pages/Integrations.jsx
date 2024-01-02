@@ -9,13 +9,11 @@ import ToastFailed from '../Modal/ToastFailed';
 import ErrorPage from '../Modal/ErrorPage';
 import axiosInstance from '../utils/axios';
 import { useDispatch } from 'react-redux';
-import { setFaqs } from '../Store/slice/FaqsSlice';
+import { resetFaqs, setFaqs } from '../Store/slice/FaqsSlice';
 
 
 function Integrations() {
     const dispatch = useDispatch();
-
-    // const access = useSelector(selectConnet)
 
     const [openModal, setOpenModal] = useState(false);
     const [openUpdateModal, setOpenUpdateModal] = useState(false);
@@ -27,7 +25,6 @@ function Integrations() {
     const [openAIkey, setOpenAIKey] = useState([])
 
     const [allow, setAllow] = useState("");
-
 
     // useEffect(() => {
     //     setAllow(access)
@@ -54,6 +51,7 @@ function Integrations() {
     }
 
     const handlegethighlevel = async () => {
+            dispatch(resetFaqs())
         try {
             const resp = await axiosInstance.get("users/agency-integration/")
             setHighlevel(resp.message);

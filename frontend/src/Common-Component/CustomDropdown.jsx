@@ -1,27 +1,54 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import InputField from '../Component/TextInput';
 import { HiOutlineChevronDown } from 'react-icons/hi';
+import axiosInstance from '../utils/axios';
 
-const CustomDropdown = ({ 
-    locationOptions, 
-    toggleIsOpen, 
-    handleSelect, 
+const CustomDropdown = ({
+    toggleIsOpen,
+    handleSelect,
     selectedOption,
-    isOpen 
- }) => {
+    isOpen
+}) => {
     // const [isOpen, setIsOpen] = useState(false);
-    const [filterData, setFilterData] = useState([])
+    const [filterData, setFilterData] = useState([]);
+
+    console.log(filterData,"?????????????????????")
+    const [faqsPermission, setFaqsPermission] = useState("");
+    const [locationOptions, setLocationOptions] = useState([]);
+
+    console.log(locationOptions,"tjis is ")
+
+    const handlegethighlevel = async () => {
+        try {
+            const resp = await axiosInstance.get("users/agency-integration/")
+            if (resp.message) {
+                setFaqsPermission(resp.message.id);
+            }
+        } catch (error) {
+            console.log(error, "error of high level")
+        }
+    }
+
+    useEffect(() => {
+        handlegethighlevel();
+    }, [])
 
     const handleSearchOption = (event) => {
         const dd = event.target.value;
         const filterOpt = locationOptions.filter((item) =>
-            item.name.toLowerCase().includes(dd.toLowerCase())
+            item.location_name.toLowerCase().includes(dd.toLowerCase())
         );
         setFilterData(filterOpt);
     }
 
-    const handleFire = () => {
+    const handleFire = async() => {
         toggleIsOpen()
+        try {
+           const responce = await axiosInstance.get(`locations/get/${faqsPermission}/`);
+           setLocationOptions(responce.data)
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     return (
@@ -50,19 +77,19 @@ const CustomDropdown = ({
                             <div
                                 className="text-start cursor-pointer hover:bg-blue-200 hover:text-blue-600"
                                 key={id}
-                                onClick={() => handleSelect(item.name)}
+                                onClick={() => handleSelect(item)}
                             >
-                                <p className='text-semibold my-1 text-sm text-gray-500'>{item.name}</p>
+                                <p className='text-semibold my-1 text-sm text-gray-500'>{item.location_name}</p>
                             </div>
                         ))
                     ) : (
-                        locationOptions?.map((item, id) => (
+                        locationOptions.map((item, id) => (
                             <div
                                 className="text-start cursor-pointer hover:bg-blue-200 hover:text-blue-600"
                                 key={id}
-                                onClick={() => handleSelect(item.name)}
+                                onClick={() => handleSelect(item)}
                             >
-                                <p className='text-semibold my-1 text-sm text-gray-500'>{item.name}</p>
+                                <p className='text-semibold my-1 text-sm text-gray-500'>{item.location_name}</p>
                             </div>
                         ))
                     )}
